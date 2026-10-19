@@ -21,6 +21,21 @@ class User extends Authenticatable
 
     public const ROLE_ADMIN = 'admin';
 
+    /**
+     * Mirror the column defaults so a freshly created model matches one loaded from the database.
+     *
+     * @var array<string, mixed>
+     */
+    protected $attributes = [
+        'role' => self::ROLE_USER,
+        'username' => null,
+        'avatar_url' => null,
+        'email_verified_at' => null,
+        'banned_at' => null,
+        'ban_reason' => null,
+        'last_login_at' => null,
+    ];
+
     protected function casts(): array
     {
         return [
@@ -28,6 +43,21 @@ class User extends Authenticatable
             'banned_at' => 'datetime',
             'last_login_at' => 'datetime',
         ];
+    }
+
+    /**
+     * There are no passwords (SSO only). Sanctum's session-invalidation check still needs a stable
+     * per-user secret, so derive one from the key instead of reading a column that does not exist.
+     */
+    public function getAuthPassword(): string
+    {
+        return hash_hmac('sha256', (string) $this->getKey(), (string) config('app.key'));
+    }
+
+    /** No "remember me" tokens: sessions are cookie-only. */
+    public function getRememberTokenName(): string
+    {
+        return '';
     }
 
     public function isAdmin(): bool

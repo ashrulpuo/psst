@@ -17,6 +17,8 @@ return new class extends Migration
             // Per-receiver counter shown to the receiver as "Anonymous #N".
             $table->unsignedInteger('anon_label');
             $table->timestampTz('last_message_at')->nullable();
+            // Pointer to the newest message, so the inbox needs no per-thread subquery (Postgres has no max(uuid)).
+            $table->uuid('last_message_id')->nullable();
             $table->unsignedInteger('receiver_unread_count')->default(0);
             $table->unsignedInteger('sender_unread_count')->default(0);
             $table->timestampTz('blocked_at')->nullable();

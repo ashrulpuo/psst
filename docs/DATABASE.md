@@ -31,6 +31,7 @@
 | sender_id | uuid fk users | real identity (admin-only visibility) |
 | anon_label | smallint | per-receiver counter → "Anonymous #N" |
 | last_message_at | timestamptz | inbox ordering |
+| last_message_id | uuid null | pointer to newest message (Postgres has no max(uuid)) |
 | receiver_unread_count / sender_unread_count | int | denormalized, updated in same tx |
 | blocked_at | timestamptz null | set when receiver blocks |
 | created_at | timestamptz | |

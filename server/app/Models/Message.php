@@ -16,6 +16,9 @@ class Message extends Model
 
     public const UPDATED_AT = null;
 
+    /** @var array<string, mixed> */
+    protected $attributes = ['read_at' => null];
+
     protected function casts(): array
     {
         return [
