@@ -19,7 +19,7 @@ psst/
 
 ## Milestones (each ends shippable + tested)
 0. **Foundations:** monorepo, docker compose (caddy, app, reverb, queue, scheduler, postgres, redis), CI, lint/static analysis, health endpoint.
-1. **Auth:** Google/Apple SSO (Socialite web flow), Sanctum SPA cookie auth for web + tokens for mobile, mobile sign-in spike.
+1. **Auth:** Google/Apple SSO via ID-token verification (no Socialite): `POST /api/auth/{provider}` (cookie session, Sanctum SPA) and `/api/auth/{provider}/token` (30-day bearer token for native); one-time username onboarding. Done.
 2. **Domain:** users/threads/messages/blocks/reports, policies, API Resources, feature tests incl. privacy leak tests.
 3. **Realtime:** Reverb private channels + authorization, optimistic UI.
 4. **Client web:** design tokens, component gallery, link page, inbox, chat, settings.
@@ -36,7 +36,7 @@ psst/
 - **Observability:** structured JSON logs, request IDs, Sentry (or GlitchTip self-hosted), Prometheus metrics/Uptime Kuma.
 
 ## Security checklist (built in, not bolted on)
-- SSO only; verify ID tokens server-side (iss/aud/exp/nonce); no passwords stored.
+- SSO only; ID tokens verified server-side (JWKS signature, iss, aud, exp, nonce, email_verified); generic 401 on any failure; 10 attempts/min per IP; no passwords stored.
 - Sanctum cookies: HttpOnly, Secure, SameSite=Lax; CSRF on stateful routes; short-lived tokens + rotation for mobile.
 - Authorization on every route via Policies; deny by default; UUIDs prevent IDOR enumeration; scoped queries (`where receiver_id = auth`).
 - Input: FormRequest validation, length caps, output escaped (Vue default), CSP + HSTS + X-Content-Type-Options + Referrer-Policy via Caddy; strict CORS allow-list.

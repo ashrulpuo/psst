@@ -25,7 +25,7 @@ Therefore senders must be identifiable -> **senders sign in with SSO too** (reco
 | Layer | Choice | Notes |
 |---|---|---|
 | Backend | Laravel 12 (PHP 8.3+) | API, policies, queues, scheduler |
-| Auth | Laravel Socialite (Google, Apple) + Sanctum | SSO only, no passwords. Flutter: native sign-in -> ID token -> backend verifies |
+| Auth | Sanctum + custom OIDC ID-token verifier (Google, Apple) | SSO only, no passwords. Every client obtains an ID token (web: Google Identity Services / Sign in with Apple JS; native: platform plugin) and POSTs it with a nonce; no server-side OAuth redirects |
 | Realtime | Laravel Reverb | Pusher protocol, Redis |
 | Database | PostgreSQL 16 | |
 | Cache/queue | Redis | |
