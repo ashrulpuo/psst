@@ -12,7 +12,7 @@ psst/
 
 ## Workflow
 - Trunk-based: short-lived branches → PR → CI green → squash merge to `main`. Conventional Commits.
-- CI (GitHub Actions) on every PR: Pint + PHPStan (level 8 / Larastan), Pest tests, `composer audit`, ESLint + vue-tsc + Vitest, `pnpm audit`, Docker build, Trivy image scan.
+- CI (GitHub Actions) on every PR: Pint + PHPStan (level 8 / Larastan), PHPUnit tests, `composer audit`, ESLint + vue-tsc + Vitest, `pnpm audit`, Docker build, Trivy image scan.
 - Migrations are forward-only, zero-downtime-safe (expand → migrate → contract).
 - Deploy: build images in CI → push to registry → `docker compose pull && up -d` on VPS; healthchecks + automatic rollback to previous tag.
 - Environments: local (docker compose), production. Secrets via env files outside git (SOPS/age or Docker secrets).
@@ -32,7 +32,7 @@ psst/
 - **SOLID, thin controllers.** Controller → FormRequest (validation) → Action class (one use-case, single `handle()`) → Eloquent/Repository only when it earns its keep. Policies for authorization. API Resources for output shape. No business logic in controllers or models' magic.
 - **DRY but not clever.** Prefer explicit over magic; small pure functions; strict types (`declare(strict_types=1)`), typed properties/returns, enums, readonly DTOs.
 - **Frontend:** Composition API + TypeScript strict, feature-folder structure, composables for logic, Pinia only for shared state, API layer generated from OpenAPI (Scramble) so types never drift.
-- **Testing pyramid:** Pest unit (Actions) + feature (HTTP, policies) + a few E2E (Playwright). Mandatory tests: authorization boundaries, "receiver never sees sender identity", block enforcement, rate limits.
+- **Testing pyramid:** PHPUnit unit (Actions) + feature (HTTP, policies) + a few E2E (Playwright). Mandatory tests: authorization boundaries, "receiver never sees sender identity", block enforcement, rate limits.
 - **Observability:** structured JSON logs, request IDs, Sentry (or GlitchTip self-hosted), Prometheus metrics/Uptime Kuma.
 
 ## Security checklist (built in, not bolted on)

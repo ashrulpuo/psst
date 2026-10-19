@@ -39,7 +39,7 @@ Constraints: **unique (receiver_id, sender_id)** (one thread per pair), CHECK (r
 Indexes: `(receiver_id, last_message_at desc)`, `(sender_id, last_message_at desc)`.
 
 ### messages
-`id uuid pk, thread_id fk, from_receiver bool, body text check(length ≤ 1000), read_at, created_at`
+`id uuid pk, thread_id fk, from_receiver bool, body text (ciphertext; 1000-char cap enforced in the app, since a CHECK can not see plaintext), read_at, created_at`
 Index: **(thread_id, id desc)** — keyset pagination, no OFFSET. `body` uses Laravel `encrypted` cast (app-level encryption at rest; admin reads via app).
 
 ### blocks
