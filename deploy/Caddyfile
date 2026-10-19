@@ -1,0 +1,31 @@
+{
+	email {$ACME_EMAIL}
+}
+
+{$APP_DOMAIN} {
+	root * /var/www/html/public
+	encode zstd gzip
+
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "DENY"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		Permissions-Policy "camera=(), microphone=(), geolocation=()"
+		-Server
+		-X-Powered-By
+	}
+
+	# Reverb WebSockets
+	@ws path /app/* /apps/*
+	reverse_proxy @ws reverb:8080
+
+	# Immutable build assets
+	@assets path /build/*
+	header @assets Cache-Control "public, max-age=31536000, immutable"
+
+	php_fastcgi app:9000 {
+		resolve_root_symlink
+	}
+	file_server
+}
