@@ -19,6 +19,7 @@ class DevLoginController extends Controller
     {
         $email = $request->validate(['email' => ['required', 'email']])['email'];
         $user = User::query()->where('email', $email)->firstOrFail();
+        $user->forceFill(['last_login_at' => now()])->save(); // like real sign-in, so "active users" is meaningful locally
 
         if ($request->hasSession()) {
             Auth::guard('web')->login($user);

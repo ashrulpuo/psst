@@ -3,18 +3,19 @@
 Anonymous messaging with two-way chat. Receivers get a public link; senders sign in (Google / Apple) and stay
 anonymous **to the receiver** — admins can identify senders (disclose this in the Terms and Privacy Policy).
 
-Client instructions: [`client/README.md`](client/README.md). Plan and design docs live in [`docs/`](docs/): `PLAN.md`, `DATABASE.md`, `DESIGN.md`, `DEVELOPMENT.md`.
+Client: [`client/README.md`](client/README.md). Admin: [`admin/README.md`](admin/README.md). Plan and design docs live in [`docs/`](docs/): `PLAN.md`, `DATABASE.md`, `DESIGN.md`, `DEVELOPMENT.md`.
 
 ## Status
 
 | Done | Not yet |
 |---|---|
 | **Server** (`server/`): schema, models, Google/Apple sign-in, username onboarding | FCM push for the native mobile apps |
-| Threads, messages, inbox, sent, read state, block/report, rate limits | Admin dashboard SPA and admin API |
+| Threads, messages, inbox, sent, read state, block/report, rate limits | Caddy config for the two SPAs has not been run (no Caddy here) |
 | **Web client** (`client/`): sign-in, username, public link page, inbox/sent split pane, settings, dark mode | Capacitor (mobile) and desktop builds |
 | **Realtime** (Reverb): live messages, read receipts, block state; polling only as fallback | Docker images (compose file written, never built) |
 | **Web Push** (VAPID): per-device opt-in, queued delivery, installable PWA | |
-| Browser tests: `pnpm e2e` (21), `pnpm e2e:realtime` (7), `pnpm e2e:push` (12) | |
+| **Admin dashboard** (`admin/`): users, conversations with real identities, report triage, bans, audit log; mandatory TOTP 2FA | |
+| Browser tests: client `pnpm e2e` (21), `e2e:realtime` (7), `e2e:push` (12); admin `pnpm e2e` (16) | |
 | | Real Google/Apple credentials (tests use a fake provider) |
 
 ## Run the API locally
@@ -38,6 +39,15 @@ php artisan queue:work                   # sends the broadcasts (separate termin
 
 Realtime needs `BROADCAST_CONNECTION=reverb` and the `REVERB_*` keys (`php artisan reverb:install` generates them), and
 the client needs the public key in `client/.env` as `QCLI_REVERB_KEY`. Without it the app still works by polling.
+### Admin access
+
+```sh
+php artisan psst:make-admin you@example.com   # the account must have signed in once
+php artisan psst:reset-2fa you@example.com    # support path if an admin loses their authenticator AND recovery codes
+```
+
+See [`admin/README.md`](admin/README.md) for the dashboard, the two-factor flow and what is audited.
+
 ### Push notifications
 
 ```sh
@@ -54,7 +64,7 @@ Restart `queue:work` after `migrate:fresh`: dropping the `jobs` table under a ru
 ### Tests
 
 ```sh
-cd server && php artisan test            # 104 tests, run against the psst_test database
+cd server && php artisan test            # 150 tests, run against the psst_test database
 ```
 
 ### Try it by hand

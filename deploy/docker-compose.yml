@@ -31,6 +31,9 @@ services:
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - ../server/public:/var/www/html/public:ro
+      # Built front-ends: `pnpm build:pwa` in client/ and `pnpm build` in admin/ before `docker compose up`.
+      - ../client/dist/pwa:/srv/client:ro
+      - ../admin/dist:/srv/admin/admin:ro
       - caddy_data:/data
       - caddy_config:/config
     depends_on: [app, reverb]
