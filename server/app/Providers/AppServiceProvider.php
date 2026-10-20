@@ -37,6 +37,9 @@ class AppServiceProvider extends ServiceProvider
             Limit::perMinute(20)->by($request->user()->id),
             Limit::perDay(300)->by($request->user()->id),
         ]);
+        // Second-factor attempts are the brute-force target: a 6-digit code must not be guessable.
+        RateLimiter::for('admin-2fa', fn (Request $request) => Limit::perMinute(5)->by($request->user()?->id ?? $request->ip()));
+        RateLimiter::for('admin', fn (Request $request) => Limit::perMinute(120)->by($request->user()?->id ?? $request->ip()));
         RateLimiter::for('reports', fn (Request $request) => Limit::perHour(30)->by($request->user()->id));
 
         // Participants only: strangers get a 404, so thread and message ids cannot be probed.

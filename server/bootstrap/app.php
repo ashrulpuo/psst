@@ -2,6 +2,8 @@
 
 use App\Auth\AccountBanned;
 use App\Auth\InvalidIdToken;
+use App\Http\Middleware\EnsureAdmin;
+use App\Http\Middleware\EnsureAdminTwoFactor;
 use App\Http\Middleware\EnsureNotBanned;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -20,7 +22,11 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withBroadcasting(__DIR__.'/../routes/channels.php', ['prefix' => 'api', 'middleware' => ['api', 'auth:sanctum']])
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->statefulApi();
-        $middleware->alias(['not-banned' => EnsureNotBanned::class]);
+        $middleware->alias([
+            'not-banned' => EnsureNotBanned::class,
+            'admin' => EnsureAdmin::class,
+            'admin.2fa' => EnsureAdminTwoFactor::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

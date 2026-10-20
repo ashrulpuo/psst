@@ -25,6 +25,12 @@ return new class extends Migration
             $table->timestampTz('banned_at')->nullable();
             $table->string('ban_reason')->nullable();
             $table->timestampTz('last_login_at')->nullable();
+            // Admin two-factor (TOTP). Secret and recovery-code hashes are encrypted at rest.
+            $table->text('two_factor_secret')->nullable();
+            $table->timestampTz('two_factor_confirmed_at')->nullable();
+            $table->text('two_factor_recovery_codes')->nullable();
+            // Last accepted 30-second step: a code can never be used twice.
+            $table->unsignedBigInteger('two_factor_last_step')->nullable();
             $table->timestampsTz();
         });
 

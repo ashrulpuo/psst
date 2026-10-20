@@ -25,6 +25,12 @@ class Report extends Model
         return $this->belongsTo(User::class, 'reporter_id');
     }
 
+    /** @return BelongsTo<User, $this> */
+    public function reviewer(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'reviewed_by');
+    }
+
     /** @return BelongsTo<Message, $this> */
     public function message(): BelongsTo
     {

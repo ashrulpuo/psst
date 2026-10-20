@@ -1,5 +1,11 @@
 <?php
 
+use App\Http\Controllers\Admin\AuditController;
+use App\Http\Controllers\Admin\OverviewController;
+use App\Http\Controllers\Admin\ReportController as AdminReportController;
+use App\Http\Controllers\Admin\ThreadController as AdminThreadController;
+use App\Http\Controllers\Admin\TwoFactorController;
+use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Auth\DevLoginController;
 use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Auth\SessionLoginController;
@@ -59,4 +65,34 @@ Route::middleware(['auth:sanctum', 'not-banned'])->group(function () {
     Route::post('messages/{message}/report', [ReportController::class, 'store'])
         ->whereUuid('message')
         ->middleware('throttle:reports');
+});
+
+// Admin API: cookie session + admin role (stage one), then a verified second factor (stage two).
+Route::prefix('admin')->middleware(['auth:sanctum', 'not-banned', 'admin'])->group(function () {
+    Route::get('2fa', [TwoFactorController::class, 'status']);
+    Route::middleware('throttle:admin-2fa')->group(function () {
+        Route::post('2fa/enroll', [TwoFactorController::class, 'enroll']);
+        Route::post('2fa/confirm', [TwoFactorController::class, 'confirm']);
+        Route::post('2fa/verify', [TwoFactorController::class, 'verify']);
+    });
+
+    Route::middleware(['admin.2fa', 'throttle:admin'])->group(function () {
+        Route::get('overview', OverviewController::class);
+
+        Route::get('users', [AdminUserController::class, 'index']);
+        Route::get('users/{user}', [AdminUserController::class, 'show'])->whereUuid('user');
+        Route::put('users/{user}/ban', [AdminUserController::class, 'ban'])->whereUuid('user');
+        Route::delete('users/{user}/ban', [AdminUserController::class, 'unban'])->whereUuid('user');
+
+        Route::get('threads', [AdminThreadController::class, 'index']);
+        // `adminThread`, not `thread`: the global `thread` binding is limited to the caller's own conversations.
+        Route::get('threads/{adminThread}', [AdminThreadController::class, 'show'])->whereUuid('adminThread');
+        Route::get('threads/{adminThread}/messages', [AdminThreadController::class, 'messages'])->whereUuid('adminThread');
+
+        Route::get('reports', [AdminReportController::class, 'index']);
+        Route::get('reports/{report}', [AdminReportController::class, 'show'])->whereUuid('report');
+        Route::post('reports/{report}/resolve', [AdminReportController::class, 'resolve'])->whereUuid('report');
+
+        Route::get('audit', [AuditController::class, 'index']);
+    });
 });

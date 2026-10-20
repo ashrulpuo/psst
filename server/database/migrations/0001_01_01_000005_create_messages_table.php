@@ -19,6 +19,8 @@ return new class extends Migration
 
             // Keyset pagination for chat history: WHERE thread_id = ? AND id < ? ORDER BY id DESC.
             $table->index(['thread_id', 'id']);
+            // Admin statistics group messages by day.
+            $table->index('created_at');
         });
     }
 

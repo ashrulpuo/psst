@@ -35,6 +35,10 @@ class User extends Authenticatable
         'banned_at' => null,
         'ban_reason' => null,
         'last_login_at' => null,
+        'two_factor_secret' => null,
+        'two_factor_confirmed_at' => null,
+        'two_factor_recovery_codes' => null,
+        'two_factor_last_step' => null,
     ];
 
     protected function casts(): array
@@ -42,6 +46,9 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'push_previews' => 'boolean',
+            'two_factor_secret' => 'encrypted',
+            'two_factor_confirmed_at' => 'datetime',
+            'two_factor_recovery_codes' => 'encrypted:array',
             'banned_at' => 'datetime',
             'last_login_at' => 'datetime',
         ];
@@ -65,6 +72,11 @@ class User extends Authenticatable
     public function isAdmin(): bool
     {
         return $this->role === self::ROLE_ADMIN;
+    }
+
+    public function hasTwoFactor(): bool
+    {
+        return $this->two_factor_confirmed_at !== null;
     }
 
     public function isBanned(): bool
