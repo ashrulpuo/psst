@@ -1,0 +1,199 @@
+/*
+ * Psst design tokens. Rules (see docs/DESIGN.md):
+ *  - 60-30-10: canvas (L0) / raised surfaces (L1) / one accent.
+ *  - Elevation is a 1px border first, a barely-there shadow second.
+ *  - 4/8pt spacing, 3 font weights (400/500/600), body 16px, secondary 14px, meta 12px.
+ *  - Animate transform/opacity only.
+ */
+
+:root {
+  --font-sans:
+    "Inter Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI",
+    Roboto, sans-serif;
+
+  --canvas: #f6f6f9;
+  --surface: #ffffff;
+  --surface-hover: #f1f1f6;
+  --text: #17171c;
+  --text-2: #4f4f5e;
+  --text-3: #6a6a7a;
+  --border: rgba(23, 23, 28, 0.09);
+  --border-strong: rgba(23, 23, 28, 0.18);
+  --shadow-soft: 0 1px 3px rgba(23, 23, 28, 0.06);
+
+  --accent: #5b4bf0; // fills (buttons, own bubbles)
+  --accent-hover: #4a3bd9;
+  --on-accent: #ffffff;
+  --accent-text: #4a3bd9; // links, active nav
+  --accent-soft: rgba(91, 75, 240, 0.1);
+  --danger: #c62828;
+
+  --bubble-theirs: #eceef3;
+
+  --s-1: 0.25rem;
+  --s-2: 0.5rem;
+  --s-3: 0.75rem;
+  --s-4: 1rem;
+  --s-5: 1.5rem;
+  --s-6: 2rem;
+  --s-7: 3rem;
+
+  --r-control: 12px;
+  --r-card: 20px;
+
+  --text-meta: 0.75rem;
+  --text-secondary: 0.875rem;
+  --text-body: 1rem;
+  --text-h3: 1.25rem;
+  --text-h2: 1.5rem;
+  --text-h1: 2rem;
+
+  --vp-narrow: 375px;
+  --vp-medium: 768px;
+  --vp-wide: 1280px;
+
+  --ease: cubic-bezier(0.2, 0, 0, 1);
+  --dur: 160ms;
+
+  --nav-height: 64px;
+  --rail-width: 88px;
+}
+
+.body--dark {
+  --canvas: #0e0e12;
+  --surface: #16161c;
+  --surface-hover: #1e1e26;
+  --text: #ececf2;
+  --text-2: #b3b3c3;
+  --text-3: #9494a8;
+  --border: rgba(255, 255, 255, 0.09);
+  --border-strong: rgba(255, 255, 255, 0.2);
+  --shadow-soft: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+
+  --accent: #6355e8;
+  --accent-hover: #7569f0;
+  --accent-text: #a79dff;
+  --accent-soft: rgba(167, 157, 255, 0.14);
+  --danger: #ff7b7b;
+
+  --bubble-theirs: #23232d;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur: 0ms;
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  background: var(--canvas);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: var(--text-body);
+  font-weight: 400;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1,
+h2,
+h3 {
+  margin: 0;
+  font-weight: 600;
+  line-height: 1.2;
+}
+h1 {
+  font-size: var(--text-h1);
+  letter-spacing: -0.01em;
+}
+h2 {
+  font-size: var(--text-h2);
+}
+h3 {
+  font-size: var(--text-h3);
+}
+p {
+  margin: 0;
+}
+
+.text-secondary-copy {
+  font-size: var(--text-secondary);
+  color: var(--text-2);
+}
+.text-meta {
+  font-size: var(--text-meta);
+  line-height: 1.4;
+  color: var(--text-3);
+}
+
+a {
+  color: var(--accent-text);
+}
+
+// Visible keyboard focus everywhere, never on mouse clicks.
+:focus-visible {
+  outline: 2px solid var(--accent-text);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+// Raised surface (L1): 1px border first, hairline shadow second.
+.surface {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-card);
+  box-shadow: var(--shadow-soft);
+}
+
+// Main page content is capped; the app shell never is.
+.page {
+  width: 100%;
+  max-width: var(--vp-wide);
+  margin-inline: auto;
+  padding: var(--s-5) var(--s-4);
+}
+
+// 44px hit target for icon-only controls.
+.hit {
+  min-width: 44px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.q-btn {
+  font-weight: 500;
+  min-height: 44px;
+  border-radius: var(--r-control);
+  transition:
+    transform var(--dur) var(--ease),
+    background-color var(--dur) var(--ease);
+}
+.q-btn:active {
+  transform: scale(0.98);
+}
+
+// Quasar's body must not scroll the page horizontally.
+.q-layout,
+.q-page-container {
+  overflow-x: clip;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}

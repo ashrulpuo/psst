@@ -3,17 +3,17 @@
 Anonymous messaging with two-way chat. Receivers get a public link; senders sign in (Google / Apple) and stay
 anonymous **to the receiver** — admins can identify senders (disclose this in the Terms and Privacy Policy).
 
-Plan and design docs live in [`docs/`](docs/): `PLAN.md`, `DATABASE.md`, `DESIGN.md`, `DEVELOPMENT.md`.
+Client instructions: [`client/README.md`](client/README.md). Plan and design docs live in [`docs/`](docs/): `PLAN.md`, `DATABASE.md`, `DESIGN.md`, `DEVELOPMENT.md`.
 
 ## Status
 
-| Done (backend, in `server/`) | Not yet |
+| Done | Not yet |
 |---|---|
-| Schema + migrations, models | Realtime (Reverb) and push notifications |
-| Google / Apple sign-in (ID-token verification) | Quasar web/mobile/desktop client |
-| Username onboarding | Admin dashboard SPA and admin API |
-| Threads, messages, inbox, sent, read state | Docker images (compose file written, never built) |
-| Block / unblock, report, rate limits, spam cap | Real Google/Apple credentials (tests use a fake provider) |
+| **Server** (`server/`): schema, models, Google/Apple sign-in, username onboarding | Realtime (Reverb) and push notifications |
+| Threads, messages, inbox, sent, read state, block/report, rate limits | Admin dashboard SPA and admin API |
+| **Web client** (`client/`): sign-in, username, public link page, inbox/sent split pane, settings, dark mode | Capacitor (mobile) and desktop builds |
+| Browser smoke test (`pnpm e2e`, 21 checks incl. 375px/1280px overflow) | Docker images (compose file written, never built) |
+| | Real Google/Apple credentials (tests use a fake provider) |
 
 ## Run the API locally
 
