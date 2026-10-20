@@ -19,6 +19,8 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->text('avatar_url')->nullable();
             $table->string('role', 16)->default('user');
+            // Lock screens are public: message text in push notifications is opt-in.
+            $table->boolean('push_previews')->default(false);
             $table->timestampTz('email_verified_at')->nullable();
             $table->timestampTz('banned_at')->nullable();
             $table->string('ban_reason')->nullable();

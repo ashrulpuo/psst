@@ -16,7 +16,8 @@ return new class extends Migration
             $table->text('token');
             // sha256 of the token: web-push endpoints/FCM tokens are too long for a safe unique btree key.
             $table->char('token_hash', 64);
-            $table->jsonb('keys')->nullable();
+            // Encrypted at rest (Eloquent `encrypted:array`), so ciphertext text rather than jsonb.
+            $table->text('keys')->nullable();
             $table->string('user_agent')->nullable();
             $table->timestampTz('last_seen_at')->nullable();
             $table->timestampsTz();

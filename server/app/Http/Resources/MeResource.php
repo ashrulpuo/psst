@@ -27,6 +27,7 @@ class MeResource extends JsonResource
             'avatar_url' => $this->avatar_url,
             'role' => $this->role,
             'needs_username' => $this->username === null,
+            'push_previews' => $this->push_previews,
         ];
     }
 

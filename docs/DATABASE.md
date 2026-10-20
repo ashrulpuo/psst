@@ -50,7 +50,7 @@ Index: **(thread_id, id desc)** — keyset pagination, no OFFSET. `body` uses La
 `id, reporter_id, message_id, reason text, status check in (open, reviewed, dismissed), reviewed_by, created_at`. Index `(status, created_at)`.
 
 ### push_subscriptions
-`id, user_id, channel check in (webpush, fcm), token/endpoint, keys jsonb, user_agent, last_seen_at` — unique (channel, token). Pruned on 404/410 from push service.
+`id, user_id, channel check in (webpush, fcm), token/endpoint (encrypted), keys (encrypted text), user_agent, last_seen_at` — unique (channel, token). Pruned on 404/410 from push service.
 
 ### audit_logs (append-only)
 `id, actor_id, action, subject_type, subject_id, meta jsonb, ip inet, created_at`. Written whenever an admin views sender identity, bans, resolves reports. Revoke UPDATE/DELETE from the app DB role.

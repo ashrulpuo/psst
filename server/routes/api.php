@@ -6,6 +6,7 @@ use App\Http\Controllers\Auth\SessionLoginController;
 use App\Http\Controllers\Auth\TokenLoginController;
 use App\Http\Controllers\MeController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\PushController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\Threads\ThreadListController;
 use App\Http\Controllers\Threads\ThreadMessageController;
@@ -17,6 +18,9 @@ Route::prefix('auth')->middleware('throttle:auth')->group(function () {
     Route::post('{provider}', SessionLoginController::class)->whereIn('provider', ['google', 'apple']);
     Route::post('{provider}/token', TokenLoginController::class)->whereIn('provider', ['google', 'apple']);
 });
+
+// Public: the browser needs the VAPID public key before it can subscribe.
+Route::get('push/config', [PushController::class, 'config'])->middleware('throttle:profile');
 
 // Public: the link page needs this before sign-in.
 Route::get('profiles/{username}', [ProfileController::class, 'show'])
@@ -32,6 +36,10 @@ Route::middleware(['auth:sanctum', 'not-banned'])->group(function () {
 
     Route::get('me', [MeController::class, 'show']);
     Route::patch('me/username', [MeController::class, 'setUsername']);
+    Route::patch('me/preferences', [MeController::class, 'updatePreferences']);
+
+    Route::post('push/subscriptions', [PushController::class, 'store'])->middleware('throttle:reports');
+    Route::delete('push/subscriptions', [PushController::class, 'destroy']);
 
     Route::post('profiles/{username}/messages', [ProfileController::class, 'send'])
         ->where('username', '[a-z0-9_.]{3,24}')

@@ -52,4 +52,13 @@ return [
         ],
     ],
 
+    /*
+    | Web Push (VAPID). Generate a pair with `php artisan psst:vapid`. Push is disabled while the public key is empty.
+    */
+    'vapid' => [
+        'public_key' => env('VAPID_PUBLIC_KEY'),
+        'private_key' => env('VAPID_PRIVATE_KEY'),
+        'subject' => env('VAPID_SUBJECT', 'mailto:admin@example.com'),
+    ],
+
 ];

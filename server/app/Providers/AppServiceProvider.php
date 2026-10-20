@@ -4,6 +4,8 @@ namespace App\Providers;
 
 use App\Models\Message;
 use App\Models\Thread;
+use App\Push\MinishlinkWebPushSender;
+use App\Push\WebPushSender;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
@@ -18,7 +20,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->bind(WebPushSender::class, MinishlinkWebPushSender::class);
     }
 
     /**

@@ -6,12 +6,16 @@ use App\Messaging\CannotMessage;
 use App\Models\Message;
 use App\Models\Thread;
 use App\Models\User;
+use App\Push\PushNotifier;
 use App\Realtime\Broadcasts;
 use Illuminate\Support\Facades\DB;
 
 class PostMessage
 {
-    public function __construct(private readonly Broadcasts $broadcasts) {}
+    public function __construct(
+        private readonly Broadcasts $broadcasts,
+        private readonly PushNotifier $push,
+    ) {}
 
     /**
      * Append a message from a participant and update the thread's counters in the same transaction.
@@ -47,6 +51,7 @@ class PostMessage
 
             // Queued and sent only after this transaction commits (events set $afterCommit).
             $this->broadcasts->messagePosted($thread, $message);
+            $this->push->messagePosted($thread, $message);
 
             return $message;
         });

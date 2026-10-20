@@ -28,6 +28,7 @@ class User extends Authenticatable
      */
     protected $attributes = [
         'role' => self::ROLE_USER,
+        'push_previews' => false,
         'username' => null,
         'avatar_url' => null,
         'email_verified_at' => null,
@@ -40,6 +41,7 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
+            'push_previews' => 'boolean',
             'banned_at' => 'datetime',
             'last_login_at' => 'datetime',
         ];
