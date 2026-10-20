@@ -9,10 +9,11 @@ Client instructions: [`client/README.md`](client/README.md). Plan and design doc
 
 | Done | Not yet |
 |---|---|
-| **Server** (`server/`): schema, models, Google/Apple sign-in, username onboarding | Realtime (Reverb) and push notifications |
+| **Server** (`server/`): schema, models, Google/Apple sign-in, username onboarding | Push notifications (Web Push / FCM) |
 | Threads, messages, inbox, sent, read state, block/report, rate limits | Admin dashboard SPA and admin API |
 | **Web client** (`client/`): sign-in, username, public link page, inbox/sent split pane, settings, dark mode | Capacitor (mobile) and desktop builds |
-| Browser smoke test (`pnpm e2e`, 21 checks incl. 375px/1280px overflow) | Docker images (compose file written, never built) |
+| **Realtime** (Reverb): live messages, read receipts, block state; polling only as fallback | Docker images (compose file written, never built) |
+| Browser tests: `pnpm e2e` (21 checks incl. 375px/1280px overflow), `pnpm e2e:realtime` (7 checks) | |
 | | Real Google/Apple credentials (tests use a fake provider) |
 
 ## Run the API locally
@@ -29,8 +30,14 @@ composer install
 cp .env.example .env && php artisan key:generate
 echo 'PSST_DEV_LOGIN=true' >> .env      # local-only sign-in shortcut, ignored in production
 php artisan migrate:fresh --seed         # demo users: alice, bob, carol, admin
-php artisan serve                        # http://127.0.0.1:8000
+php artisan serve                        # API on http://127.0.0.1:8000
+php artisan reverb:start                 # WebSocket server on :8080 (separate terminal)
+php artisan queue:work                   # sends the broadcasts (separate terminal)
 ```
+
+Realtime needs `BROADCAST_CONNECTION=reverb` and the `REVERB_*` keys (`php artisan reverb:install` generates them), and
+the client needs the public key in `client/.env` as `QCLI_REVERB_KEY`. Without it the app still works by polling.
+Restart `queue:work` after `migrate:fresh`: dropping the `jobs` table under a running worker makes it exit.
 
 ### Tests
 

@@ -54,3 +54,23 @@ export interface CursorPage<T> {
 }
 
 export type Provider = "google" | "apple";
+
+/** Realtime payloads pushed on the private `users.{id}` channel (see server/app/Realtime/Broadcasts.php). */
+export interface MessagePostedPayload {
+  box: "inbox" | "sent";
+  thread: Omit<InboxThread, "last_message"> | Omit<SentThread, "last_message">;
+  message: Message;
+}
+
+export interface BlockChangedPayload {
+  thread_id: string;
+  /** Sent to the receiver. */
+  blocked?: boolean;
+  /** Sent to the sender. */
+  can_reply?: boolean;
+}
+
+export interface MessagesReadPayload {
+  thread_id: string;
+  read_at: string;
+}

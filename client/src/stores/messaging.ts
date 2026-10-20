@@ -1,7 +1,14 @@
 import { defineStore } from "pinia";
 import { computed, reactive, ref } from "vue";
 import { threadApi } from "@/api/endpoints";
-import type { InboxThread, Message, SentThread } from "@/api/types";
+import type {
+  BlockChangedPayload,
+  InboxThread,
+  Message,
+  MessagePostedPayload,
+  MessagesReadPayload,
+  SentThread
+} from "@/api/types";
 
 type Thread = InboxThread | SentThread;
 
@@ -45,6 +52,8 @@ export const useMessagingStore = defineStore("messaging", () => {
   const olderCursor = reactive<Record<string, string | null>>({});
   const threadLoading = ref<string | null>(null);
   const threadError = ref<string | null>(null);
+  /** The conversation currently on screen: incoming messages there are read immediately. */
+  const activeThreadId = ref<string | null>(null);
 
   const inboxUnread = computed(() =>
     inbox.items.reduce((sum, t) => sum + t.unread_count, 0)
@@ -221,6 +230,63 @@ export const useMessagingStore = defineStore("messaging", () => {
     await threadApi.report(messageId, reason);
   }
 
+  // ---- realtime (pushed over the user's private channel) ----
+
+  function setActive(threadId: string | null) {
+    activeThreadId.value = threadId;
+  }
+
+  function applyMessagePosted({ box, thread, message }: MessagePostedPayload) {
+    const list = (box === "inbox" ? inbox : sent) as ListState<Thread>;
+    const watching = activeThreadId.value === thread.id && !message.mine;
+    const unread = watching ? 0 : thread.unread_count;
+    const existing = list.items.find(t => t.id === thread.id);
+
+    if (existing) {
+      Object.assign(existing, thread, {
+        unread_count: unread,
+        last_message: message
+      });
+    } else if (list.loaded) {
+      list.items.push({
+        ...thread,
+        unread_count: unread,
+        last_message: message
+      } as Thread);
+    }
+    list.items.sort(byRecency);
+
+    // Only touch conversations we already hold; unopened ones load fresh when opened.
+    if (thread.id in messages) {
+      messages[thread.id] = mergeMessages(messages[thread.id] ?? [], [message]);
+    }
+    // The reader is looking right at it: tell the server it was read.
+    if (watching) void threadApi.markRead(thread.id).catch(() => undefined);
+  }
+
+  function applyBlockChanged(payload: BlockChangedPayload) {
+    const asReceiver = inbox.items.find(t => t.id === payload.thread_id);
+    if (asReceiver && payload.blocked !== undefined)
+      asReceiver.blocked = payload.blocked;
+    const asSender = sent.items.find(t => t.id === payload.thread_id);
+    if (asSender && payload.can_reply !== undefined)
+      asSender.can_reply = payload.can_reply;
+  }
+
+  function applyMessagesRead({ thread_id, read_at }: MessagesReadPayload) {
+    const list = messages[thread_id];
+    if (!list) return;
+    messages[thread_id] = list.map(m =>
+      m.mine && !m.read_at && !m.pending ? { ...m, read_at } : m
+    );
+  }
+
+  /** After a dropped connection: re-fetch everything on screen, since pushed events were missed. */
+  async function resync() {
+    await Promise.all([loadInbox(), loadSent()]);
+    if (activeThreadId.value) await refreshThread(activeThreadId.value);
+  }
+
   /** Drop everything cached for the previous user. */
   function reset() {
     Object.assign(inbox, emptyList());
@@ -228,6 +294,7 @@ export const useMessagingStore = defineStore("messaging", () => {
     for (const key of Object.keys(messages)) delete messages[key];
     for (const key of Object.keys(olderCursor)) delete olderCursor[key];
     threadError.value = null;
+    activeThreadId.value = null;
   }
 
   return {
@@ -248,6 +315,11 @@ export const useMessagingStore = defineStore("messaging", () => {
     send,
     discard,
     markRead,
+    setActive,
+    applyMessagePosted,
+    applyBlockChanged,
+    applyMessagesRead,
+    resync,
     setBlocked,
     report,
     reset

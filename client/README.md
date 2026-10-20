@@ -28,18 +28,18 @@ Variables must start with `QCLI_` (Quasar v3 convention) and are public: never p
 ### Try the whole flow
 
 1. Sign in as **Alice** in one browser window → `/inbox`.
-2. In a private window open `http://localhost:9000/alice`, write a message, choose *Sign in to send* → **Bob**.
+2. In a private window open `http://localhost:9000/alice`, write a message, choose _Sign in to send_ → **Bob**.
    (The draft survives the sign-in.)
 3. Back in Alice's window the message appears as **Anonymous #1**; reply, block, report from there.
 
 ## Scripts
 
-| Command | |
-|---|---|
-| `pnpm dev` | Dev server with HMR |
-| `pnpm build` | Production SPA in `dist/spa` |
-| `pnpm typecheck` | `vue-tsc` (strict, `exactOptionalPropertyTypes`) |
-| `pnpm lint` / `pnpm lint:check` | oxfmt + oxlint |
+| Command                         |                                                  |
+| ------------------------------- | ------------------------------------------------ |
+| `pnpm dev`                      | Dev server with HMR                              |
+| `pnpm build`                    | Production SPA in `dist/spa`                     |
+| `pnpm typecheck`                | `vue-tsc` (strict, `exactOptionalPropertyTypes`) |
+| `pnpm lint` / `pnpm lint:check` | oxfmt + oxlint                                   |
 
 ## Structure
 
@@ -57,14 +57,15 @@ src/
 
 ## Design rules (see `../docs/DESIGN.md`)
 
-Each screen is one named pattern: *Form (auth)*, *Form* (public link), *Split Pane* (inbox/sent), *Settings*.
+Each screen is one named pattern: _Form (auth)_, _Form_ (public link), _Split Pane_ (inbox/sent), _Settings_.
 Single violet accent, 1px borders before shadows, 3 font weights, 44px hit targets, no page-level horizontal
 overflow at 375px or 1280px, real dark mode, `prefers-reduced-motion` honoured.
 
 ## Known gaps
 
-- Live updates use polling (6s in an open conversation, 15s for lists, paused while the tab is hidden) until
-  Reverb lands.
+- Live updates arrive over Reverb WebSockets. If the socket is down (or `QCLI_REVERB_KEY` is empty) the app polls
+  instead: 6s in an open conversation, 15s for lists, paused while the tab is hidden. While connected, polling
+  slows to 30s/60s as a safety net, and a reconnect re-fetches whatever was missed.
 - Web push, the Capacitor/desktop builds, i18n beyond English, and the marketing landing page are not built.
 - Quasar's full stylesheet ships (~37 KB gzipped); trimming it is a later optimisation.
 - Real Google/Apple buttons render only when client IDs are configured and have not been exercised against the

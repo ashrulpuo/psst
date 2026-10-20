@@ -1,18 +1,36 @@
 import { onBeforeUnmount, onMounted } from "vue";
 
 /**
- * Run `fn` every `ms` while the tab is visible, and once immediately when it becomes visible again.
- * Interim stand-in for WebSockets until Reverb is wired up.
+ * Run `fn` repeatedly while the tab is visible, and once immediately when it becomes visible again.
+ * `ms` may be a function so the cadence can change at runtime (slow down while realtime is connected).
+ * Acts as the fallback and safety net next to WebSockets.
  */
-export function usePolling(fn: () => void | Promise<void>, ms: number) {
-  let timer: ReturnType<typeof setInterval> | undefined;
+export function usePolling(
+  fn: () => void | Promise<void>,
+  ms: number | (() => number)
+) {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  let running = false;
 
+  const delay = () => (typeof ms === "function" ? ms() : ms);
+
+  const schedule = () => {
+    timer = setTimeout(async () => {
+      try {
+        await fn();
+      } finally {
+        if (running) schedule();
+      }
+    }, delay());
+  };
   const start = () => {
     stop();
-    timer = setInterval(() => void fn(), ms);
+    running = true;
+    schedule();
   };
   const stop = () => {
-    if (timer) clearInterval(timer);
+    running = false;
+    if (timer) clearTimeout(timer);
     timer = undefined;
   };
   const onVisibility = () => {

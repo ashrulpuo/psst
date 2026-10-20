@@ -12,6 +12,8 @@ export const config = {
     (import.meta.env.QCLI_APPLE_CLIENT_ID as string | undefined) ?? "",
   appleRedirectUri:
     (import.meta.env.QCLI_APPLE_REDIRECT_URI as string | undefined) ?? "",
+  /** Public Reverb app key (not the secret). Empty disables realtime and the app falls back to polling. */
+  reverbKey: (import.meta.env.QCLI_REVERB_KEY as string | undefined) ?? "",
   /** Local-only shortcut: shows demo-account sign-in. The API refuses it in production regardless. */
   // Quasar parses "true"/"false" in .env files into booleans, so compare the string form.
   devLogin: String(import.meta.env.QCLI_DEV_LOGIN) === "true"

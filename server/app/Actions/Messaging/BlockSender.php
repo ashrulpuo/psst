@@ -4,10 +4,13 @@ namespace App\Actions\Messaging;
 
 use App\Models\Block;
 use App\Models\Thread;
+use App\Realtime\Broadcasts;
 use Illuminate\Support\Facades\DB;
 
 class BlockSender
 {
+    public function __construct(private readonly Broadcasts $broadcasts) {}
+
     public function block(Thread $thread): void
     {
         DB::transaction(function () use ($thread) {
@@ -18,6 +21,8 @@ class BlockSender
             ]);
 
             $thread->newQuery()->whereKey($thread->id)->whereNull('blocked_at')->update(['blocked_at' => now()]);
+
+            $this->broadcasts->blockChanged($thread, true);
         });
     }
 
@@ -30,6 +35,8 @@ class BlockSender
                 ->delete();
 
             $thread->newQuery()->whereKey($thread->id)->update(['blocked_at' => null]);
+
+            $this->broadcasts->blockChanged($thread, false);
         });
     }
 }

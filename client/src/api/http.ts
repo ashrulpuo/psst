@@ -30,7 +30,7 @@ export function setUnauthorizedHandler(handler: () => void) {
   onUnauthorized = handler;
 }
 
-function xsrfToken(): string | undefined {
+export function xsrfToken(): string | undefined {
   const match = document.cookie.match(/(?:^|;\s*)XSRF-TOKEN=([^;]+)/);
   return match?.[1] ? decodeURIComponent(match[1]) : undefined;
 }

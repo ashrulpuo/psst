@@ -23,7 +23,10 @@ defineEmits<{
         <template v-else-if="message.pending">{{
           $t("thread.sending")
         }}</template>
-        <template v-else>{{ clockTime(message.created_at) }}</template>
+        <template v-else>
+          {{ clockTime(message.created_at)
+          }}<template v-if="message.mine && message.read_at"> · Read</template>
+        </template>
       </span>
     </div>
 

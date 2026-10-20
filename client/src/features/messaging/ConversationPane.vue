@@ -1,5 +1,12 @@
 <script setup lang="ts">
-import { computed, nextTick, ref, useTemplateRef, watch } from "vue";
+import {
+  computed,
+  nextTick,
+  onBeforeUnmount,
+  ref,
+  useTemplateRef,
+  watch
+} from "vue";
 import { useRouter } from "vue-router";
 import { useQuasar } from "quasar";
 import {
@@ -10,6 +17,7 @@ import {
 } from "@lucide/vue";
 import type { Message } from "@/api/types";
 import { useMessagingStore } from "@/stores/messaging";
+import { useRealtimeStore } from "@/stores/realtime";
 import { usePolling } from "@/composables/usePolling";
 import { dayLabel } from "@/utils/format";
 import AppAvatar from "@/components/AppAvatar.vue";
@@ -23,6 +31,7 @@ const props = defineProps<{ threadId: string; box: "inbox" | "sent" }>();
 const $q = useQuasar();
 const router = useRouter();
 const store = useMessagingStore();
+const realtime = useRealtimeStore();
 
 const scroller = useTemplateRef<HTMLElement>("scroller");
 const composer =
@@ -97,10 +106,21 @@ watch(
   }
 );
 
-usePolling(async () => {
-  await store.refreshThread(props.threadId);
-  void store.markRead(props.threadId);
-}, 6000);
+// Tell the store which conversation is on screen so pushed messages are marked read straight away.
+watch(
+  () => props.threadId,
+  id => store.setActive(id),
+  { immediate: true }
+);
+onBeforeUnmount(() => store.setActive(null));
+
+usePolling(
+  async () => {
+    await store.refreshThread(props.threadId);
+    void store.markRead(props.threadId);
+  },
+  () => (realtime.connected ? 30000 : 6000)
+);
 
 const sending = ref(false);
 async function send(body: string) {

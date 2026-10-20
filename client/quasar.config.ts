@@ -79,7 +79,9 @@ export default defineConfig(ctx => {
       // Same origin in dev as in production (Caddy proxies /api), so cookie auth needs no CORS.
       proxy: {
         "/api": "http://127.0.0.1:8000",
-        "/sanctum": "http://127.0.0.1:8000"
+        "/sanctum": "http://127.0.0.1:8000",
+        // Reverb WebSocket. Anchored so usernames such as /apple are never mistaken for it.
+        "^/app/.*": { target: "http://127.0.0.1:8080", ws: true }
       }
     },
 

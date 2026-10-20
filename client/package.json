@@ -21,13 +21,16 @@
     "build": "quasar build",
     "typecheck": "vue-tsc --noEmit",
     "postinstall": "quasar prepare --silent",
-    "e2e": "node e2e/smoke.mjs"
+    "e2e": "node e2e/smoke.mjs",
+    "e2e:realtime": "node e2e/realtime.mjs"
   },
   "dependencies": {
     "@fontsource-variable/inter": "^5.3.0",
     "@lucide/vue": "^1.59.0",
     "@quasar/extras": "^2.1.0",
+    "laravel-echo": "^2.6.1",
     "pinia": "^4.0.2",
+    "pusher-js": "^8.6.0",
     "quasar": "^2.35.2",
     "vue": "^3.5.22",
     "vue-i18n": "^11.3.0",

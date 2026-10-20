@@ -4,20 +4,26 @@ import { onMounted } from "vue";
 import { Inbox, MessageCircle, Send, Settings } from "@lucide/vue";
 import { useAuthStore } from "@/stores/auth";
 import { useMessagingStore } from "@/stores/messaging";
+import { useRealtimeStore } from "@/stores/realtime";
 import { usePolling } from "@/composables/usePolling";
 import AppAvatar from "@/components/AppAvatar.vue";
 
 const auth = useAuthStore();
 const messaging = useMessagingStore();
+const realtime = useRealtimeStore();
 
 onMounted(() => {
   void messaging.loadInbox();
   void messaging.loadSent();
 });
-usePolling(() => {
-  void messaging.loadInbox();
-  void messaging.loadSent();
-}, 15000);
+// WebSockets push changes; polling is only a safety net while connected and the main path otherwise.
+usePolling(
+  () => {
+    void messaging.loadInbox();
+    void messaging.loadSent();
+  },
+  () => (realtime.connected ? 60000 : 15000)
+);
 
 const items = [
   {

@@ -6,10 +6,13 @@ use App\Messaging\CannotMessage;
 use App\Models\Message;
 use App\Models\Thread;
 use App\Models\User;
+use App\Realtime\Broadcasts;
 use Illuminate\Support\Facades\DB;
 
 class PostMessage
 {
+    public function __construct(private readonly Broadcasts $broadcasts) {}
+
     /**
      * Append a message from a participant and update the thread's counters in the same transaction.
      *
@@ -41,6 +44,9 @@ class PostMessage
                 'last_message_at' => $message->created_at,
                 'last_message_id' => $message->id,
             ]);
+
+            // Queued and sent only after this transaction commits (events set $afterCommit).
+            $this->broadcasts->messagePosted($thread, $message);
 
             return $message;
         });

@@ -2,10 +2,23 @@ import { defineBoot } from "#q-app";
 import { setUnauthorizedHandler } from "@/api/http";
 import { useAuthStore } from "@/stores/auth";
 import { useMessagingStore } from "@/stores/messaging";
+import { useRealtimeStore } from "@/stores/realtime";
+import { watch } from "vue";
 
 export default defineBoot(({ router, store }) => {
   const auth = useAuthStore(store);
   const messaging = useMessagingStore(store);
+  const realtime = useRealtimeStore(store);
+
+  // One socket per signed-in user; closed on sign-out so nothing leaks to the next account.
+  watch(
+    () => auth.user?.id,
+    id => {
+      if (id) void realtime.start(id);
+      else realtime.stop();
+    },
+    { immediate: true }
+  );
 
   // A 401 on an authenticated request means the session ended: forget it and go sign in.
   setUnauthorizedHandler(() => {
