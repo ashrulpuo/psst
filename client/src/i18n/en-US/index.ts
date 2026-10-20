@@ -98,9 +98,33 @@ export default {
     themeAuto: "Match device",
     themeLight: "Light",
     themeDark: "Dark",
+    notifications: "Notifications",
+    notificationsBody:
+      "Get a heads-up when someone writes to you or replies, even when Psst is closed.",
+    pushOn: "Notifications are on for this device.",
+    pushOff: "Notifications are off for this device.",
+    pushEnable: "Turn on notifications",
+    pushDisable: "Turn off notifications",
+    pushBlocked:
+      "Notifications are blocked for this site. Allow them in your browser's site settings, then reload.",
+    pushUnsupported: "This browser can't show notifications from Psst.",
+    pushUnsupportedIos:
+      "On iPhone and iPad, add Psst to your Home Screen first, then open it from there.",
+    pushUnconfigured: "Notifications aren't set up on this server yet.",
+    pushFailed: "We couldn't turn notifications on. Please try again.",
+    previews: "Show message text in notifications",
+    previewsBody:
+      "Off by default, so nobody sees your messages on a locked screen.",
     account: "Account",
     signedInAs: "Signed in as {email}",
     signOut: "Sign out"
+  },
+
+  push: {
+    promptTitle: "Get notified",
+    promptBody: "Know straight away when someone writes to you or replies.",
+    promptEnable: "Turn on",
+    promptDismiss: "Not now"
   },
 
   errors: {

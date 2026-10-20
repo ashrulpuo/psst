@@ -10,7 +10,8 @@ Needs Node 22+ and pnpm. The API from `../server` must be running on `127.0.0.1:
 ```sh
 pnpm install
 cp .env.example .env          # then set QCLI_DEV_LOGIN=true for demo sign-in (see below)
-pnpm dev                      # http://localhost:9000
+pnpm dev                      # http://localhost:9000 (no service worker, so no push)
+pnpm dev:pwa                  # same, as an installable PWA: needed to try push notifications
 ```
 
 The dev server proxies `/api` and `/sanctum` to the API, so the browser sees one origin and cookie sessions work
@@ -66,7 +67,11 @@ overflow at 375px or 1280px, real dark mode, `prefers-reduced-motion` honoured.
 - Live updates arrive over Reverb WebSockets. If the socket is down (or `QCLI_REVERB_KEY` is empty) the app polls
   instead: 6s in an open conversation, 15s for lists, paused while the tab is hidden. While connected, polling
   slows to 30s/60s as a safety net, and a reconnect re-fetches whatever was missed.
-- Web push, the Capacitor/desktop builds, i18n beyond English, and the marketing landing page are not built.
+- Web Push works in browsers and installed PWAs. Native mobile push (FCM) and the Capacitor/desktop builds are not
+  built yet, nor is i18n beyond English or the marketing landing page.
+- The push browser test stubs the browser's subscribe call (headless Chromium can't reach Google's push service)
+  and delivers pushes to the service worker over DevTools. Delivery through the real push services has not been
+  exercised.
 - Quasar's full stylesheet ships (~37 KB gzipped); trimming it is a later optimisation.
 - Real Google/Apple buttons render only when client IDs are configured and have not been exercised against the
   live providers.

@@ -4,6 +4,7 @@ import { useAuthStore } from "@/stores/auth";
 import { useMessagingStore } from "@/stores/messaging";
 import { useRealtimeStore } from "@/stores/realtime";
 import { watch } from "vue";
+import { usePush } from "@/features/push/usePush";
 
 export default defineBoot(({ router, store }) => {
   const auth = useAuthStore(store);
@@ -14,8 +15,13 @@ export default defineBoot(({ router, store }) => {
   watch(
     () => auth.user?.id,
     id => {
-      if (id) void realtime.start(id);
-      else realtime.stop();
+      if (id) {
+        void realtime.start(id);
+        // A device that already has a push subscription now belongs to whoever just signed in.
+        void usePush().syncThisDevice();
+      } else {
+        realtime.stop();
+      }
     },
     { immediate: true }
   );

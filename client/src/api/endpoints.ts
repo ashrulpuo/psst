@@ -1,4 +1,4 @@
-import { http } from "./http";
+import { http, request } from "./http";
 import type {
   CursorPage,
   InboxThread,
@@ -24,7 +24,11 @@ export const authApi = {
     http.post<{ data: Me }>("/dev/login", { email }).then(r => r.data),
   setUsername: (username: string) =>
     http.patch<{ data: Me }>("/me/username", { username }).then(r => r.data),
-  logout: () => http.post<void>("/auth/logout")
+  logout: () => http.post<void>("/auth/logout"),
+  setPushPreviews: (enabled: boolean) =>
+    http
+      .patch<{ data: Me }>("/me/preferences", { push_previews: enabled })
+      .then(r => r.data)
 };
 
 export const profileApi = {
@@ -56,4 +60,21 @@ export const threadApi = {
     http.delete<void>(`/threads/${threadId}/block`),
   report: (messageId: string, reason: string) =>
     http.post<void>(`/messages/${messageId}/report`, { reason })
+};
+
+export interface WebPushRegistration {
+  endpoint: string;
+  keys: { p256dh: string; auth: string };
+}
+
+export const pushApi = {
+  /** VAPID public key, or null when the server has push switched off. */
+  publicKey: () =>
+    http
+      .get<{ data: { public_key: string | null } }>("/push/config")
+      .then(r => r.data.public_key),
+  register: (subscription: WebPushRegistration) =>
+    http.post<void>("/push/subscriptions", subscription),
+  unregister: (endpoint: string) =>
+    request<void>("DELETE", "/push/subscriptions", { body: { endpoint } })
 };

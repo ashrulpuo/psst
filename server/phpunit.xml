@@ -28,6 +28,9 @@
         <env name="DB_URL" value=""/>
         <env name="PSST_DEV_LOGIN" value="false"/>
         <env name="SANCTUM_STATEFUL_DOMAINS" value="localhost:3000"/>
+        <env name="PUSH_EXTRA_ALLOWED_HOSTS" value=""/>
+        <env name="VAPID_PUBLIC_KEY" value=""/>
+        <env name="VAPID_PRIVATE_KEY" value=""/>
         <env name="MAIL_MAILER" value="array"/>
         <env name="QUEUE_CONNECTION" value="sync"/>
         <env name="SESSION_DRIVER" value="array"/>

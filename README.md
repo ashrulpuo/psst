@@ -9,11 +9,12 @@ Client instructions: [`client/README.md`](client/README.md). Plan and design doc
 
 | Done | Not yet |
 |---|---|
-| **Server** (`server/`): schema, models, Google/Apple sign-in, username onboarding | Push notifications (Web Push / FCM) |
+| **Server** (`server/`): schema, models, Google/Apple sign-in, username onboarding | FCM push for the native mobile apps |
 | Threads, messages, inbox, sent, read state, block/report, rate limits | Admin dashboard SPA and admin API |
 | **Web client** (`client/`): sign-in, username, public link page, inbox/sent split pane, settings, dark mode | Capacitor (mobile) and desktop builds |
 | **Realtime** (Reverb): live messages, read receipts, block state; polling only as fallback | Docker images (compose file written, never built) |
-| Browser tests: `pnpm e2e` (21 checks incl. 375px/1280px overflow), `pnpm e2e:realtime` (7 checks) | |
+| **Web Push** (VAPID): per-device opt-in, queued delivery, installable PWA | |
+| Browser tests: `pnpm e2e` (21), `pnpm e2e:realtime` (7), `pnpm e2e:push` (12) | |
 | | Real Google/Apple credentials (tests use a fake provider) |
 
 ## Run the API locally
@@ -37,12 +38,23 @@ php artisan queue:work                   # sends the broadcasts (separate termin
 
 Realtime needs `BROADCAST_CONNECTION=reverb` and the `REVERB_*` keys (`php artisan reverb:install` generates them), and
 the client needs the public key in `client/.env` as `QCLI_REVERB_KEY`. Without it the app still works by polling.
+### Push notifications
+
+```sh
+php artisan psst:vapid                   # prints VAPID_PUBLIC_KEY / VAPID_PRIVATE_KEY for server/.env
+```
+
+With no `VAPID_PUBLIC_KEY` push stays off and the app says so in Settings. Web Push needs the PHP `gmp` extension
+(`apt install php8.3-gmp`; the Docker image has it). The client needs the PWA build for its service worker:
+`pnpm dev:pwa` instead of `pnpm dev`. On iPhone/iPad the app must first be added to the Home Screen.
+Message text in notifications is opt-in per user (lock screens are public); sender identity is never included.
+
 Restart `queue:work` after `migrate:fresh`: dropping the `jobs` table under a running worker makes it exit.
 
 ### Tests
 
 ```sh
-cd server && php artisan test            # 64 tests, run against the psst_test database
+cd server && php artisan test            # 104 tests, run against the psst_test database
 ```
 
 ### Try it by hand

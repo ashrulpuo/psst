@@ -45,6 +45,10 @@ export const useAuthStore = defineStore("auth", () => {
     user.value = await authApi.devLogin(email);
   }
 
+  async function setPushPreviews(enabled: boolean) {
+    user.value = await authApi.setPushPreviews(enabled);
+  }
+
   async function setUsername(username: string) {
     user.value = await authApi.setUsername(username);
   }
@@ -71,6 +75,7 @@ export const useAuthStore = defineStore("auth", () => {
     signIn,
     devLogin,
     setUsername,
+    setPushPreviews,
     clear,
     logout
   };

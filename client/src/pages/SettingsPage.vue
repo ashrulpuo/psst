@@ -1,14 +1,15 @@
 <script setup lang="ts">
 // Pattern: Settings — grouped sections in a single column.
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import { useMeta, useQuasar } from "quasar";
-import { Copy, LogOut, Share2 } from "@lucide/vue";
+import { Bell, BellOff, Copy, LogOut, Share2 } from "@lucide/vue";
 import { applyTheme, THEME_KEY, type ThemeChoice } from "@/boot/theme";
 import { useAuthStore } from "@/stores/auth";
 import { useMessagingStore } from "@/stores/messaging";
 import { copyText } from "@/utils/clipboard";
 import AppAvatar from "@/components/AppAvatar.vue";
+import { usePush } from "@/features/push/usePush";
 
 useMeta({ title: "Settings · Psst" });
 
@@ -16,6 +17,25 @@ const $q = useQuasar();
 const router = useRouter();
 const auth = useAuthStore();
 const messaging = useMessagingStore();
+
+const push = usePush();
+onMounted(() => void push.refresh());
+
+const previewsBusy = ref(false);
+async function togglePreviews() {
+  previewsBusy.value = true;
+  try {
+    await auth.setPushPreviews(!auth.user?.push_previews);
+  } catch {
+    $q.notify({
+      type: "negative",
+      message: "Couldn't save that. Please try again.",
+      position: "top"
+    });
+  } finally {
+    previewsBusy.value = false;
+  }
+}
 
 const canShare = typeof navigator !== "undefined" && "share" in navigator;
 
@@ -69,6 +89,8 @@ const signingOut = ref(false);
 async function signOut() {
   signingOut.value = true;
   try {
+    // Stop pushes for this account on this device before the session goes away.
+    await push.detachThisDevice();
     await auth.logout();
   } finally {
     messaging.reset();
@@ -95,6 +117,97 @@ async function signOut() {
             ><Share2 :size="18" class="ico" />{{ $t("settings.share") }}</q-btn
           >
         </div>
+      </section>
+
+      <section class="surface block" aria-labelledby="push-h">
+        <h2 id="push-h">{{ $t("settings.notifications") }}</h2>
+        <p class="text-secondary-copy">{{
+          $t("settings.notificationsBody")
+        }}</p>
+
+        <p v-if="push.state.value === 'unsupported'" class="note" role="status">
+          {{
+            push.isIos
+              ? $t("settings.pushUnsupportedIos")
+              : $t("settings.pushUnsupported")
+          }}
+        </p>
+        <p
+          v-else-if="push.state.value === 'unconfigured'"
+          class="note"
+          role="status"
+        >
+          {{ $t("settings.pushUnconfigured") }}
+        </p>
+        <p
+          v-else-if="push.state.value === 'blocked'"
+          class="note"
+          role="status"
+          >{{ $t("settings.pushBlocked") }}</p
+        >
+
+        <template
+          v-else-if="push.state.value === 'on' || push.state.value === 'off'"
+        >
+          <p class="status" role="status">
+            <component
+              :is="push.state.value === 'on' ? Bell : BellOff"
+              :size="18"
+              aria-hidden="true"
+            />
+            {{
+              push.state.value === "on"
+                ? $t("settings.pushOn")
+                : $t("settings.pushOff")
+            }}
+          </p>
+          <p v-if="push.failed.value" class="error" role="alert">{{
+            $t("settings.pushFailed")
+          }}</p>
+          <div class="row">
+            <q-btn
+              v-if="push.state.value === 'off'"
+              color="primary"
+              unelevated
+              no-caps
+              :loading="push.busy.value"
+              :label="$t('settings.pushEnable')"
+              @click="push.enable()"
+            />
+            <q-btn
+              v-else
+              outline
+              unelevated
+              no-caps
+              :loading="push.busy.value"
+              :label="$t('settings.pushDisable')"
+              @click="push.disable()"
+            />
+          </div>
+
+          <div class="switch-row">
+            <div class="switch-text">
+              <span id="previews-label" class="switch-title">{{
+                $t("settings.previews")
+              }}</span>
+              <span class="text-secondary-copy">{{
+                $t("settings.previewsBody")
+              }}</span>
+            </div>
+            <button
+              type="button"
+              role="switch"
+              class="switch"
+              :class="{ on: auth.user?.push_previews }"
+              :aria-checked="Boolean(auth.user?.push_previews)"
+              aria-labelledby="previews-label"
+              :disabled="previewsBusy"
+              @click="togglePreviews"
+            >
+              <span class="knob" />
+            </button>
+          </div>
+        </template>
       </section>
 
       <section class="surface block" aria-labelledby="look-h">
@@ -151,7 +264,7 @@ async function signOut() {
 }
 .block {
   display: grid;
-  gap: var(--s-3);
+  gap: var(--s-4);
   padding: var(--s-5);
 }
 .block h2 {
@@ -203,6 +316,77 @@ async function signOut() {
   color: var(--text);
   box-shadow: var(--shadow-soft);
   border: 1px solid var(--border);
+}
+.note {
+  padding: var(--s-3) var(--s-4);
+  border-radius: var(--r-control);
+  background: var(--canvas);
+  border: 1px solid var(--border);
+  font-size: var(--text-secondary);
+  color: var(--text-2);
+}
+.status {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  font-size: var(--text-secondary);
+}
+.error {
+  color: var(--danger);
+  font-size: var(--text-secondary);
+}
+.switch-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-4);
+  padding-top: var(--s-3);
+  border-top: 1px solid var(--border);
+}
+.switch-text {
+  display: grid;
+  gap: 2px;
+}
+.switch-title {
+  font-weight: 500;
+}
+.switch {
+  position: relative;
+  flex: none;
+  width: 52px;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+.switch::before {
+  content: "";
+  position: absolute;
+  inset: 10px 0;
+  border-radius: 999px;
+  background: var(--border-strong);
+  transition: background-color var(--dur) var(--ease);
+}
+.switch.on::before {
+  background: var(--accent);
+}
+.knob {
+  position: absolute;
+  top: 12px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+  transition: transform var(--dur) var(--ease);
+}
+.switch.on .knob {
+  transform: translateX(28px);
+}
+.switch:disabled {
+  opacity: 0.6;
 }
 .who {
   display: flex;

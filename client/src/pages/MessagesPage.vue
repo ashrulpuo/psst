@@ -11,6 +11,7 @@ import { copyText } from "@/utils/clipboard";
 import EmptyState from "@/components/EmptyState.vue";
 import ThreadListItem from "@/components/ThreadListItem.vue";
 import ConversationPane from "@/features/messaging/ConversationPane.vue";
+import PushPrompt from "@/features/push/PushPrompt.vue";
 
 const props = defineProps<{ box: "inbox" | "sent" }>();
 
@@ -60,6 +61,8 @@ async function copyLink() {
           <q-tooltip>{{ $t("settings.copy") }}</q-tooltip>
         </q-btn>
       </header>
+
+      <PushPrompt />
 
       <div class="frame surface">
         <div

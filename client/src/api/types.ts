@@ -8,6 +8,8 @@ export interface Me {
   avatar_url: string | null;
   role: "user" | "admin";
   needs_username: boolean;
+  /** Show message text in push notifications (off by default: lock screens are public). */
+  push_previews: boolean;
 }
 
 export interface PublicProfile {
