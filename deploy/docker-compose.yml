@@ -34,6 +34,7 @@ services:
       # Built front-ends: `pnpm build:pwa` in client/ and `pnpm build` in admin/ before `docker compose up`.
       - ../client/dist/pwa:/srv/client:ro
       - ../admin/dist:/srv/admin/admin:ro
+      - ./wellknown:/srv/wellknown/.well-known:ro
       - caddy_data:/data
       - caddy_config:/config
     depends_on: [app, reverb]

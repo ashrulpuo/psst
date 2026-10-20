@@ -46,6 +46,8 @@ Route::middleware(['auth:sanctum', 'not-banned'])->group(function () {
 
     Route::post('push/subscriptions', [PushController::class, 'store'])->middleware('throttle:reports');
     Route::delete('push/subscriptions', [PushController::class, 'destroy']);
+    Route::post('push/devices', [PushController::class, 'storeDevice'])->middleware('throttle:reports');
+    Route::delete('push/devices', [PushController::class, 'destroyDevice']);
 
     Route::post('profiles/{username}/messages', [ProfileController::class, 'send'])
         ->where('username', '[a-z0-9_.]{3,24}')

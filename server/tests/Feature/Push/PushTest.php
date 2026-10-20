@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Queue;
 use Laravel\Sanctum\Sanctum;
 use PHPUnit\Framework\Attributes\DataProvider;
 use RuntimeException;
+use Tests\Support\FakeFcmSender;
 use Tests\Support\FakeWebPushSender;
 use Tests\TestCase;
 
@@ -79,10 +80,10 @@ class PushTest extends TestCase
 
     public function test_the_public_key_is_exposed_for_subscribing(): void
     {
-        $this->getJson('/api/push/config')->assertOk()->assertExactJson(['data' => ['public_key' => 'test-public-key']]);
+        $this->getJson('/api/push/config')->assertOk()->assertExactJson(['data' => ['public_key' => 'test-public-key', 'fcm' => false]]);
 
         config(['services.vapid.public_key' => null]);
-        $this->getJson('/api/push/config')->assertOk()->assertExactJson(['data' => ['public_key' => null]]);
+        $this->getJson('/api/push/config')->assertOk()->assertExactJson(['data' => ['public_key' => null, 'fcm' => false]]);
     }
 
     // ---- registering devices ----
@@ -318,7 +319,7 @@ class PushTest extends TestCase
         $this->expectException(RuntimeException::class);
 
         try {
-            $job->handle($this->push);
+            $job->handle($this->push, new FakeFcmSender);
         } finally {
             $this->assertSame(1, PushSubscription::count());
         }

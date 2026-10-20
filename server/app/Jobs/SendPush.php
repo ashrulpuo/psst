@@ -6,6 +6,7 @@ use App\Models\Message;
 use App\Models\PushSubscription;
 use App\Models\Thread;
 use App\Models\User;
+use App\Push\FcmSender;
 use App\Push\PushPayload;
 use App\Push\PushResult;
 use App\Push\WebPushSender;
@@ -40,7 +41,7 @@ class SendPush implements ShouldQueue
         return [15, 60, 300];
     }
 
-    public function handle(WebPushSender $sender): void
+    public function handle(WebPushSender $webPush, FcmSender $fcm): void
     {
         $subscription = PushSubscription::query()->find($this->subscriptionId);
         $message = Message::query()->find($this->messageId);
@@ -54,6 +55,9 @@ class SendPush implements ShouldQueue
         $receiverName = $recipient->id === $thread->receiver_id
             ? $recipient->name
             : (string) User::query()->whereKey($thread->receiver_id)->value('name');
+
+        // One job per device; the device's channel decides which push service carries it.
+        $sender = $subscription->channel === 'fcm' ? $fcm : $webPush;
 
         $result = $sender->send(
             $subscription,

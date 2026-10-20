@@ -16,7 +16,9 @@ class PushNotifier
      */
     public function messagePosted(Thread $thread, Message $message): void
     {
-        if (! config('services.vapid.public_key')) {
+        $channels = $this->enabledChannels();
+
+        if ($channels === []) {
             return;
         }
 
@@ -29,8 +31,21 @@ class PushNotifier
 
         PushSubscription::query()
             ->where('user_id', $recipientId)
-            ->where('channel', 'webpush')
+            ->whereIn('channel', $channels)
             ->pluck('id')
             ->each(fn (string $subscriptionId) => SendPush::dispatch($subscriptionId, $message->id));
+    }
+
+    /**
+     * Channels that are actually configured on this server.
+     *
+     * @return list<string>
+     */
+    private function enabledChannels(): array
+    {
+        return array_values(array_filter([
+            config('services.vapid.public_key') ? 'webpush' : null,
+            config('services.fcm.project_id') && config('services.fcm.credentials') ? 'fcm' : null,
+        ]));
     }
 }

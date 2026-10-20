@@ -55,6 +55,16 @@ return [
     /*
     | Web Push (VAPID). Generate a pair with `php artisan psst:vapid`. Push is disabled while the public key is empty.
     */
+    /*
+    | Firebase Cloud Messaging (native push for the iOS/Android apps), HTTP v1 API.
+    | `credentials` is a Google service-account key: the JSON itself, base64 of it, or a path to the file.
+    | Native push stays off while either value is empty.
+    */
+    'fcm' => [
+        'project_id' => env('FCM_PROJECT_ID'),
+        'credentials' => env('FCM_CREDENTIALS'),
+    ],
+
     'vapid' => [
         'public_key' => env('VAPID_PUBLIC_KEY'),
         'private_key' => env('VAPID_PRIVATE_KEY'),

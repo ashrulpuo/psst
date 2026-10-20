@@ -28,6 +28,14 @@
 		}
 	}
 
+	# App-link verification for the native apps. Must be served as-is (no redirects) with a JSON content type.
+	handle /.well-known/assetlinks.json /.well-known/apple-app-site-association {
+		root * /srv/wellknown
+		header Content-Type "application/json"
+		header Cache-Control "public, max-age=3600"
+		file_server
+	}
+
 	# Admin app (built with base /admin/). Same origin as the API so the session cookie is shared.
 	# To restrict it to a network, add before file_server:  @blocked not remote_ip 203.0.113.0/24
 	#                                                      respond @blocked 404

@@ -4,6 +4,8 @@ namespace App\Providers;
 
 use App\Models\Message;
 use App\Models\Thread;
+use App\Push\FcmSender;
+use App\Push\FirebaseFcmSender;
 use App\Push\MinishlinkWebPushSender;
 use App\Push\WebPushSender;
 use Illuminate\Cache\RateLimiting\Limit;
@@ -21,6 +23,7 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->bind(WebPushSender::class, MinishlinkWebPushSender::class);
+        $this->app->bind(FcmSender::class, FirebaseFcmSender::class);
     }
 
     /**

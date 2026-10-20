@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\DeletePushDeviceRequest;
 use App\Http\Requests\DeletePushSubscriptionRequest;
+use App\Http\Requests\StorePushDeviceRequest;
 use App\Http\Requests\StorePushSubscriptionRequest;
 use App\Models\PushSubscription;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 use Illuminate\Support\Str;
@@ -12,11 +15,15 @@ use Illuminate\Support\Str;
 class PushController extends Controller
 {
     /**
-     * Public key the browser needs to subscribe. `null` means push is not configured on this server.
+     * What this server can push to. `public_key` is what browsers need to subscribe (null = Web Push is off);
+     * `fcm` says whether the native apps will receive pushes.
      */
     public function config(): JsonResponse
     {
-        return response()->json(['data' => ['public_key' => config('services.vapid.public_key') ?: null]]);
+        return response()->json(['data' => [
+            'public_key' => config('services.vapid.public_key') ?: null,
+            'fcm' => (bool) (config('services.fcm.project_id') && config('services.fcm.credentials')),
+        ]]);
     }
 
     /**
@@ -25,21 +32,55 @@ class PushController extends Controller
      */
     public function store(StorePushSubscriptionRequest $request): Response
     {
-        $user = $request->user();
-        $endpoint = $request->validated('endpoint');
+        $this->register($request->user(), 'webpush', $request->validated('endpoint'), $request->validated('keys'), (string) $request->userAgent());
 
+        return response()->noContent();
+    }
+
+    /**
+     * Register a native (iOS/Android) device by its FCM token. Same hand-over rule as the browser endpoint.
+     */
+    public function storeDevice(StorePushDeviceRequest $request): Response
+    {
+        $this->register($request->user(), 'fcm', $request->validated('token'), null, 'capacitor-'.$request->validated('platform'));
+
+        return response()->noContent();
+    }
+
+    public function destroyDevice(DeletePushDeviceRequest $request): Response
+    {
+        $this->unregister($request->user(), 'fcm', $request->validated('token'));
+
+        return response()->noContent();
+    }
+
+    public function destroy(DeletePushSubscriptionRequest $request): Response
+    {
+        $this->unregister($request->user(), 'webpush', $request->validated('endpoint'));
+
+        return response()->noContent();
+    }
+
+    /**
+     * Idempotent by (channel, token). A device that changes hands moves to the new account, so notifications
+     * never keep arriving for the previous user.
+     *
+     * @param  array<string, string>|null  $keys
+     */
+    private function register(User $user, string $channel, string $token, ?array $keys, string $userAgent): void
+    {
         PushSubscription::query()->updateOrCreate(
-            ['channel' => 'webpush', 'token_hash' => hash('sha256', $endpoint)],
+            ['channel' => $channel, 'token_hash' => hash('sha256', $token)],
             [
                 'user_id' => $user->id,
-                'token' => $endpoint,
-                'keys' => $request->validated('keys'),
-                'user_agent' => Str::limit((string) $request->userAgent(), 255, ''),
+                'token' => $token,
+                'keys' => $keys,
+                'user_agent' => Str::limit($userAgent, 255, ''),
                 'last_seen_at' => now(),
             ],
         );
 
-        // Keep only the most recently seen devices.
+        // Keep only the most recently seen devices (across all channels).
         $stale = PushSubscription::query()
             ->where('user_id', $user->id)
             ->orderByDesc('last_seen_at')
@@ -47,18 +88,14 @@ class PushController extends Controller
             ->take(PHP_INT_MAX)
             ->pluck('id');
         PushSubscription::query()->whereIn('id', $stale)->delete();
-
-        return response()->noContent();
     }
 
-    public function destroy(DeletePushSubscriptionRequest $request): Response
+    private function unregister(User $user, string $channel, string $token): void
     {
         PushSubscription::query()
-            ->where('user_id', $request->user()->id)
-            ->where('channel', 'webpush')
-            ->where('token_hash', hash('sha256', $request->validated('endpoint')))
+            ->where('user_id', $user->id)
+            ->where('channel', $channel)
+            ->where('token_hash', hash('sha256', $token))
             ->delete();
-
-        return response()->noContent();
     }
 }

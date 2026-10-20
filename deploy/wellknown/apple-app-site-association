@@ -1,0 +1,16 @@
+{
+  "applinks": {
+    "details": [
+      {
+        "appIDs": ["REPLACE_WITH_APPLE_TEAM_ID.app.psst.mobile"],
+        "components": [
+          { "/": "/api/*", "exclude": true },
+          { "/": "/admin/*", "exclude": true },
+          { "/": "/app/*", "exclude": true },
+          { "/": "/sanctum/*", "exclude": true },
+          { "/": "/*" }
+        ]
+      }
+    ]
+  }
+}
