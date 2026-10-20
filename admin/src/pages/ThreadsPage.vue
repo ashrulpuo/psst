@@ -33,7 +33,7 @@ onMounted(() => void list.reload(query()));
 const filterName = computed(() => {
   const t = list.items.value[0];
   if (!t || !userId.value) return null;
-  return (t.receiver.id === userId.value ? t.receiver : t.sender).name;
+  return (t.receiver.id === userId.value ? t.receiver : t.sender)?.name ?? "Guest";
 });
 
 function setQuery(patch: Record<string, string | undefined>) {

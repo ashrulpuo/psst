@@ -60,7 +60,14 @@ const cannotReply = computed(() => {
   const t = thread.value;
   return Boolean(t && "can_reply" in t && !t.can_reply);
 });
-const composerDisabled = computed(() => blocked.value || cannotReply.value);
+/** The receiver's view of a guest: nothing to reply to until the sender signs in. */
+const awaitingSignIn = computed(() => {
+  const t = thread.value;
+  return Boolean(t && "can_chat" in t && !t.can_chat && !t.blocked);
+});
+const composerDisabled = computed(
+  () => blocked.value || cannotReply.value || awaitingSignIn.value
+);
 
 // Messages grouped under day separators, oldest first.
 const groups = computed(() => {
@@ -311,6 +318,9 @@ async function submitReport(reason: string) {
           @click="setBlocked(false)"
         />
       </p>
+      <p v-else-if="awaitingSignIn" class="notice" role="status">{{
+        $t("thread.guestSender")
+      }}</p>
       <p v-else-if="cannotReply" class="notice" role="status">{{
         $t("thread.cannotReply")
       }}</p>

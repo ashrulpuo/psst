@@ -13,7 +13,7 @@
     />
     <meta
       http-equiv="Content-Security-Policy"
-      content="default-src 'self'; script-src 'self' https://accounts.google.com https://appleid.cdn-apple.com; style-src 'self' 'unsafe-inline' https://accounts.google.com; img-src 'self' data: https:; frame-src https://accounts.google.com https://appleid.apple.com; connect-src 'self' wss: https://accounts.google.com<% if (apiOrigin) { %> <%= apiOrigin %> <%= apiOrigin.replace(/^http/, 'ws') %><% } %><% if (ctx.dev) { %> ws://localhost:*<% } %>; worker-src 'self'<% if (ctx.dev) { %> blob:<% } %>; object-src 'none'; base-uri 'self'; form-action 'self'"
+      content="default-src 'self'; script-src 'self' https://accounts.google.com https://appleid.cdn-apple.com<% if (turnstile) { %> https://challenges.cloudflare.com<% } %>; style-src 'self' 'unsafe-inline' https://accounts.google.com; img-src 'self' data: https:; frame-src https://accounts.google.com https://appleid.apple.com<% if (turnstile) { %> https://challenges.cloudflare.com<% } %>; connect-src 'self' wss: https://accounts.google.com<% if (apiOrigin) { %> <%= apiOrigin %> <%= apiOrigin.replace(/^http/, 'ws') %><% } %><% if (ctx.dev) { %> ws://localhost:*<% } %>; worker-src 'self'<% if (ctx.dev) { %> blob:<% } %>; object-src 'none'; base-uri 'self'; form-action 'self'"
     />
 
     <link

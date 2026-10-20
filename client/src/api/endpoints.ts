@@ -58,11 +58,36 @@ export const profileApi = {
     http
       .get<{ data: PublicProfile }>(`/profiles/${username}`)
       .then(r => r.data),
-  send: (username: string, body: string) =>
-    http.post<{ data: Message; thread_id: string }>(
-      `/profiles/${username}/messages`,
-      { body }
-    )
+  /**
+   * Anyone can send. A signed-in sender gets a thread id back; a guest gets a token to keep in their browser,
+   * which later lets them claim the thread (and be replied to) by signing in.
+   */
+  send: (
+    username: string,
+    body: string,
+    guest?: { token: string | null; challenge?: string; website?: string }
+  ) =>
+    request<SendResult>("POST", `/profiles/${username}/messages`, {
+      body: {
+        body,
+        ...(guest?.challenge ? { turnstile_token: guest.challenge } : {}),
+        ...(guest?.website ? { website: guest.website } : {})
+      },
+      headers: guest?.token ? { "X-Guest-Token": guest.token } : {}
+    })
+};
+
+export type SendResult =
+  | { data: Message; thread_id: string }
+  | { data: { sent: true }; guest_token: string };
+
+export const guestApi = {
+  /** After sign-in: attach this browser's anonymous threads to the account. */
+  claim: (token: string) =>
+    request<{ data: { claimed: number } }>("POST", "/guest/claim", {
+      body: {},
+      headers: { "X-Guest-Token": token }
+    }).then(r => r.data.claimed)
 };
 
 export const threadApi = {

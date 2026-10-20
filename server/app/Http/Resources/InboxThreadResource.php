@@ -26,6 +26,8 @@ class InboxThreadResource extends JsonResource
             'label' => 'Anonymous #'.$this->anon_label,
             'unread_count' => $this->receiver_unread_count,
             'blocked' => $this->blocked_at !== null,
+            // False while the sender has not signed in: there is no one to reply to yet.
+            'can_chat' => $this->sender_id !== null,
             'last_message_at' => $this->last_message_at,
             'last_message' => new MessageResource($this->whenLoaded('latestMessage')),
         ];

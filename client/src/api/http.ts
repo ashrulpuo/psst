@@ -67,6 +67,7 @@ export async function request<T>(
     body?: unknown;
     query?: Record<string, string | undefined> | undefined;
     silent401?: boolean;
+    headers?: Record<string, string>;
   } = {}
 ): Promise<T> {
   if (method !== "GET") await ensureCsrf();
@@ -76,7 +77,10 @@ export async function request<T>(
     if (value !== undefined) url.searchParams.set(key, value);
   }
 
-  const headers: Record<string, string> = { Accept: "application/json" };
+  const headers: Record<string, string> = {
+    Accept: "application/json",
+    ...options.headers
+  };
   if (options.body !== undefined) headers["Content-Type"] = "application/json";
   if (isNativeApp) {
     if (authToken) headers.Authorization = `Bearer ${authToken}`;

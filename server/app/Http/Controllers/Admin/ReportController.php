@@ -103,12 +103,12 @@ class ReportController extends Controller
      */
     private function attachReportedUsers(Collection $reports): void
     {
-        $authorIds = $reports->map(fn (Report $r) => $r->message->from_receiver ? $r->message->thread->receiver_id : $r->message->thread->sender_id)->unique();
+        $authorIds = $reports->map(fn (Report $r) => $r->message->from_receiver ? $r->message->thread->receiver_id : $r->message->thread->sender_id)->filter()->unique();
         $users = User::query()->select(explode(',', self::USER_COLUMNS))->whereIn('id', $authorIds)->get()->keyBy('id');
 
         foreach ($reports as $report) {
             $id = $report->message->from_receiver ? $report->message->thread->receiver_id : $report->message->thread->sender_id;
-            $report->setRelation('reportedUser', $users[$id]);
+            $report->setRelation('reportedUser', $id === null ? null : $users[$id]);
         }
     }
 }

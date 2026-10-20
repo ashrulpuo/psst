@@ -36,6 +36,8 @@ export interface InboxThread {
   label: string;
   unread_count: number;
   blocked: boolean;
+  /** False while the sender hasn't signed in: there is nobody to reply to yet. */
+  can_chat: boolean;
   last_message_at: string | null;
   last_message: Message | null;
 }
@@ -70,6 +72,8 @@ export interface BlockChangedPayload {
   blocked?: boolean;
   /** Sent to the sender. */
   can_reply?: boolean;
+  /** Sent to the receiver when a guest signs in: the thread can now be replied to. */
+  can_chat?: boolean;
 }
 
 export interface MessagesReadPayload {

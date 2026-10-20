@@ -23,4 +23,9 @@ class CannotMessage extends HttpException
     {
         return new self(429, "You have sent $limit messages without a reply. Wait for a response before sending more.");
     }
+
+    public static function senderNotSignedIn(): self
+    {
+        return new self(409, 'You can reply once this person signs in to chat.');
+    }
 }

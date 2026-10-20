@@ -38,6 +38,11 @@ return [
         'ttl_seconds' => 86400,
     ],
 
+    'turnstile' => [
+        // Cloudflare Turnstile secret key. Empty = no challenge. The site key goes in the client (QCLI_TURNSTILE_SITE_KEY).
+        'secret' => env('TURNSTILE_SECRET', ''),
+    ],
+
     'auth' => [
         'token_ttl_days' => 30,
     ],

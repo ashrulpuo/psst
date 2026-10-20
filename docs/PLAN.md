@@ -82,3 +82,23 @@ them survives; the other party loses those conversations. The username becomes c
 `account.deleted` audit row with the opaque id (no PII). Admins cannot self-delete (the append-only audit log must
 stay attributable); demote first. Banned users are blocked by the ban middleware, so deletion cannot be used to dodge a
 ban while the account row still exists.
+
+## Anonymous sending without an account (decision record)
+
+Product rule, NGL-style: **anyone can send an anonymous message with no login; signing in is only for chatting.**
+
+- `POST /api/profiles/{username}/messages` is public. A signed-in sender gets a normal thread (two-way chat).
+  A guest gets a thread keyed by a random token the server issues (`guest_token`, kept in the browser, sent back as
+  `X-Guest-Token`; only its SHA-256 is stored) plus an HMAC of their IP. Neither identifies a person.
+- The receiver sees "Anonymous #N" either way, and cannot reply to a guest thread (409) until the sender signs in.
+  Signing in calls `POST /api/guest/claim` with the token: the thread becomes the user's own (merging into an existing
+  conversation with that receiver if there is one), and the receiver's open inbox unlocks the composer live.
+- Abuse controls (guests are cheap to create, so these matter): per-IP, per-token and per-link rate limits; a hidden
+  honeypot field; optional Cloudflare Turnstile (`TURNSTILE_SECRET` / `QCLI_TURNSTILE_SITE_KEY`, fails closed);
+  guests are not subject to the "wait for a reply" cap (they can't be answered) so throttles carry that load.
+- Blocking a guest flags the thread and silently drops later messages from the same browser token **or the same IP
+  hash, for that receiver only** (the sender is never told). Trade-off: someone on a shared network can be caught by
+  another person's block; unblocking releases it. A determined person can still clear storage and switch network.
+- Admins: guests have no account, so there is no identity to reveal; admin screens show "Guest" (and `sender_kind`).
+  Signed-in senders remain fully identifiable to admins, which the sign-in page discloses.
+- Data model: `threads.sender_id` nullable, `guest_key_hash`, `ip_hash`, CHECK that exactly one kind of sender is set.

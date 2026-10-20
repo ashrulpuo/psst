@@ -32,20 +32,21 @@ const demo = async (page, who) => { await page.getByRole("button", { name: who }
   await ctx.close();
 }
 
-// ---- 2. Sender (Bob): opens Alice's link signed out, signs in, sends ----
+// ---- 2. Sender (Bob): no account needed to send; signing in is for chatting ----
 const bobCtx = await ctxOf(mobile); const bob = await bobCtx.newPage();
 await bob.goto(`${BASE}/alice`);
 await bob.fill("#message", "I've always admired how you handled that presentation. You were great!");
-await shot(bob, "04-public-link-draft");
-await bob.getByRole("button", { name: "Sign in to send" }).click();
-await bob.waitForURL("**/login**");
-await shot(bob, "05-sender-sign-in");
-await demo(bob, "Bob");
-await bob.waitForURL(`**/alice`);
-await shot(bob, "06-draft-restored-after-sign-in");
+await shot(bob, "04-public-link-no-login");
 await bob.getByRole("button", { name: "Send message" }).click();
 await bob.waitForSelector("text=Sent");
-await shot(bob, "07-sent-confirmation");
+await shot(bob, "05-sent-as-guest");
+await bob.getByRole("button", { name: "Sign in to chat" }).click();
+await bob.waitForURL("**/login**");
+await shot(bob, "06-sign-in-to-chat");
+await demo(bob, "Bob");
+await bob.waitForURL("**/sent");
+await bob.getByText("Alice Rahman").first().waitFor();
+await shot(bob, "07-sent-list-after-sign-in");
 
 // ---- 3. Receiver (Alice): inbox, conversation, reply, block/report ----
 const aliceCtx = await ctxOf(mobile); const alice = await aliceCtx.newPage();
@@ -55,7 +56,6 @@ await alice.waitForURL("**/inbox");
 // A couple more senders so the inbox looks lived-in.
 for (const [who, text] of [["Carol", "Coffee sometime? Your talk gave me ideas."], ["Carol", "Also: thank you for the book recommendation!"]]) {
   const c = await ctxOf(mobile); const p = await c.newPage();
-  await p.goto(`${BASE}/login`); await demo(p, who); await p.waitForURL("**/inbox");
   await p.goto(`${BASE}/alice`); await p.fill("#message", text); await p.getByRole("button", { name: "Send message" }).click(); await p.waitForSelector("text=Sent"); await c.close();
 }
 await alice.reload();
@@ -69,6 +69,14 @@ await alice.getByText("That means a lot").first().waitFor();
 await shot(alice, "09-conversation-reply");
 await alice.getByRole("button", { name: "Conversation options" }).click();
 await shot(alice, "10-conversation-options");
+await alice.keyboard.press("Escape");
+await alice.getByRole("button", { name: "Back to messages" }).click();
+await alice.getByText("Anonymous #2").first().click();
+await alice.getByText("haven't signed in").waitFor();
+await shot(alice, "10b-guest-cannot-reply-yet");
+await alice.getByRole("button", { name: "Back to messages" }).click();
+await alice.getByText("Anonymous #1").first().click();
+await alice.getByRole("button", { name: "Conversation options" }).click();
 await alice.getByText("Block sender").click();
 await shot(alice, "11-block-confirmation");
 await alice.getByRole("button", { name: "Cancel" }).click();

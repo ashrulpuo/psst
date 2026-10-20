@@ -118,7 +118,7 @@ const messageCount = computed(() => thread.value?.message_count ?? messages.valu
                 <Badge :tone="m.author === 'sender' ? 'accent' : 'neutral'">{{
                   roleLabel(m)
                 }}</Badge>
-                <span class="font-medium text-fg-2">{{ who(m)?.name }}</span>
+                <span class="font-medium text-fg-2">{{ who(m)?.name ?? "Guest" }}</span>
                 <time :datetime="m.created_at">{{ formatDateTime(m.created_at) }}</time>
                 <span v-if="m.read_at">· read</span>
               </p>

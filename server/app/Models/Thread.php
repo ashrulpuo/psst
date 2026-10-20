@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['receiver_id', 'sender_id', 'anon_label'])]
+#[Fillable(['receiver_id', 'sender_id', 'anon_label', 'guest_key_hash', 'ip_hash'])]
 class Thread extends Model
 {
     use HasUuids;
@@ -21,6 +21,9 @@ class Thread extends Model
         'blocked_at' => null,
         'last_message_at' => null,
         'last_message_id' => null,
+        'sender_id' => null,
+        'guest_key_hash' => null,
+        'ip_hash' => null,
     ];
 
     protected function casts(): array
@@ -29,6 +32,12 @@ class Thread extends Model
             'last_message_at' => 'datetime',
             'blocked_at' => 'datetime',
         ];
+    }
+
+    /** Written by someone who has not signed in: nobody to reply to until they claim the thread. */
+    public function isGuest(): bool
+    {
+        return $this->sender_id === null;
     }
 
     public function isBlocked(): bool

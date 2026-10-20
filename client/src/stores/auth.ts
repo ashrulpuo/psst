@@ -1,11 +1,12 @@
 import { defineStore } from "pinia";
 import { computed, ref } from "vue";
-import { authApi, type TokenLogin } from "@/api/endpoints";
+import { authApi, guestApi, type TokenLogin } from "@/api/endpoints";
 import { setAuthToken } from "@/api/http";
 import type { Me, Provider } from "@/api/types";
 import { nativeAdapters } from "@/native/adapters";
 import { isNativeApp, nativePlatform } from "@/native/platform";
 import { config } from "@/utils/config";
+import { clearGuestToken, guestToken } from "@/utils/guest";
 import { randomNonce } from "@/utils/format";
 
 export const useAuthStore = defineStore("auth", () => {
@@ -34,11 +35,27 @@ export const useAuthStore = defineStore("auth", () => {
     setAuthToken(token);
   }
 
+  /**
+   * Anonymous threads this browser started become the user's own once they sign in, so receivers can reply.
+   * Best effort: if it fails the token is kept and the next sign-in retries.
+   */
+  async function claimGuestThreads(): Promise<void> {
+    const token = guestToken();
+    if (!token || !user.value) return;
+    try {
+      await guestApi.claim(token);
+      clearGuestToken();
+    } catch {
+      /* retried on the next sign-in or app start */
+    }
+  }
+
   function init(): Promise<void> {
     initializing ??= restoreNativeSession()
       .then(() => authApi.me())
-      .then(me => {
+      .then(async me => {
         user.value = me;
+        await claimGuestThreads();
       })
       .catch(() => {
         user.value = null;
@@ -53,6 +70,7 @@ export const useAuthStore = defineStore("auth", () => {
     await (await nativeAdapters()).tokens.set(login.token);
     setAuthToken(login.token);
     user.value = login.user;
+    await claimGuestThreads();
   }
 
   /** Browser sign-in: the provider's ID token is exchanged for a cookie session. */
@@ -63,6 +81,7 @@ export const useAuthStore = defineStore("auth", () => {
     name?: string
   ) {
     user.value = await authApi.signIn(provider, idToken, nonce, name);
+    await claimGuestThreads();
   }
 
   /** Device sign-in: the native Google/Apple sheet, then the same verification, answered with a bearer token. */
@@ -85,6 +104,7 @@ export const useAuthStore = defineStore("auth", () => {
     const result = await authApi.devLogin(email);
     if ("token" in result) await adoptToken(result);
     else user.value = result.data;
+    await claimGuestThreads();
   }
 
   async function setUsername(username: string) {

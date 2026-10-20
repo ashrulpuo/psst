@@ -72,27 +72,24 @@ await B.page.waitForSelector("text=Send Alice Rahman an anonymous message");
 await B.page.screenshot({ path: OUT + "03-profile-mobile.png" });
 await noOverflow(B.page, "profile @375");
 await B.page.fill("#message", "You always make the room feel warmer.");
-const guestCta = await B.page
+const hasSignInToSend = await B.page
   .getByRole("button", { name: "Sign in to send" })
-  .isVisible();
-ok("guest sees 'Sign in to send'", guestCta);
-await B.page.getByRole("button", { name: "Sign in to send" }).click();
-await B.page.waitForURL("**/login?next=/alice");
-await B.page.screenshot({ path: OUT + "04-login-mobile.png" });
-await noOverflow(B.page, "login @375");
-await B.page.getByRole("button", { name: "Bob" }).click();
-await B.page.waitForURL("**/alice");
-await B.page.waitForSelector("#message");
-const restored = await B.page.inputValue("#message");
-ok(
-  "draft restored after sign-in round trip",
-  restored === "You always make the room feel warmer.",
-  restored
-);
+  .count();
+ok("no sign-in needed to send", hasSignInToSend === 0);
 await B.page.getByRole("button", { name: "Send message" }).click();
 await B.page.waitForSelector("text=Sent");
 await B.page.screenshot({ path: OUT + "05-sent-mobile.png" });
-ok("Bob's message sent", true);
+ok("guest message sent without an account", true);
+await B.page.getByRole("button", { name: "Sign in to chat" }).waitFor();
+ok("guest is offered sign-in to chat", true);
+await B.page.getByRole("button", { name: "Sign in to chat" }).click();
+await B.page.waitForURL("**/login?next=/sent");
+await B.page.screenshot({ path: OUT + "04-login-mobile.png" });
+await noOverflow(B.page, "login @375");
+await B.page.getByRole("button", { name: "Bob" }).click();
+await B.page.waitForURL("**/sent");
+await B.page.getByText("Alice Rahman").first().waitFor({ timeout: 8000 });
+ok("signing in claims the anonymous thread into Sent", true);
 
 // ---------- Alice sees it (polling or reload) ----------
 await A.page.reload();

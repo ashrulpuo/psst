@@ -11,11 +11,12 @@ export default {
 
   login: {
     title: "Say it. Psst.",
-    subtitle: "Send and receive anonymous messages. Sign in to continue.",
+    subtitle:
+      "Get your own link to receive anonymous messages, or sign in to chat with people you've messaged.",
     google: "Continue with Google",
     apple: "Continue with Apple",
     privacy:
-      "You stay anonymous to the person you message. Psst admins can see who sent what, to keep everyone safe.",
+      "You stay anonymous to the person you message. To keep everyone safe, Psst admins can see which account a message came from.",
     notConfigured: "Sign-in isn't set up on this server yet.",
     failed: "We couldn't sign you in. Please try again.",
     demo: "Local demo accounts"
@@ -36,8 +37,10 @@ export default {
     subtitle: "They won't see who you are. Be kind.",
     label: "Your message",
     send: "Send message",
-    signInToSend: "Sign in to send",
-    signInNote: "Your draft is saved. You'll come back to it after signing in.",
+    chatOffer:
+      "Want to hear back? Sign in and they can reply to you, still anonymously. You don't need to sign in to send more.",
+    signInToChat: "Sign in to chat",
+    getYourOwn: "Get your own Psst link",
     sent: "Sent",
     sentBody: "{name} will see it as an anonymous message.",
     viewConversation: "View conversation",
@@ -76,6 +79,8 @@ export default {
     unblock: "Unblock",
     block: "Block sender",
     cannotReply: "This person isn't accepting replies from you.",
+    guestSender:
+      "They haven't signed in, so you can't reply yet. If they sign in, you'll be able to chat.",
     report: "Report message",
     reportTitle: "Report this message",
     reportReason: "What's wrong with it?",

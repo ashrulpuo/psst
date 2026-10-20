@@ -22,9 +22,10 @@ class PostMessage
      *
      * @throws CannotMessage
      */
-    public function handle(Thread $thread, User $author, string $body): Message
+    public function handle(Thread $thread, ?User $author, string $body): Message
     {
-        $fromReceiver = $thread->receiver_id === $author->id;
+        // A null author is a guest sender.
+        $fromReceiver = $author !== null && $thread->receiver_id === $author->id;
 
         return DB::transaction(function () use ($thread, $fromReceiver, $body) {
             // Re-read under lock so block state and the unanswered count cannot change mid-check.
@@ -34,7 +35,12 @@ class PostMessage
                 throw CannotMessage::blocked();
             }
 
-            if (! $fromReceiver) {
+            if ($fromReceiver && $thread->isGuest()) {
+                throw CannotMessage::senderNotSignedIn();
+            }
+
+            // Guests cannot be answered, so the "wait for a reply" rule does not apply; request throttles do.
+            if (! $fromReceiver && ! $thread->isGuest()) {
                 $this->assertSenderNotSpamming($thread);
             }
 

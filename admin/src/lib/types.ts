@@ -33,7 +33,9 @@ export interface AdminThread {
   id: string;
   label: string;
   receiver: UserBrief;
-  sender: UserBrief;
+  /** Null for a guest who never signed in: there is no account to reveal. */
+  sender: UserBrief | null;
+  sender_kind: "user" | "guest";
   blocked_at: string | null;
   last_message_at: string | null;
   created_at: string;
@@ -58,7 +60,7 @@ export interface AdminReport {
   reviewed_at: string | null;
   reviewer: UserBrief | null;
   reporter: UserBrief;
-  reported_user: UserBrief;
+  reported_user: UserBrief | null;
   thread_id: string;
   message: { id: string; body: string; created_at: string };
   /** Only on the detail endpoint: the conversation around the reported message. */

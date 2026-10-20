@@ -268,6 +268,8 @@ export const useMessagingStore = defineStore("messaging", () => {
     const asReceiver = inbox.items.find(t => t.id === payload.thread_id);
     if (asReceiver && payload.blocked !== undefined)
       asReceiver.blocked = payload.blocked;
+    if (asReceiver && payload.can_chat !== undefined)
+      asReceiver.can_chat = payload.can_chat;
     const asSender = sent.items.find(t => t.id === payload.thread_id);
     if (asSender && payload.can_reply !== undefined)
       asSender.can_reply = payload.can_reply;

@@ -4,20 +4,24 @@
 import { defineConfig } from "#q-app";
 import { readFileSync } from "node:fs";
 
-/** http(s) origin of QCLI_API_URL (shell env wins over .env), or "" for the web builds that use their own origin. */
-function apiOrigin(): string {
-  let raw = process.env.QCLI_API_URL ?? "";
-  if (!raw) {
-    try {
-      raw =
-        /^QCLI_API_URL=(.*)$/m
-          .exec(readFileSync(".env", "utf8"))?.[1]
-          ?.trim() ?? "";
-    } catch {
-      // no .env: a plain web build
-    }
-  }
+/** A QCLI_* build variable: the shell environment wins over .env. */
+function envVar(name: string): string {
+  if (process.env[name]) return process.env[name];
   try {
+    return (
+      new RegExp(`^${name}=(.*)$`, "m")
+        .exec(readFileSync(".env", "utf8"))?.[1]
+        ?.trim() ?? ""
+    );
+  } catch {
+    return ""; // no .env: a plain web build
+  }
+}
+
+/** http(s) origin of QCLI_API_URL, or "" for the web builds that use their own origin. */
+function apiOrigin(): string {
+  try {
+    const raw = envVar("QCLI_API_URL");
     return raw ? new URL(raw).origin : "";
   } catch {
     return "";
@@ -41,7 +45,10 @@ export default defineConfig(ctx => {
     extras: [],
 
     // Where a device build's API lives (QCLI_API_URL), so the page's CSP can allow exactly that origin.
-    htmlVariables: { apiOrigin: apiOrigin() },
+    htmlVariables: {
+      apiOrigin: apiOrigin(),
+      turnstile: envVar("QCLI_TURNSTILE_SITE_KEY") !== ""
+    },
 
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-file#build
     build: {

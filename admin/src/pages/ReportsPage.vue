@@ -100,10 +100,10 @@ async function resolve(outcome: "reviewed" | "dismissed", banAuthor = false) {
   }
 }
 
-const reportedName = computed(() => report.value?.reported_user.name ?? "this user");
+const reportedName = computed(() => report.value?.reported_user?.name ?? "this guest");
 const canBan = computed(
   () =>
-    report.value &&
+    report.value?.reported_user != null &&
     report.value.reported_user.role !== "admin" &&
     !report.value.reported_user.banned_at,
 );
@@ -175,7 +175,9 @@ const statusTone = (s: ReportStatus) =>
                     timeAgo(r.created_at)
                   }}</time>
                 </span>
-                <span class="truncate text-xs text-fg-2">Against {{ r.reported_user.name }}</span>
+                <span class="truncate text-xs text-fg-2"
+                  >Against {{ r.reported_user?.name ?? "a guest" }}</span
+                >
                 <span class="truncate text-xs text-fg-3">“{{ r.message.body }}”</span>
               </RouterLink>
             </li>

@@ -10,6 +10,7 @@ use App\Http\Controllers\Auth\DevLoginController;
 use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Auth\SessionLoginController;
 use App\Http\Controllers\Auth\TokenLoginController;
+use App\Http\Controllers\GuestController;
 use App\Http\Controllers\MeController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PushController;
@@ -29,6 +30,9 @@ Route::prefix('auth')->middleware('throttle:auth')->group(function () {
 Route::get('push/config', [PushController::class, 'config'])->middleware('throttle:profile');
 
 // Public: the link page needs this before sign-in.
+Route::post('profiles/{username}/messages', [ProfileController::class, 'send'])
+    ->where('username', '[a-z0-9_.]{3,24}')
+    ->middleware('throttle:messages');
 Route::get('profiles/{username}', [ProfileController::class, 'show'])
     ->where('username', '[a-z0-9_.]{3,24}')
     ->middleware('throttle:profile');
@@ -50,9 +54,7 @@ Route::middleware(['auth:sanctum', 'not-banned'])->group(function () {
     Route::post('push/devices', [PushController::class, 'storeDevice'])->middleware('throttle:reports');
     Route::delete('push/devices', [PushController::class, 'destroyDevice']);
 
-    Route::post('profiles/{username}/messages', [ProfileController::class, 'send'])
-        ->where('username', '[a-z0-9_.]{3,24}')
-        ->middleware('throttle:messages');
+    Route::post('guest/claim', [GuestController::class, 'claim'])->middleware('throttle:reports');
 
     Route::get('inbox', [ThreadListController::class, 'inbox']);
     Route::get('sent', [ThreadListController::class, 'sent']);

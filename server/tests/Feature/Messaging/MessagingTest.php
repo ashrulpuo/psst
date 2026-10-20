@@ -67,9 +67,9 @@ class MessagingTest extends TestCase
 
     // ---- sending ----
 
-    public function test_sending_requires_sign_in(): void
+    public function test_sending_does_not_require_sign_in(): void
     {
-        $this->postJson('/api/profiles/alice/messages', ['body' => 'hi'])->assertUnauthorized();
+        $this->postJson('/api/profiles/alice/messages', ['body' => 'hi'])->assertCreated();
     }
 
     public function test_first_message_opens_a_thread_labelled_anonymous_1(): void

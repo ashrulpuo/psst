@@ -23,6 +23,11 @@ class PushNotifier
         }
 
         $recipientId = $message->from_receiver ? $thread->sender_id : $thread->receiver_id;
+
+        if ($recipientId === null) {
+            return;
+        }
+
         $recipient = User::query()->select(['id', 'banned_at'])->find($recipientId);
 
         if (! $recipient || $recipient->isBanned()) {

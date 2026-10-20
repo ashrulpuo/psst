@@ -26,7 +26,9 @@ class AdminReportResource extends JsonResource
             'reviewed_at' => $this->reviewed_at,
             'reviewer' => new AdminUserBriefResource($this->whenLoaded('reviewer')),
             'reporter' => new AdminUserBriefResource($this->whenLoaded('reporter')),
-            'reported_user' => new AdminUserBriefResource($this->whenLoaded('reportedUser')),
+            'reported_user' => $this->relationLoaded('reportedUser') && $this->reportedUser === null
+                ? null
+                : new AdminUserBriefResource($this->whenLoaded('reportedUser')),
             'thread_id' => $this->whenLoaded('message', fn () => $this->message->thread_id),
             'message' => $this->whenLoaded('message', fn () => [
                 'id' => $this->message->id,

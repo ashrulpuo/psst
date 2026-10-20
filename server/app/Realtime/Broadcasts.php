@@ -23,6 +23,11 @@ class Broadcasts
         $receiver = User::query()->select(['id', 'username', 'name', 'avatar_url'])->findOrFail($thread->receiver_id);
 
         foreach ([true, false] as $toReceiver) {
+            // A guest has no account to push to.
+            if (! $toReceiver && $thread->sender_id === null) {
+                continue;
+            }
+
             $authoredByRecipient = $message->from_receiver === $toReceiver;
 
             MessagePosted::dispatch(
@@ -35,6 +40,7 @@ class Broadcasts
                             'label' => 'Anonymous #'.$thread->anon_label,
                             'unread_count' => $thread->receiver_unread_count,
                             'blocked' => $thread->blocked_at !== null,
+                            'can_chat' => $thread->sender_id !== null,
                             'last_message_at' => $message->created_at,
                         ]
                         : [
@@ -63,7 +69,15 @@ class Broadcasts
     public function blockChanged(Thread $thread, bool $blocked): void
     {
         ThreadBlockChanged::dispatch($thread->receiver_id, ['thread_id' => $thread->id, 'blocked' => $blocked]);
-        ThreadBlockChanged::dispatch($thread->sender_id, ['thread_id' => $thread->id, 'can_reply' => ! $blocked]);
+        if ($thread->sender_id !== null) {
+            ThreadBlockChanged::dispatch($thread->sender_id, ['thread_id' => $thread->id, 'can_reply' => ! $blocked]);
+        }
+    }
+
+    /** A guest signed in: the receiver's open inbox learns the thread can now be replied to. */
+    public function threadClaimed(Thread $thread): void
+    {
+        ThreadBlockChanged::dispatch($thread->receiver_id, ['thread_id' => $thread->id, 'can_chat' => true]);
     }
 
     /**
@@ -72,9 +86,14 @@ class Broadcasts
     public function messagesRead(Thread $thread, User $reader): void
     {
         $readerIsReceiver = $thread->receiver_id === $reader->id;
+        $other = $readerIsReceiver ? $thread->sender_id : $thread->receiver_id;
+
+        if ($other === null) {
+            return; // the other side is a guest
+        }
 
         MessagesRead::dispatch(
-            $readerIsReceiver ? $thread->sender_id : $thread->receiver_id,
+            $other,
             ['thread_id' => $thread->id, 'read_at' => now()->toIso8601String()],
         );
     }

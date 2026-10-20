@@ -6,6 +6,9 @@ import { useMeta } from "quasar";
 import { Link2, UserX } from "@lucide/vue";
 import { ApiError } from "@/api/http";
 import { profileApi } from "@/api/endpoints";
+import { config } from "@/utils/config";
+import { guestToken, setGuestToken } from "@/utils/guest";
+import TurnstileBox from "@/components/TurnstileBox.vue";
 import type { PublicProfile } from "@/api/types";
 import { useAuthStore } from "@/stores/auth";
 import { useMessagingStore } from "@/stores/messaging";
@@ -26,6 +29,12 @@ const body = ref("");
 const sending = ref(false);
 const error = ref("");
 const sentThreadId = ref<string | null>(null);
+/** Sent without an account: offer sign-in as the way to get replies. */
+const sentAsGuest = ref(false);
+/** Honeypot: real people never see or fill this. */
+const website = ref("");
+const challenge = ref<string | null>(null);
+const turnstile = ref<InstanceType<typeof TurnstileBox> | null>(null);
 
 useMeta(() => ({
   title: profile.value ? `Message ${profile.value.name} · Psst` : "Psst"
@@ -35,8 +44,13 @@ const draftKey = computed(() => `psst.draft.${props.username}`);
 const isOwn = computed(() => auth.user?.username === props.username);
 const trimmed = computed(() => body.value.trim());
 const remaining = computed(() => MAX - body.value.length);
+const challengeNeeded = Boolean(config.turnstileSiteKey);
 const canSend = computed(
-  () => trimmed.value.length > 0 && remaining.value >= 0 && !sending.value
+  () =>
+    trimmed.value.length > 0 &&
+    remaining.value >= 0 &&
+    !sending.value &&
+    (auth.isAuthenticated || !challengeNeeded || challenge.value !== null)
 );
 
 // Keep a half-written message across the sign-in round trip (and accidental refreshes).
@@ -75,28 +89,44 @@ watch(() => props.username, load);
 
 async function submit() {
   if (!canSend.value) return;
-  if (!auth.isAuthenticated) {
-    await router.push({
-      path: "/login",
-      query: { next: `/${props.username}` }
-    });
-    return;
-  }
   sending.value = true;
   error.value = "";
   try {
-    const result = await profileApi.send(props.username, trimmed.value);
-    sentThreadId.value = result.thread_id;
+    const result = await profileApi.send(
+      props.username,
+      trimmed.value,
+      auth.isAuthenticated
+        ? undefined
+        : {
+            token: guestToken(),
+            ...(challenge.value ? { challenge: challenge.value } : {}),
+            website: website.value
+          }
+    );
+    if ("guest_token" in result) {
+      setGuestToken(result.guest_token);
+      sentAsGuest.value = true;
+      sentThreadId.value = "guest";
+    } else {
+      sentAsGuest.value = false;
+      sentThreadId.value = result.thread_id;
+      void messaging.loadSent();
+    }
     body.value = "";
-    void messaging.loadSent();
   } catch (e) {
     error.value =
       e instanceof Error
         ? e.message
         : "Something went wrong. Please try again.";
+    // A challenge token is single-use.
+    turnstile.value?.reset();
   } finally {
     sending.value = false;
   }
+}
+
+function signInToChat() {
+  void router.push({ path: "/login", query: { next: "/sent" } });
 }
 
 const copied = ref(false);
@@ -163,8 +193,20 @@ async function copyOwn() {
     <p class="text-secondary-copy">{{
       $t("profile.sentBody", { name: profile.name })
     }}</p>
+    <p v-if="sentAsGuest" class="chat-offer text-secondary-copy">
+      {{ $t("profile.chatOffer") }}
+    </p>
     <div class="row">
       <q-btn
+        v-if="sentAsGuest"
+        color="primary"
+        unelevated
+        no-caps
+        :label="$t('profile.signInToChat')"
+        @click="signInToChat"
+      />
+      <q-btn
+        v-else
         color="primary"
         unelevated
         no-caps
@@ -211,12 +253,26 @@ async function copyOwn() {
         :class="{ over: remaining < 0 }"
       >
         <span v-if="error" class="error" role="alert">{{ error }}</span>
-        <span v-else-if="!auth.isAuthenticated && trimmed">{{
-          $t("profile.signInNote")
-        }}</span>
         <span class="count" aria-live="polite">{{ remaining }}</span>
       </p>
     </div>
+
+    <!-- Honeypot: hidden from people and assistive tech, irresistible to form-filling bots. -->
+    <input
+      v-model="website"
+      class="hp"
+      type="text"
+      name="website"
+      tabindex="-1"
+      autocomplete="off"
+      aria-hidden="true"
+    />
+
+    <TurnstileBox
+      v-if="!auth.isAuthenticated"
+      ref="turnstile"
+      @token="challenge = $event"
+    />
 
     <q-btn
       type="submit"
@@ -226,14 +282,36 @@ async function copyOwn() {
       size="lg"
       :loading="sending"
       :disable="!canSend"
-      :label="
-        auth.isAuthenticated ? $t('profile.send') : $t('profile.signInToSend')
-      "
+      :label="$t('profile.send')"
     />
+
+    <router-link v-if="!auth.isAuthenticated" to="/login" class="own-link">{{
+      $t("profile.getYourOwn")
+    }}</router-link>
   </form>
 </template>
 
 <style scoped lang="scss">
+.own-link {
+  justify-self: center;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  font-size: var(--text-secondary);
+  color: var(--accent-text, var(--accent));
+}
+.hp {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+.chat-offer {
+  max-width: 32ch;
+  margin-inline: auto;
+  text-align: center;
+}
 .card {
   display: grid;
   gap: var(--s-5);

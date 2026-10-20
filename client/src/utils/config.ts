@@ -29,6 +29,9 @@ export const config = {
   /** iOS OAuth client ID for native Google sign-in (the web client ID above is used on Android). */
   googleIosClientId:
     (import.meta.env.QCLI_GOOGLE_IOS_CLIENT_ID as string | undefined) ?? "",
+  /** Cloudflare Turnstile site key (public). Empty = no challenge on anonymous sends; set TURNSTILE_SECRET on the server too. */
+  turnstileSiteKey:
+    (import.meta.env.QCLI_TURNSTILE_SITE_KEY as string | undefined) ?? "",
   /** Test builds only: run the native code paths in a normal browser against in-page fakes (see native/simulator.ts). */
   nativeSimulator: String(import.meta.env.QCLI_NATIVE_SIMULATOR) === "true",
   /** Local-only shortcut: shows demo-account sign-in. The API refuses it in production regardless. */
