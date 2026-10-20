@@ -1,5 +1,6 @@
 import type Echo from "laravel-echo";
-import { xsrfToken } from "@/api/http";
+import { apiOrigin, getAuthToken, xsrfToken } from "@/api/http";
+import { isNativeApp } from "@/native/platform";
 import type {
   BlockChangedPayload,
   MessagePostedPayload,
@@ -23,20 +24,27 @@ interface PusherLike {
 
 let echo: Echo<"reverb"> | null = null;
 
-/** Ask the API whether this session may join a private channel (cookie session + CSRF header). */
+/** Ask the API whether this session may join a private channel: cookie + CSRF on the web, bearer on a device. */
 async function authorizeChannel(
   socketId: string,
   channelName: string
 ): Promise<unknown> {
-  const token = xsrfToken();
-  const response = await fetch("/api/broadcasting/auth", {
+  const headers: Record<string, string> = {
+    Accept: "application/json",
+    "Content-Type": "application/json"
+  };
+  if (isNativeApp) {
+    const bearer = getAuthToken();
+    if (bearer) headers.Authorization = `Bearer ${bearer}`;
+  } else {
+    const token = xsrfToken();
+    if (token) headers["X-XSRF-TOKEN"] = token;
+  }
+
+  const response = await fetch(new URL("/api/broadcasting/auth", apiOrigin()), {
     method: "POST",
-    credentials: "include",
-    headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json",
-      ...(token ? { "X-XSRF-TOKEN": token } : {})
-    },
+    credentials: isNativeApp ? "omit" : "include",
+    headers,
     body: JSON.stringify({ socket_id: socketId, channel_name: channelName })
   });
   if (!response.ok)
@@ -60,13 +68,15 @@ export async function openConnection(
   ]);
   (window as unknown as { Pusher: typeof Pusher }).Pusher = Pusher;
 
-  const secure = window.location.protocol === "https:";
-  const port = Number(window.location.port) || (secure ? 443 : 80);
+  // Reverb lives behind the API's host (Caddy proxies /app); a device app's own origin is capacitor://localhost.
+  const origin = new URL(apiOrigin());
+  const secure = origin.protocol === "https:";
+  const port = Number(origin.port) || (secure ? 443 : 80);
 
   const client = new EchoClient({
     broadcaster: "reverb",
     key: config.reverbKey,
-    wsHost: window.location.hostname,
+    wsHost: origin.hostname,
     wsPort: port,
     wssPort: port,
     forceTLS: secure,

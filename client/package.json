@@ -25,7 +25,10 @@
     "e2e:realtime": "node e2e/realtime.mjs",
     "dev:pwa": "quasar dev -m pwa",
     "build:pwa": "quasar build -m pwa",
-    "e2e:push": "node e2e/push.mjs"
+    "e2e:push": "node e2e/push.mjs",
+    "e2e:native": "node e2e/native.mjs",
+    "build:android": "quasar build -m capacitor -T android",
+    "build:ios": "quasar build -m capacitor -T ios"
   },
   "dependencies": {
     "@fontsource-variable/inter": "^5.3.0",
@@ -40,6 +43,12 @@
     "vue-router": "^5.0.6"
   },
   "devDependencies": {
+    "@aparajita/capacitor-secure-storage": "^8.0.1",
+    "@capacitor-firebase/messaging": "^8.5.2",
+    "@capacitor/keyboard": "^8.0.6",
+    "@capacitor/splash-screen": "^8.0.2",
+    "@capacitor/status-bar": "^8.0.4",
+    "@capgo/capacitor-social-login": "^8.7.4",
     "@intlify/unplugin-vue-i18n": "^11.0.0",
     "@quasar/app-vite": "^3.10.3",
     "@types/node": "^22.19.11",

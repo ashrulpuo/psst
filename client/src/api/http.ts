@@ -20,10 +20,24 @@ export class ApiError extends Error {
   }
 }
 
+import { isNativeApp } from "@/native/platform";
+import { config } from "@/utils/config";
+
 type Method = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 
 let csrfReady: Promise<void> | null = null;
+/** Native apps authenticate with a bearer token instead of a cookie session. */
+let authToken: string | null = null;
 let onUnauthorized: () => void = () => {};
+
+export function setAuthToken(token: string | null) {
+  authToken = token;
+}
+
+export const getAuthToken = () => authToken;
+
+/** Where API requests go: the configured API origin on native, otherwise the page's own origin. */
+export const apiOrigin = () => config.apiUrl || window.location.origin;
 
 /** Called when an authenticated request comes back 401 (session expired). */
 export function setUnauthorizedHandler(handler: () => void) {
@@ -36,6 +50,8 @@ export function xsrfToken(): string | undefined {
 }
 
 function ensureCsrf(): Promise<void> {
+  // Bearer-token requests are not CSRF-prone (nothing is attached automatically), so native skips it.
+  if (isNativeApp) return Promise.resolve();
   csrfReady ??= fetch("/sanctum/csrf-cookie", { credentials: "include" })
     .then(() => undefined)
     .catch(() => {
@@ -55,19 +71,27 @@ export async function request<T>(
 ): Promise<T> {
   if (method !== "GET") await ensureCsrf();
 
-  const url = new URL(`/api${path}`, window.location.origin);
+  const url = new URL(`/api${path}`, apiOrigin());
   for (const [key, value] of Object.entries(options.query ?? {})) {
     if (value !== undefined) url.searchParams.set(key, value);
   }
 
   const headers: Record<string, string> = { Accept: "application/json" };
   if (options.body !== undefined) headers["Content-Type"] = "application/json";
-  const token = xsrfToken();
-  if (token) headers["X-XSRF-TOKEN"] = token;
+  if (isNativeApp) {
+    if (authToken) headers.Authorization = `Bearer ${authToken}`;
+  } else {
+    const token = xsrfToken();
+    if (token) headers["X-XSRF-TOKEN"] = token;
+  }
 
   let response: Response;
   try {
-    const init: RequestInit = { method, headers, credentials: "include" };
+    const init: RequestInit = {
+      method,
+      headers,
+      credentials: isNativeApp ? "omit" : "include"
+    };
     if (options.body !== undefined) init.body = JSON.stringify(options.body);
     response = await fetch(url, init);
   } catch {

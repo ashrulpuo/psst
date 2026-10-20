@@ -2,6 +2,27 @@
 // https://v2.quasar.dev/quasar-cli-vite/quasar-config-file
 
 import { defineConfig } from "#q-app";
+import { readFileSync } from "node:fs";
+
+/** http(s) origin of QCLI_API_URL (shell env wins over .env), or "" for the web builds that use their own origin. */
+function apiOrigin(): string {
+  let raw = process.env.QCLI_API_URL ?? "";
+  if (!raw) {
+    try {
+      raw =
+        /^QCLI_API_URL=(.*)$/m
+          .exec(readFileSync(".env", "utf8"))?.[1]
+          ?.trim() ?? "";
+    } catch {
+      // no .env: a plain web build
+    }
+  }
+  try {
+    return raw ? new URL(raw).origin : "";
+  } catch {
+    return "";
+  }
+}
 
 export default defineConfig(ctx => {
   return {
@@ -11,13 +32,16 @@ export default defineConfig(ctx => {
     // app boot file (/src/boot)
     // --> boot files are part of "main.js"
     // https://v2.quasar.dev/quasar-cli-vite/boot-files
-    boot: ["i18n", "fonts", "theme", "auth", "pwa"],
+    boot: ["i18n", "fonts", "theme", "auth", "pwa", "native"],
 
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-file#css
     css: ["app.scss"],
 
     // https://github.com/quasarframework/quasar/tree/dev/extras
     extras: [],
+
+    // Where a device build's API lives (QCLI_API_URL), so the page's CSP can allow exactly that origin.
+    htmlVariables: { apiOrigin: apiOrigin() },
 
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-file#build
     build: {

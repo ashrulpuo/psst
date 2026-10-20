@@ -35,12 +35,15 @@ Variables must start with `QCLI_` (Quasar v3 convention) and are public: never p
 
 ## Scripts
 
-| Command                         |                                                  |
-| ------------------------------- | ------------------------------------------------ |
-| `pnpm dev`                      | Dev server with HMR                              |
-| `pnpm build`                    | Production SPA in `dist/spa`                     |
-| `pnpm typecheck`                | `vue-tsc` (strict, `exactOptionalPropertyTypes`) |
-| `pnpm lint` / `pnpm lint:check` | oxfmt + oxlint                                   |
+| Command                            |                                                               |
+| ---------------------------------- | ------------------------------------------------------------- |
+| `pnpm dev`                         | Dev server with HMR                                           |
+| `pnpm build`                       | Production SPA in `dist/spa`                                  |
+| `pnpm build:pwa`                   | Installable PWA (service worker, web push)                    |
+| `pnpm build:android` / `build:ios` | Capacitor apps — see [`../docs/MOBILE.md`](../docs/MOBILE.md) |
+| `pnpm e2e:native`                  | Native code paths in Chromium with fake plugins               |
+| `pnpm typecheck`                   | `vue-tsc` (strict, `exactOptionalPropertyTypes`)              |
+| `pnpm lint` / `pnpm lint:check`    | oxfmt + oxlint                                                |
 
 ## Structure
 
@@ -67,8 +70,8 @@ overflow at 375px or 1280px, real dark mode, `prefers-reduced-motion` honoured.
 - Live updates arrive over Reverb WebSockets. If the socket is down (or `QCLI_REVERB_KEY` is empty) the app polls
   instead: 6s in an open conversation, 15s for lists, paused while the tab is hidden. While connected, polling
   slows to 30s/60s as a safety net, and a reconnect re-fetches whatever was missed.
-- Web Push works in browsers and installed PWAs. Native mobile push (FCM) and the Capacitor/desktop builds are not
-  built yet, nor is i18n beyond English or the marketing landing page.
+- Web Push works in browsers and installed PWAs. Mobile apps (Capacitor, FCM push) are wired up but never compiled or run on a device here, see `../docs/MOBILE.md`.
+  Desktop (Electron/Tauri) builds, i18n beyond English or the marketing landing page.
 - The push browser test stubs the browser's subscribe call (headless Chromium can't reach Google's push service)
   and delivers pushes to the service worker over DevTools. Delivery through the real push services has not been
   exercised.

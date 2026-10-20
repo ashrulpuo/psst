@@ -1,5 +1,13 @@
 import { ref } from "vue";
 import { pushApi } from "@/api/endpoints";
+import { isNativeApp } from "@/native/platform";
+import {
+  detachNative,
+  disableNative,
+  enableNative,
+  refreshNative,
+  syncNative
+} from "./nativePush";
 
 /**
  * - unsupported:   this browser/context can't do Web Push (or no service worker is registered)
@@ -20,6 +28,7 @@ const busy = ref(false);
 const failed = ref(false);
 
 const isIos = /iPad|iPhone|iPod/.test(navigator.userAgent);
+const context = { state, busy, failed };
 
 /** VAPID public keys travel as base64url; the Push API wants raw bytes. */
 function keyToBytes(key: string): Uint8Array<ArrayBuffer> {
@@ -52,6 +61,7 @@ function toRegistration(sub: PushSubscription) {
 
 /** Work out where this device stands. Safe to call repeatedly. */
 async function refresh(): Promise<void> {
+  if (isNativeApp) return refreshNative(context);
   if (!supported() || !(await registration())) {
     state.value = "unsupported";
     return;
@@ -77,6 +87,7 @@ async function refresh(): Promise<void> {
 
 /** Must be called from a click: browsers only show the permission prompt after a user gesture. */
 async function enable(): Promise<void> {
+  if (isNativeApp) return enableNative(context);
   busy.value = true;
   failed.value = false;
   try {
@@ -107,6 +118,7 @@ async function enable(): Promise<void> {
 }
 
 async function disable(): Promise<void> {
+  if (isNativeApp) return disableNative(context);
   busy.value = true;
   failed.value = false;
   try {
@@ -128,6 +140,7 @@ async function disable(): Promise<void> {
  * server moves a device to whoever last registered it) and heal browser-rotated subscriptions.
  */
 async function syncThisDevice(): Promise<void> {
+  if (isNativeApp) return syncNative();
   try {
     if (!supported() || Notification.permission !== "granted") return;
     const sub = await (await registration())?.pushManager.getSubscription();
@@ -142,6 +155,7 @@ async function syncThisDevice(): Promise<void> {
  * next person who signs in here is simply re-registered by syncThisDevice().
  */
 async function detachThisDevice(): Promise<void> {
+  if (isNativeApp) return detachNative();
   try {
     if (!supported()) return;
     const sub = await (await registration())?.pushManager.getSubscription();

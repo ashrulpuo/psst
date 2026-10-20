@@ -9,8 +9,27 @@ import type {
   SentThread
 } from "./types";
 
+export interface TokenLogin {
+  token: string;
+  user: Me;
+}
+
 export const authApi = {
   me: () => http.get<{ data: Me }>("/me", undefined, true).then(r => r.data),
+  /** Native sign-in: the same ID-token verification, answered with a bearer token instead of a cookie session. */
+  signInToken: (
+    provider: Provider,
+    idToken: string,
+    nonce: string,
+    deviceName: string,
+    name?: string
+  ) =>
+    http.post<TokenLogin>(`/auth/${provider}/token`, {
+      id_token: idToken,
+      nonce,
+      device_name: deviceName,
+      ...(name ? { name } : {})
+    }),
   signIn: (provider: Provider, idToken: string, nonce: string, name?: string) =>
     http
       .post<{ data: Me }>(`/auth/${provider}`, {
@@ -21,7 +40,7 @@ export const authApi = {
       .then(r => r.data),
   /** Local development only; the endpoint does not exist in production. */
   devLogin: (email: string) =>
-    http.post<{ data: Me }>("/dev/login", { email }).then(r => r.data),
+    http.post<{ data: Me } | TokenLogin>("/dev/login", { email }),
   setUsername: (username: string) =>
     http.patch<{ data: Me }>("/me/username", { username }).then(r => r.data),
   logout: () => http.post<void>("/auth/logout"),
@@ -67,14 +86,32 @@ export interface WebPushRegistration {
   keys: { p256dh: string; auth: string };
 }
 
+export interface PushConfig {
+  /** VAPID public key for browsers; null when Web Push is off. */
+  publicKey: string | null;
+  /** Whether the server can push to the native apps. */
+  fcm: boolean;
+}
+
 export const pushApi = {
-  /** VAPID public key, or null when the server has push switched off. */
-  publicKey: () =>
+  config: () =>
     http
-      .get<{ data: { public_key: string | null } }>("/push/config")
-      .then(r => r.data.public_key),
+      .get<{ data: { public_key: string | null; fcm: boolean } }>(
+        "/push/config"
+      )
+      .then((r): PushConfig => ({
+        publicKey: r.data.public_key,
+        fcm: r.data.fcm
+      })),
+  /** VAPID public key, or null when the server has push switched off. */
+  publicKey: () => pushApi.config().then(c => c.publicKey),
   register: (subscription: WebPushRegistration) =>
     http.post<void>("/push/subscriptions", subscription),
   unregister: (endpoint: string) =>
-    request<void>("DELETE", "/push/subscriptions", { body: { endpoint } })
+    request<void>("DELETE", "/push/subscriptions", { body: { endpoint } }),
+  /** Native devices register their FCM token. */
+  registerDevice: (token: string, platform: "ios" | "android") =>
+    http.post<void>("/push/devices", { token, platform }),
+  unregisterDevice: (token: string) =>
+    request<void>("DELETE", "/push/devices", { body: { token } })
 };

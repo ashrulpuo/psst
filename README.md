@@ -3,20 +3,20 @@
 Anonymous messaging with two-way chat. Receivers get a public link; senders sign in (Google / Apple) and stay
 anonymous **to the receiver** — admins can identify senders (disclose this in the Terms and Privacy Policy).
 
-Client: [`client/README.md`](client/README.md). Admin: [`admin/README.md`](admin/README.md). Plan and design docs live in [`docs/`](docs/): `PLAN.md`, `DATABASE.md`, `DESIGN.md`, `DEVELOPMENT.md`.
+Client: [`client/README.md`](client/README.md). Admin: [`admin/README.md`](admin/README.md). Plan and design docs live in [`docs/`](docs/): `MOBILE.md`, `PLAN.md`, `DATABASE.md`, `DESIGN.md`, `DEVELOPMENT.md`.
 
 ## Status
 
 | Done | Not yet |
 |---|---|
-| **Server** (`server/`): schema, models, Google/Apple sign-in, username onboarding | FCM push for the native mobile apps |
+| **Server** (`server/`): schema, models, Google/Apple sign-in, username onboarding | Mobile apps compiled and run on real devices / real FCM, Google and Apple sheets (see `docs/MOBILE.md`) |
 | Threads, messages, inbox, sent, read state, block/report, rate limits | Caddy config for the two SPAs has not been run (no Caddy here) |
-| **Web client** (`client/`): sign-in, username, public link page, inbox/sent split pane, settings, dark mode | Capacitor (mobile) and desktop builds |
+| **Web client** (`client/`): sign-in, username, public link page, inbox/sent split pane, settings, dark mode | Desktop (macOS/Windows) builds |
 | **Realtime** (Reverb): live messages, read receipts, block state; polling only as fallback | Docker images (compose file written, never built) |
 | **Web Push** (VAPID): per-device opt-in, queued delivery, installable PWA | |
 | **Admin dashboard** (`admin/`): users, conversations with real identities, report triage, bans, audit log; mandatory TOTP 2FA | |
-| Browser tests: client `pnpm e2e` (21), `e2e:realtime` (7), `e2e:push` (12); admin `pnpm e2e` (16) | |
-| | Real Google/Apple credentials (tests use a fake provider) |
+| Browser tests: client `pnpm e2e` (21), `e2e:realtime` (7), `e2e:push` (12), `e2e:native` (15); admin `pnpm e2e` (16) | |
+| **Mobile (Capacitor)**: native sign-in/Keychain token, FCM push, deep links, safe areas, icons; `e2e:native` (15) | Real Google/Apple credentials (tests use a fake provider) |
 
 ## Run the API locally
 

@@ -24,7 +24,7 @@ import { MessageCircle } from "@lucide/vue";
 .auth-shell {
   display: grid;
   place-items: center;
-  min-height: 100dvh;
+  min-height: calc(100dvh - var(--safe-top));
   padding: var(--s-5) var(--s-4);
 }
 .auth-main {

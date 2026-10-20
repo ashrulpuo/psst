@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Psst</string>
+    <string name="title_activity_main">Psst</string>
+    <string name="package_name">app.psst.mobile</string>
+    <string name="custom_url_scheme">app.psst.mobile</string>
+    <!-- The public host of your deployment, for verified app links. Must match APP_DOMAIN in deploy/.env. -->
+    <string name="deep_link_host">psst.example.com</string>
+</resources>

@@ -89,7 +89,7 @@ const items = [
 
 <style scoped lang="scss">
 .shell {
-  min-height: 100dvh;
+  min-height: calc(100dvh - var(--safe-top));
 }
 
 // ---- narrow: bottom tab bar ----
@@ -169,7 +169,7 @@ const items = [
     flex-direction: column;
     align-items: center;
     width: var(--rail-width);
-    height: 100dvh;
+    height: calc(100dvh - var(--safe-top));
     padding: var(--s-4) 0;
     border-top: 0;
     border-right: 1px solid var(--border);

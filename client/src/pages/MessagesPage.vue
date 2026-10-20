@@ -155,7 +155,9 @@ async function copyLink() {
 <style scoped lang="scss">
 // Narrow: exactly one pane. The page area is the viewport minus the bottom tab bar.
 .split {
-  --pane-height: calc(100dvh - var(--nav-height) - env(safe-area-inset-bottom));
+  --pane-height: calc(
+    100dvh - var(--safe-top) - var(--nav-height) - env(safe-area-inset-bottom)
+  );
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   width: 100%;
@@ -228,7 +230,7 @@ async function copyLink() {
 // Wide: both panes side by side.
 @media (min-width: 900px) {
   .split {
-    --pane-height: 100dvh;
+    --pane-height: calc(100dvh - var(--safe-top));
     grid-template-columns: 380px minmax(0, 1fr);
   }
   .has-thread .list-pane,

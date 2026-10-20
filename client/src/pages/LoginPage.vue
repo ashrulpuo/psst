@@ -9,6 +9,8 @@ import { safeNext } from "@/features/auth/redirect";
 import GoogleSignIn from "@/features/auth/GoogleSignIn.vue";
 import AppleSignIn from "@/features/auth/AppleSignIn.vue";
 import DevLogin from "@/features/auth/DevLogin.vue";
+import NativeSignIn from "@/features/auth/NativeSignIn.vue";
+import { isNativeApp } from "@/native/platform";
 
 useMeta({ title: "Sign in · Psst" });
 
@@ -40,15 +42,22 @@ async function done() {
     </header>
 
     <div class="providers">
-      <GoogleSignIn @signed-in="done" @failed="failed = true" />
-      <AppleSignIn @signed-in="done" @failed="failed = true" />
-      <p
-        v-if="!googleOn && !appleOn && !devOn"
-        class="text-secondary-copy"
-        role="status"
-      >
-        {{ $t("login.notConfigured") }}
-      </p>
+      <NativeSignIn
+        v-if="isNativeApp"
+        @signed-in="done"
+        @failed="failed = true"
+      />
+      <template v-else>
+        <GoogleSignIn @signed-in="done" @failed="failed = true" />
+        <AppleSignIn @signed-in="done" @failed="failed = true" />
+        <p
+          v-if="!googleOn && !appleOn && !devOn"
+          class="text-secondary-copy"
+          role="status"
+        >
+          {{ $t("login.notConfigured") }}
+        </p>
+      </template>
     </div>
 
     <p v-if="failed" class="error" role="alert">{{ $t("login.failed") }}</p>

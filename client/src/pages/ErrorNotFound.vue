@@ -24,7 +24,7 @@ import EmptyState from "@/components/EmptyState.vue";
 <style scoped lang="scss">
 .wrap {
   display: grid;
-  min-height: 100dvh;
+  min-height: calc(100dvh - var(--safe-top));
   place-items: center;
   padding: var(--s-5) var(--s-4);
 }
