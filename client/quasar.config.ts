@@ -32,7 +32,7 @@ export default defineConfig(ctx => {
     // app boot file (/src/boot)
     // --> boot files are part of "main.js"
     // https://v2.quasar.dev/quasar-cli-vite/boot-files
-    boot: ["i18n", "fonts", "theme", "auth", "pwa", "native"],
+    boot: ["i18n", "fonts", "theme", "auth", "pwa", "native", "desktop"],
 
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-file#css
     css: ["app.scss"],
@@ -235,12 +235,14 @@ export default defineConfig(ctx => {
       packager: {
         // https://github.com/electron-userland/electron-packager/blob/master/docs/api.md#options
         // OS X / Mac App Store
-        // appBundleId: '',
-        // appCategoryType: '',
-        // osxSign: '',
-        // protocol: 'myapp://path',
-        // Windows only
-        // win32metadata: { ... }
+        appBundleId: "app.psst.desktop",
+        appCategoryType: "public.app-category.social-networking",
+        // Unsigned by default; see docs/DESKTOP.md for code signing and notarization.
+        win32metadata: {
+          ProductName: "Psst",
+          CompanyName: "Psst",
+          FileDescription: "Psst"
+        }
       },
 
       builder: {

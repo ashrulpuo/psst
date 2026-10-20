@@ -2,15 +2,11 @@ import { defineBoot } from "#q-app";
 import { Dark } from "quasar";
 import { watch } from "vue";
 import { nativeAdapters } from "@/native/adapters";
+import { safePath } from "@/native/links";
 import { isNativeApp } from "@/native/platform";
 import { onTokenRotated } from "@/features/push/nativePush";
 import { config } from "@/utils/config";
 import { useAuthStore } from "@/stores/auth";
-
-/** Same-origin in-app paths only: whatever a link or notification carries, it can never navigate elsewhere. */
-function safePath(path: string): string | null {
-  return path.startsWith("/") && !path.startsWith("//") ? path : null;
-}
 
 /**
  * A universal/app link (https://<public host>/alice) arrives as a full URL. Only our own host is honoured,

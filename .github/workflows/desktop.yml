@@ -1,0 +1,46 @@
+name: Desktop builds
+
+# Manual (or on a version tag): builds unsigned macOS / Windows / Linux apps and attaches them to the run.
+on:
+  workflow_dispatch:
+    inputs:
+      app_url:
+        description: Public URL of your Psst server (baked into the app)
+        required: true
+  push:
+    tags: ["desktop-v*"]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: ubuntu-latest, target: linux }
+          - { os: windows-latest, target: win32 }
+          - { os: macos-latest, target: darwin }
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        working-directory: client
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: client/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build:desktop
+        env:
+          QCLI_PUBLIC_URL: ${{ inputs.app_url || vars.PSST_APP_URL }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: psst-desktop-${{ matrix.target }}
+          path: client/dist/electron/Packaged
