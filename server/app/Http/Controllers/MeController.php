@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\Account\DeleteAccount;
+use App\Http\Requests\DeleteAccountRequest;
 use App\Http\Requests\SetUsernameRequest;
 use App\Http\Requests\UpdatePreferencesRequest;
 use App\Http\Resources\MeResource;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Validation\ValidationException;
 
 class MeController extends Controller
@@ -41,5 +44,24 @@ class MeController extends Controller
         $user->forceFill(['push_previews' => $request->validated('push_previews')])->save();
 
         return new MeResource($user);
+    }
+
+    /**
+     * Erase the account for good. Admins must be demoted first: their audit trail must stay attributable.
+     */
+    public function destroy(DeleteAccountRequest $request, DeleteAccount $deleteAccount): Response
+    {
+        $user = $request->user();
+
+        abort_if($user->isAdmin(), 403, 'Admin accounts cannot be deleted here. Ask another admin to change your role first.');
+
+        $deleteAccount->delete($user);
+
+        // The session (cookie clients) is invalid now; tokens were deleted with the user.
+        if ($request->hasSession()) {
+            $request->session()->invalidate();
+        }
+
+        return response()->noContent();
     }
 }

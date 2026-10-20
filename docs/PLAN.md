@@ -73,3 +73,12 @@ Therefore senders must be identifiable -> **senders sign in with SSO too** (reco
 - Confirm: senders must sign in with SSO?
 - Project name
 - Web client tech: Inertia + Vue vs Flutter web
+
+## Account deletion (decision record)
+
+`DELETE /api/me` with the username typed as confirmation. Erases the user, their identities, tokens, sessions, push
+devices, blocks and reports, **and every thread they are part of** (as receiver or sender), so no message traceable to
+them survives; the other party loses those conversations. The username becomes claimable again. Only residue: an
+`account.deleted` audit row with the opaque id (no PII). Admins cannot self-delete (the append-only audit log must
+stay attributable); demote first. Banned users are blocked by the ban middleware, so deletion cannot be used to dodge a
+ban while the account row still exists.

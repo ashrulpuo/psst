@@ -114,6 +114,14 @@ export const useAuthStore = defineStore("auth", () => {
     }
   }
 
+  /** Erase the account, then forget the session locally (the server already dropped it). */
+  async function deleteAccount(confirmation: string) {
+    await authApi.deleteAccount(confirmation);
+    if (isNativeApp)
+      await (await nativeAdapters()).signIn.signOut().catch(() => undefined);
+    clear();
+  }
+
   return {
     user,
     ready,
@@ -126,6 +134,7 @@ export const useAuthStore = defineStore("auth", () => {
     setUsername,
     setPushPreviews,
     clear,
+    deleteAccount,
     logout
   };
 });

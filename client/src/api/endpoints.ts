@@ -44,6 +44,9 @@ export const authApi = {
   setUsername: (username: string) =>
     http.patch<{ data: Me }>("/me/username", { username }).then(r => r.data),
   logout: () => http.post<void>("/auth/logout"),
+  /** Permanent. `confirmation` is the username typed by the user. */
+  deleteAccount: (confirmation: string) =>
+    request<void>("DELETE", "/me", { body: { confirmation } }),
   setPushPreviews: (enabled: boolean) =>
     http
       .patch<{ data: Me }>("/me/preferences", { push_previews: enabled })

@@ -15,8 +15,9 @@ Client: [`client/README.md`](client/README.md). Admin: [`admin/README.md`](admin
 | **Realtime** (Reverb): live messages, read receipts, block state; polling only as fallback | Docker images (compose file written, never built) |
 | **Web Push** (VAPID): per-device opt-in, queued delivery, installable PWA | |
 | **Admin dashboard** (`admin/`): users, conversations with real identities, report triage, bans, audit log; mandatory TOTP 2FA | |
-| Browser tests: client `pnpm e2e` (21), `e2e:realtime` (7), `e2e:push` (12), `e2e:native` (15); admin `pnpm e2e` (16) | |
+| Browser tests: client `pnpm e2e` (21), `e2e:realtime` (7), `e2e:push` (12), `e2e:native` (15), `e2e:account` (6); admin `pnpm e2e` (16) | |
 | **Desktop (Electron)**: hardened shell, native notifications + badge, offline page; `e2e:desktop` (12, Linux) | |
+| **Account deletion**: typed confirmation, erases the user and all their conversations, opaque audit record; admins must be demoted first | |
 | **Mobile (Capacitor)**: native sign-in/Keychain token, FCM push, deep links, safe areas, icons; `e2e:native` (15) | Real Google/Apple credentials (tests use a fake provider) |
 
 ## Run the API locally

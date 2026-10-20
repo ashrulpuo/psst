@@ -42,6 +42,7 @@ Route::middleware(['auth:sanctum', 'not-banned'])->group(function () {
 
     Route::get('me', [MeController::class, 'show']);
     Route::patch('me/username', [MeController::class, 'setUsername']);
+    Route::delete('me', [MeController::class, 'destroy'])->middleware('throttle:reports');
     Route::patch('me/preferences', [MeController::class, 'updatePreferences']);
 
     Route::post('push/subscriptions', [PushController::class, 'store'])->middleware('throttle:reports');

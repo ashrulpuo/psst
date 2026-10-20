@@ -117,7 +117,20 @@ export default {
       "Off by default, so nobody sees your messages on a locked screen.",
     account: "Account",
     signedInAs: "Signed in as {email}",
-    signOut: "Sign out"
+    signOut: "Sign out",
+    danger: "Delete account",
+    dangerBody:
+      "Permanently erases your account, your link, and every conversation you're part of, including messages you sent. This can't be undone.",
+    deleteOpen: "Delete my account",
+    deleteTitle: "Delete your account?",
+    deleteBody:
+      "Everything is erased for good: your inbox, the messages you sent to others, and your link. The people you talked to lose those conversations too.",
+    deleteLabel: "Type {name} to confirm",
+    deleteConfirm: "Delete forever",
+    deleteMismatch: "That doesn't match. Type it exactly as shown.",
+    deleteFailed: "We couldn't delete your account. Please try again.",
+    deleteAdmin:
+      "Admin accounts can't be deleted here. Ask another admin to change your role first."
   },
 
   push: {

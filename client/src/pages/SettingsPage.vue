@@ -2,18 +2,22 @@
 // Pattern: Settings — grouped sections in a single column.
 import { onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
+import { useI18n } from "vue-i18n";
 import { useMeta, useQuasar } from "quasar";
-import { Bell, BellOff, Copy, LogOut, Share2 } from "@lucide/vue";
+import { Bell, BellOff, Copy, LogOut, Share2, Trash2 } from "@lucide/vue";
 import { applyTheme, THEME_KEY, type ThemeChoice } from "@/boot/theme";
 import { useAuthStore } from "@/stores/auth";
 import { useMessagingStore } from "@/stores/messaging";
 import { copyText } from "@/utils/clipboard";
 import AppAvatar from "@/components/AppAvatar.vue";
+import DeleteAccountDialog from "@/components/DeleteAccountDialog.vue";
+import { ApiError } from "@/api/http";
 import { usePush } from "@/features/push/usePush";
 
 useMeta({ title: "Settings · Psst" });
 
 const $q = useQuasar();
+const { t } = useI18n();
 const router = useRouter();
 const auth = useAuthStore();
 const messaging = useMessagingStore();
@@ -96,6 +100,32 @@ async function signOut() {
     messaging.reset();
     signingOut.value = false;
     await router.replace("/login");
+  }
+}
+
+const deleteOpen = ref(false);
+const deleting = ref(false);
+const deleteError = ref("");
+const deleteExpected = () => auth.user?.username ?? auth.user?.email ?? "";
+
+async function deleteAccount(typed: string) {
+  deleting.value = true;
+  deleteError.value = "";
+  try {
+    await auth.deleteAccount(typed);
+    deleteOpen.value = false;
+    await push.detachThisDevice();
+    messaging.reset();
+    await router.replace("/login");
+  } catch (e) {
+    deleteError.value =
+      e instanceof ApiError && e.status === 403
+        ? t("settings.deleteAdmin")
+        : e instanceof ApiError && e.field("confirmation")
+          ? t("settings.deleteMismatch")
+          : t("settings.deleteFailed");
+  } finally {
+    deleting.value = false;
   }
 }
 </script>
@@ -251,6 +281,29 @@ async function signOut() {
           ><LogOut :size="18" class="ico" />{{ $t("settings.signOut") }}</q-btn
         >
       </section>
+
+      <section class="surface block danger" aria-labelledby="danger-h">
+        <h2 id="danger-h">{{ $t("settings.danger") }}</h2>
+        <p class="text-secondary-copy">{{ $t("settings.dangerBody") }}</p>
+        <q-btn
+          outline
+          unelevated
+          no-caps
+          color="negative"
+          @click="deleteOpen = true"
+          ><Trash2 :size="18" class="ico" />{{
+            $t("settings.deleteOpen")
+          }}</q-btn
+        >
+      </section>
+
+      <DeleteAccountDialog
+        v-model="deleteOpen"
+        :expected="deleteExpected()"
+        :busy="deleting"
+        :error="deleteError"
+        @confirm="deleteAccount"
+      />
     </div>
   </div>
 </template>

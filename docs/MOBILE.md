@@ -83,5 +83,7 @@ Icons and splash are generated from `src-capacitor/assets/` with
 ## Store checklist
 - iOS: Sign in with Apple is offered next to Google (App Store rule 4.8) — done. Privacy "nutrition label": email, user content.
 - Both stores require in-app **report/block** (done) and a privacy policy that discloses admins can identify senders.
-- Provide account deletion in-app before submission (not built yet; Apple requires it).
+- In-app account deletion (Settings → Delete account) satisfies Apple's requirement. Apple also expects the
+  Sign in with Apple token to be revoked on deletion; that needs the user's authorization code/refresh token, which
+  Psst doesn't store, so it is not done. Say so in the review notes if asked.
 - Android: sign with a release key; put its SHA-256 in `assetlinks.json`.
