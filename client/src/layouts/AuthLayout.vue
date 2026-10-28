@@ -22,7 +22,7 @@ import BrandMark from "@/components/BrandMark.vue";
   width: min(100%, 430px);
   min-height: 100dvh;
   margin-inline: auto;
-  background: var(--canvas);
+  background: var(--canvas-grad);
 }
 .auth-shell {
   display: grid;

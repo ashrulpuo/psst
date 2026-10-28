@@ -76,7 +76,7 @@ const body = (key: string) => (te(key) ? t(key) : "");
   display: flex;
   flex-direction: column;
   padding: 18px 22px 14px;
-  background: var(--canvas);
+  background: var(--canvas-grad);
 }
 .top {
   display: flex;

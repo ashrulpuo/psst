@@ -394,14 +394,16 @@ async function submitReport(reason: string) {
   flex-direction: column;
   height: 100%;
   min-height: 0;
-  background: var(--canvas);
+  /* Transparent so the shell's canvas wash runs behind the thread. */
+  background: transparent;
 }
 .head {
   display: flex;
   align-items: center;
   gap: var(--s-2);
   padding: 10px var(--s-4);
-  background: var(--canvas);
+  background: color-mix(in srgb, var(--canvas) 86%, transparent);
+  backdrop-filter: blur(10px);
   border-bottom: 2px solid var(--border);
 }
 .head :deep(.avatar) {
@@ -482,7 +484,8 @@ async function submitReport(reason: string) {
 }
 .foot {
   padding: var(--s-3) var(--s-4) calc(var(--s-3) + env(safe-area-inset-bottom));
-  background: var(--canvas);
+  background: color-mix(in srgb, var(--canvas) 86%, transparent);
+  backdrop-filter: blur(10px);
   border-top: 2px solid var(--border);
 }
 .notice {

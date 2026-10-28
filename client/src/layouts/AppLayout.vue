@@ -66,7 +66,7 @@ usePolling(
   width: min(100%, 430px);
   min-height: 100dvh;
   margin-inline: auto;
-  background: var(--canvas);
+  background: var(--canvas-grad);
 }
 /* A thread owns the whole screen: no tab bar, no reserved height. */
 .shell.in-thread {

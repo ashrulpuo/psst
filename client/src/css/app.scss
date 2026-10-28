@@ -22,6 +22,13 @@
   --cream: #ffe9d6;
 
   --canvas: var(--paper);
+  --canvas-top: #fff7ef;
+  --canvas-bottom: #ffeede;
+  --canvas-grad: linear-gradient(
+    180deg,
+    var(--canvas-top) 0%,
+    var(--canvas-bottom) 100%
+  );
   --surface: #ffffff;
   --surface-hover: #ffeedd;
   --text: #1b1024;
@@ -91,6 +98,13 @@
   --cream: #1e1729;
 
   --canvas: #14101c;
+  --canvas-top: #17131f;
+  --canvas-bottom: #0f0c16;
+  --canvas-grad: linear-gradient(
+    180deg,
+    var(--canvas-top) 0%,
+    var(--canvas-bottom) 100%
+  );
   --surface: #1d1728;
   --surface-hover: #261e35;
   --text: #f6f1ff;

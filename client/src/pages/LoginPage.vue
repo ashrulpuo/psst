@@ -38,7 +38,10 @@ async function done() {
 
 <template>
   <div class="signin">
-    <article class="note arrive" aria-hidden="true">
+    <span class="glow g1" aria-hidden="true" />
+    <span class="glow g2" aria-hidden="true" />
+
+    <article class="note" aria-hidden="true">
       <span class="tape" />
       <p class="from">{{ $t("login.noteFrom") }}</p>
       <blockquote>“{{ $t("login.noteBody") }}”</blockquote>
@@ -90,6 +93,39 @@ async function done() {
 </template>
 
 <style scoped lang="scss">
+@keyframes psst-glow-a {
+  from {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  to {
+    transform: translate3d(26px, 20px, 0) scale(1.14);
+  }
+}
+@keyframes psst-glow-b {
+  from {
+    transform: translate3d(0, 0, 0) scale(1.1);
+  }
+  to {
+    transform: translate3d(-22px, -18px, 0) scale(0.94);
+  }
+}
+/* A taped note never sits perfectly still. */
+@keyframes psst-note-sway {
+  0%,
+  100% {
+    transform: rotate(-1.6deg) translateY(0);
+  }
+  50% {
+    transform: rotate(-0.6deg) translateY(-3px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .glow,
+  .note {
+    animation: none;
+  }
+}
+
 .signin {
   display: flex;
   flex-direction: column;
@@ -98,8 +134,37 @@ async function done() {
   gap: 16px;
   width: 100%;
   /* Centre the pitch in the space under the brand instead of leaving a hole. */
-  min-height: calc(100dvh - 116px);
+  min-height: calc(100dvh - 160px);
   padding-bottom: 8px;
+  position: relative;
+  isolation: isolate;
+}
+/* Two slow glows, far behind the content: the page breathes without moving anything readable. */
+.glow {
+  position: absolute;
+  z-index: -1;
+  width: 240px;
+  height: 240px;
+  border-radius: 50%;
+  filter: blur(42px);
+  pointer-events: none;
+  opacity: 0.55;
+}
+.g1 {
+  top: -46px;
+  left: -70px;
+  background: radial-gradient(circle, rgba(255, 45, 111, 0.4), transparent 70%);
+  animation: psst-glow-a 17s ease-in-out infinite alternate;
+}
+.g2 {
+  right: -80px;
+  bottom: 24px;
+  background: radial-gradient(
+    circle,
+    rgba(201, 255, 79, 0.42),
+    transparent 70%
+  );
+  animation: psst-glow-b 21s ease-in-out infinite alternate;
 }
 
 /* The note: the reason to sign in, told as a sticker. */
@@ -113,6 +178,7 @@ async function done() {
   box-shadow: 0 8px 0 var(--edge);
   color: #fff;
   transform: rotate(-1.6deg);
+  animation: psst-note-sway 7.5s ease-in-out infinite;
 }
 .tape {
   position: absolute;
