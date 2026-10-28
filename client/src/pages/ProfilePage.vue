@@ -1,6 +1,6 @@
 <script setup lang="ts">
 // Pattern: Form — public link page. The sender's first impression, so it stays small and fast.
-import { computed, nextTick, onMounted, ref, watch } from "vue";
+import { computed, nextTick, onMounted, ref, useTemplateRef, watch } from "vue";
 import { useRouter } from "vue-router";
 import { useI18n } from "vue-i18n";
 import { useMeta } from "quasar";
@@ -15,6 +15,7 @@ import type { PublicProfile } from "@/api/types";
 import { useAuthStore } from "@/stores/auth";
 import { useMessagingStore } from "@/stores/messaging";
 import { copyText } from "@/utils/clipboard";
+import { celebrate } from "@/utils/celebrate";
 import AppAvatar from "@/components/AppAvatar.vue";
 import EmptyState from "@/components/EmptyState.vue";
 import AppButton from "@/components/AppButton.vue";
@@ -69,6 +70,12 @@ function addEmoji(emoji: string) {
   body.value += emoji;
   void nextTick(() => document.getElementById("message")?.focus());
 }
+
+const sentCard = useTemplateRef<HTMLElement>("sentCard");
+watch(sentThreadId, id => {
+  if (!id) return;
+  void nextTick(() => celebrate(sentCard.value));
+});
 
 // Keep a half-written message across the sign-in round trip (and accidental refreshes).
 function readDraft() {
@@ -205,7 +212,8 @@ async function copyOwn() {
 
   <div
     v-else-if="profile && sentThreadId"
-    class="surface card done"
+    ref="sentCard"
+    class="card done"
     role="status"
   >
     <AppAvatar :name="profile.name" :src="profile.avatar_url" :size="56" />
@@ -490,9 +498,23 @@ async function copyOwn() {
 .error {
   color: var(--danger);
 }
-.done {
+.card.done {
+  position: relative;
+  width: min(100%, 340px);
+  margin-inline: auto;
   justify-items: center;
+  padding: 26px 22px 22px;
+  border: 2.5px solid var(--edge);
+  border-radius: 30px;
+  background: var(--surface);
+  box-shadow: 0 9px 0 var(--edge);
   text-align: center;
+  overflow: visible;
+}
+.card.done h1 {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  letter-spacing: -0.04em;
 }
 .row {
   display: flex;
