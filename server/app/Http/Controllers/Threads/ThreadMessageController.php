@@ -33,6 +33,6 @@ class ThreadMessageController extends Controller
 
         MessageResource::viewingAs($thread->receiver_id === $request->user()->id);
 
-        return (new MessageResource($message))->response()->setStatusCode(201);
+        return (new MessageResource($message->load('reactions')))->response()->setStatusCode(201);
     }
 }
