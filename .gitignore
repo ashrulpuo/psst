@@ -1,1 +1,7 @@
 deploy/.env
+.DS_Store
+node_modules/
+client/dist/
+admin/dist/
+server/vendor/
+.pnpm-store/
