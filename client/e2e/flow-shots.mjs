@@ -6,9 +6,9 @@ import fs from "node:fs";
 const BASE = "http://localhost:9000";
 const OUT = new URL("../../docs/flow/", import.meta.url).pathname;
 fs.mkdirSync(OUT, { recursive: true });
-const browser = await chromium.launch({
-  executablePath: "/opt/pw-browsers/chromium-1194/chrome-linux/chrome"
-});
+const browser = await chromium.launch(
+  process.env.CHROME_PATH ? { executablePath: process.env.CHROME_PATH } : {}
+);
 const mobile = { width: 390, height: 844 };
 const ctxOf = (viewport, scheme = "light") =>
   browser.newContext({ viewport, colorScheme: scheme, deviceScaleFactor: 2 });

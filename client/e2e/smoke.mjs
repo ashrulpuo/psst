@@ -130,9 +130,15 @@ await B.page.screenshot({ path: OUT + "10-conversation-mobile.png" });
 await noOverflow(B.page, "conversation @375");
 ok("Bob sees Alice's reply", true);
 
-// bottom nav present on narrow, rail on wide
+// The tab bar is an overlay: hidden inside a conversation, present on list screens.
 ok(
-  "mobile: bottom tab bar visible",
+  "mobile: tab bar hidden inside a conversation",
+  !(await B.page.locator("nav").first().isVisible())
+);
+await B.page.goto(`${BASE}/sent`);
+await B.page.waitForSelector("nav");
+ok(
+  "mobile: bottom tab bar visible on a list",
   await B.page.locator("nav").first().isVisible()
 );
 

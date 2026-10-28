@@ -21,8 +21,11 @@ IDs are configured in dev; in production those buttons replace them.
 The receiver only ever sees "Anonymous #N". Guests have no account, so even admins can't identify them.
 
 ## 3. Receiver: read, reply, moderate
-1. Inbox lists conversations by recency with unread dots, live via WebSocket — `08-inbox-unread.png`
-2. A **signed-in sender**: reply in the same thread (two-way chat) — `09-conversation-reply.png`
+1. Inbox lists conversations by recency with unread dots, live via WebSocket — `08-inbox-unread.png`.
+   Each note is a sticker; **swipe a card left** (or tab to its Hide button) to clear it from the list. Any new
+   message brings the thread back.
+2. A **signed-in sender**: reply in the same thread (two-way chat) — `09-conversation-reply.png`.
+   Tap a message to react: six emoji, toggled per person, counted across both sides.
 3. A **guest**: the composer is replaced by "They haven't signed in, so you can't reply yet". It unlocks live the
    moment they sign in — `10b-guest-cannot-reply-yet.png`
 4. ⋮ menu: **Block sender** / report a message — `10-conversation-options.png`, `11-block-confirmation.png`.

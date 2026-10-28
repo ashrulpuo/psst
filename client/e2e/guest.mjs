@@ -35,7 +35,8 @@ for (const p of [alice, guest]) p.on("pageerror", e => errors.push(String(e)));
 
 await alice.goto(`${BASE}/login`);
 await alice.getByRole("button", { name: "Alice" }).click();
-await alice.waitForURL("**/inbox");
+await alice.waitForURL("**/link");
+await alice.goto(`${BASE}/inbox`);
 
 await step(
   "a visitor can write and send with no sign-in anywhere",
@@ -48,7 +49,7 @@ await step(
         .count()) === 0,
       "sign-in gate still present"
     );
-    await guest.getByRole("button", { name: "Send message" }).click();
+    await guest.getByRole("button", { name: "Send anonymously" }).click();
     await guest.waitForSelector("text=Sent");
     assert(
       await guest.evaluate(() => localStorage.getItem("psst.guest-token")),
@@ -70,7 +71,7 @@ await step(
   "a second message from the same browser lands in the same conversation",
   async () => {
     await guest.fill("#message", "Also, thank you.");
-    await guest.getByRole("button", { name: "Send message" }).click();
+    await guest.getByRole("button", { name: "Send anonymously" }).click();
     await guest.waitForSelector("text=Sent");
     await alice.getByText("Anonymous #1").first().waitFor({ timeout: 6000 }); // live, over the socket
     const rows = await alice.getByText("Anonymous #").count();
@@ -133,8 +134,10 @@ await step(
     const other = await open({ width: 390, height: 844 });
     await other.goto(`${BASE}/alice`);
     await other.fill("#message", "rude message");
-    await other.getByRole("button", { name: "Send message" }).click();
+    await other.getByRole("button", { name: "Send anonymously" }).click();
     await other.waitForSelector("text=Sent");
+    // One screen at a time at every width: go back to the list before opening another thread.
+    await alice.goto(`${BASE}/inbox`);
     await alice.getByText("Anonymous #2").first().click();
     await alice.getByRole("button", { name: "Conversation options" }).click();
     await alice.getByText("Block sender").click();
@@ -144,7 +147,7 @@ await step(
       .click();
     await other.getByRole("button", { name: "Send another" }).click();
     await other.fill("#message", "second rude message");
-    await other.getByRole("button", { name: "Send message" }).click();
+    await other.getByRole("button", { name: "Send anonymously" }).click();
     await other.waitForSelector("text=Sent"); // the blocked person is not told
     await alice.waitForTimeout(1500);
     assert(
