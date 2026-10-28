@@ -2,7 +2,6 @@
 // Phone shell at every width. A wide window shows the same column, not a website.
 import { computed, onMounted } from "vue";
 import { useRoute } from "vue-router";
-import { Settings } from "@lucide/vue";
 import { useMessagingStore } from "@/stores/messaging";
 import { useRealtimeStore } from "@/stores/realtime";
 import { usePolling } from "@/composables/usePolling";
@@ -29,30 +28,30 @@ usePolling(
 <template>
   <q-layout view="hHh lpR fFf" class="shell" :class="{ 'in-thread': inThread }">
     <nav v-show="!inThread" class="nav" :aria-label="$t('nav.main')">
-      <router-link to="/link" class="mark">Psst</router-link>
-      <div class="tabs">
-        <router-link to="/inbox" class="tab" active-class="is-active">
-          {{ $t("nav.inbox") }}
-          <span
-            v-if="messaging.inboxUnread > 0"
-            class="dot"
-            aria-hidden="true"
-          />
-          <span v-if="messaging.inboxUnread > 0" class="sr-only"
-            >{{ messaging.inboxUnread }} unread</span
-          >
-        </router-link>
-        <router-link to="/sent" class="tab" active-class="is-active">{{
-          $t("nav.sent")
-        }}</router-link>
-      </div>
+      <router-link to="/link" class="tab" active-class="is-active">
+        <span class="ico" aria-hidden="true">🔗</span>
+        {{ $t("nav.link") }}
+      </router-link>
+      <router-link to="/inbox" class="tab" active-class="is-active">
+        <span class="ico" aria-hidden="true">💌</span>
+        {{ $t("nav.inbox") }}
+        <span v-if="messaging.inboxUnread > 0" class="dot" aria-hidden="true" />
+        <span v-if="messaging.inboxUnread > 0" class="sr-only">
+          {{ messaging.inboxUnread }} unread
+        </span>
+      </router-link>
+      <router-link to="/sent" class="tab" active-class="is-active">
+        <span class="ico" aria-hidden="true">📮</span>
+        {{ $t("nav.sent") }}
+      </router-link>
       <router-link
         to="/settings"
-        class="gear"
+        class="tab"
         active-class="is-active"
         :aria-label="$t('nav.settings')"
       >
-        <Settings :size="22" aria-hidden="true" />
+        <span class="ico" aria-hidden="true">⚙️</span>
+        {{ $t("nav.settings") }}
       </router-link>
     </nav>
 
@@ -64,12 +63,12 @@ usePolling(
 
 <style scoped lang="scss">
 .shell {
-  --nav-height: 56px;
   width: min(100%, 430px);
   min-height: 100dvh;
   margin-inline: auto;
   background: var(--canvas);
 }
+/* A thread owns the whole screen: no tab bar, no reserved height. */
 .shell.in-thread {
   --nav-height: 0px;
 }
@@ -77,74 +76,69 @@ usePolling(
 .nav {
   position: fixed;
   z-index: 10;
-  top: 0;
   left: 50%;
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  align-items: center;
-  width: min(100%, 430px);
-  height: calc(var(--nav-height) + var(--safe-top));
-  padding: var(--safe-top) 8px 0;
-  background: var(--canvas);
-  transform: translateX(-50%);
-}
-.mark {
-  justify-self: start;
-  padding-left: 8px;
-  color: var(--text);
-  font-family: var(--font-display);
-  font-size: 1.45rem;
-  font-weight: 800;
-  letter-spacing: -0.04em;
-  line-height: 1;
-  text-decoration: none;
-}
-.tabs {
+  bottom: calc(12px + env(safe-area-inset-bottom));
   display: flex;
   align-items: center;
-  gap: 22px;
+  justify-content: space-between;
+  width: min(calc(100% - 24px), 406px);
+  height: 62px;
+  padding: 0 6px;
+  border: 2.5px solid var(--edge);
+  border-radius: 22px;
+  background: var(--surface);
+  box-shadow: 0 5px 0 var(--edge);
+  transform: translateX(-50%);
 }
 .tab {
   position: relative;
-  display: inline-flex;
-  align-items: center;
-  min-height: 44px;
+  display: grid;
+  justify-items: center;
+  gap: 2px;
+  flex: 1;
+  min-height: 48px;
+  padding: 5px 2px;
+  border-radius: 16px;
   color: var(--text-3);
-  font-size: 1.15rem;
-  font-weight: 600;
+  font-family: var(--font-display);
+  font-size: 0.6rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   text-decoration: none;
 }
-.tab.is-active {
-  color: var(--text);
-  font-weight: 800;
+.tab .ico {
+  font-size: 1.05rem;
+  line-height: 1;
+  filter: grayscale(1);
+  opacity: 0.7;
 }
-.tab:focus-visible,
-.mark:focus-visible,
-.gear:focus-visible {
-  outline: 2px solid var(--accent);
+.tab.is-active {
+  background: var(--accent-strong);
+  color: #fff;
+}
+.tab.is-active .ico {
+  filter: none;
+  opacity: 1;
+}
+.tab:focus-visible {
+  outline: 3px solid var(--ink);
   outline-offset: 2px;
-  border-radius: 8px;
 }
 .dot {
   position: absolute;
-  top: 10px;
-  right: -9px;
+  top: 6px;
+  right: calc(50% - 20px);
   width: 8px;
   height: 8px;
+  border: 2px solid var(--surface);
   border-radius: 50%;
-  background: #ff3b5c;
-}
-.gear {
-  justify-self: end;
-  display: grid;
-  place-items: center;
-  width: 44px;
-  height: 44px;
-  color: var(--text);
-  text-decoration: none;
+  background: var(--accent);
 }
 .content {
-  padding-top: calc(var(--nav-height) + var(--safe-top));
+  /* The tab bar is an overlay: full-height pages size themselves and
+     scrolling pages pad their own end (Link, Settings). */
+  padding-top: var(--safe-top);
 }
 
 // The window is the desk. The column is the phone.

@@ -177,7 +177,7 @@ async function hideThread(thread: InboxThread | SentThread) {
 .list-pane {
   display: flex;
   flex-direction: column;
-  padding: 4px 16px 88px;
+  padding: 4px 16px 140px;
   overflow-y: auto;
 }
 .thread-pane {
@@ -240,7 +240,7 @@ async function hideThread(thread: InboxThread | SentThread) {
   position: fixed;
   z-index: 11;
   left: 50%;
-  bottom: calc(18px + env(safe-area-inset-bottom));
+  bottom: calc(84px + env(safe-area-inset-bottom));
   display: inline-flex;
   align-items: center;
   justify-content: center;
