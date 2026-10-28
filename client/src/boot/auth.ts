@@ -42,7 +42,7 @@ export default defineBoot(({ router, store }) => {
       return { path: "/login", query: { next: to.fullPath } };
     }
     if (to.meta.guestOnly && auth.isAuthenticated) {
-      return auth.user?.needs_username ? "/welcome" : "/inbox";
+      return auth.user?.needs_username ? "/welcome" : "/link";
     }
     // Everyone signed in must claim a handle before using the app.
     if (

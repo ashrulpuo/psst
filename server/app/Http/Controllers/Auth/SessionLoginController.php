@@ -24,7 +24,7 @@ class SessionLoginController extends Controller
         abort_unless($request->hasSession(), 400, 'Cookie sign-in is only available to the web app. Use the token endpoint.');
 
         $identity = $verifier->verify($provider, $request->string('id_token')->value(), $request->string('nonce')->value(), $request->input('name'));
-        $user = $signIn->handle($identity);
+        $user = $signIn->handle($identity, $request->user());
 
         Auth::guard('web')->login($user);
         $request->session()->regenerate();

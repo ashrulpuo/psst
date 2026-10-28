@@ -38,7 +38,7 @@ async function submit() {
   serverError.value = "";
   try {
     await auth.setUsername(normalized.value);
-    await router.replace(safeNext(route.query.next) ?? "/inbox");
+    await router.replace(safeNext(route.query.next) ?? "/link");
   } catch (e) {
     serverError.value =
       e instanceof ApiError

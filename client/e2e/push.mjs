@@ -159,7 +159,7 @@ const withAppClosed = async fn => {
 // ---- sign in as Alice, open Settings ----
 await page.goto(`${BASE}/login`);
 await page.getByRole("button", { name: "Alice" }).click();
-await page.waitForURL("**/inbox");
+await page.waitForURL("**/link");
 await page.goto(`${BASE}/settings`);
 await page.waitForSelector("text=Notifications");
 
@@ -331,11 +331,11 @@ const bobCtx = await browser.newContext({
 const bob = await bobCtx.newPage();
 await bob.goto(`${BASE}/login`);
 await bob.getByRole("button", { name: "Bob" }).click();
-await bob.waitForURL("**/inbox");
+await bob.waitForURL("**/link");
 const bobSends = async text => {
   await bob.goto(`${BASE}/alice`);
   await bob.fill("#message", text);
-  await bob.getByRole("button", { name: "Send message" }).click();
+  await bob.getByRole("button", { name: "Send anonymously" }).click();
   await bob.waitForSelector("text=Sent");
 };
 
@@ -395,7 +395,7 @@ await step(
 
     // Carol signs in on the same browser; its existing subscription is re-registered for her.
     await page.getByRole("button", { name: "Carol" }).click();
-    await page.waitForURL("**/inbox");
+    await page.waitForURL("**/link");
     await until(
       () => devicesOf("carol") === 1,
       5000,

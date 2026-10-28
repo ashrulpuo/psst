@@ -220,7 +220,7 @@ await step(
   "dev sign-in over the cross-origin API yields a bearer token (no cookies, no CSRF call)",
   async () => {
     await page.getByRole("button", { name: "Alice" }).click();
-    await page.waitForURL("**/inbox", { timeout: 8000 });
+    await page.waitForURL("**/link", { timeout: 8000 });
     assert(
       !requests.some(r => r.url().includes("/sanctum/csrf-cookie")),
       "CSRF cookie requested in native mode"
@@ -251,7 +251,7 @@ await step(
   "session survives an app restart (token restored from secure storage)",
   async () => {
     await page.reload();
-    await page.waitForURL("**/inbox", { timeout: 8000 });
+    await page.waitForURL("**/link", { timeout: 8000 });
     await page
       .getByRole("navigation", { name: /main/i })
       .first()

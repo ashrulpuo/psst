@@ -42,7 +42,8 @@ watchErrors(bob, "bob");
 async function signInAs(page, name) {
   await page.goto(`${BASE}/login`);
   await page.getByRole("button", { name }).click();
-  await page.waitForURL("**/inbox");
+  await page.waitForURL("**/link");
+  await page.goto(`${BASE}/inbox`);
 }
 
 await signInAs(alice, "Alice");
@@ -57,7 +58,7 @@ await step(
   async () => {
     await bob.goto(`${BASE}/alice`);
     await bob.fill("#message", "First realtime hello");
-    await bob.getByRole("button", { name: "Send message" }).click();
+    await bob.getByRole("button", { name: "Send anonymously" }).click();
     await bob.waitForSelector("text=Sent");
     await alice
       .getByText("Anonymous #1")
@@ -73,7 +74,7 @@ await step(
     await bubble(alice, "First realtime hello").waitFor(FAST);
     await bob.getByRole("button", { name: "Send another" }).click();
     await bob.fill("#message", "Second one, while you're looking");
-    await bob.getByRole("button", { name: "Send message" }).click();
+    await bob.getByRole("button", { name: "Send anonymously" }).click();
     await bubble(alice, "Second one, while you're looking").waitFor({
       state: "visible",
       ...FAST

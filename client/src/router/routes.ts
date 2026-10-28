@@ -9,7 +9,7 @@ declare module "vue-router" {
 }
 
 const routes: RouteRecordRaw[] = [
-  { path: "/", redirect: "/inbox" },
+  { path: "/", redirect: "/link" },
 
   // Form (auth): a centred card, no app chrome.
   {
@@ -20,6 +20,11 @@ const routes: RouteRecordRaw[] = [
         path: "login",
         component: () => import("@/pages/LoginPage.vue"),
         meta: { guestOnly: true, title: "Sign in" }
+      },
+      {
+        path: "get-link",
+        component: () => import("@/pages/GetLinkPage.vue"),
+        meta: { title: "Your link" }
       },
       {
         path: "welcome",
@@ -35,6 +40,12 @@ const routes: RouteRecordRaw[] = [
     component: () => import("@/layouts/AppLayout.vue"),
     meta: { requiresAuth: true },
     children: [
+      {
+        path: "link",
+        name: "link",
+        component: () => import("@/pages/LinkPage.vue"),
+        meta: { title: "Your link" }
+      },
       {
         path: "inbox/:threadId?",
         name: "inbox",

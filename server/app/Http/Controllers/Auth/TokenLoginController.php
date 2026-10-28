@@ -23,7 +23,7 @@ class TokenLoginController extends Controller
         $request->validate(['device_name' => ['required']]);
 
         $identity = $verifier->verify($provider, $request->string('id_token')->value(), $request->string('nonce')->value(), $request->input('name'));
-        $user = $signIn->handle($identity);
+        $user = $signIn->handle($identity, $request->user());
 
         $token = $user->createToken(
             $request->string('device_name')->value(),

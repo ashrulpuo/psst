@@ -36,6 +36,10 @@ class ProfileController extends Controller
     ): JsonResponse {
         $receiver = $this->findReceiver($username);
         $sender = $request->user('sanctum');
+        // A link without a login can read its inbox, but messages it sends stay anonymous.
+        if ($sender?->link_only) {
+            $sender = null;
+        }
 
         if ($sender) {
             abort_if($sender->isBanned(), 403, 'This account has been suspended.');

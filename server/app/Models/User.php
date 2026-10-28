@@ -30,6 +30,7 @@ class User extends Authenticatable
         'role' => self::ROLE_USER,
         'push_previews' => false,
         'username' => null,
+        'link_only' => false,
         'avatar_url' => null,
         'email_verified_at' => null,
         'banned_at' => null,
@@ -46,6 +47,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'push_previews' => 'boolean',
+            'link_only' => 'boolean',
             'two_factor_secret' => 'encrypted',
             'two_factor_confirmed_at' => 'datetime',
             'two_factor_recovery_codes' => 'encrypted:array',

@@ -33,7 +33,7 @@ page.on("pageerror", e => errors.push(String(e)));
 
 await page.goto(`${BASE}/login`);
 await page.getByRole("button", { name: "Carol" }).click();
-await page.waitForURL("**/inbox");
+await page.waitForURL("**/link");
 await page.goto(`${BASE}/settings`);
 
 await step(

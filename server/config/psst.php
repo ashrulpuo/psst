@@ -9,7 +9,7 @@ return [
         'admin', 'administrator', 'api', 'app', 'auth', 'login', 'logout', 'signup', 'register',
         'settings', 'support', 'help', 'about', 'terms', 'privacy', 'security', 'root', 'system',
         'moderator', 'mod', 'staff', 'team', 'official', 'psst', 'null', 'undefined', 'me', 'www',
-        'mail', 'static', 'assets', 'cdn', 'status', 'inbox', 'messages', 'thread', 'threads',
+        'mail', 'static', 'assets', 'cdn', 'status', 'inbox', 'link', 'get-link', 'messages', 'thread', 'threads',
     ],
 
     'messages' => [

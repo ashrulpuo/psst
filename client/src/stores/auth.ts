@@ -6,8 +6,10 @@ import type { Me, Provider } from "@/api/types";
 import { nativeAdapters } from "@/native/adapters";
 import { isNativeApp, nativePlatform } from "@/native/platform";
 import { config } from "@/utils/config";
-import { clearGuestToken, guestToken } from "@/utils/guest";
+import { clearGuestToken, guestToken, setGuestToken } from "@/utils/guest";
 import { randomNonce } from "@/utils/format";
+
+const LINK_PAUSE = "psst.link-paused";
 
 export const useAuthStore = defineStore("auth", () => {
   const user = ref<Me | null>(null);
@@ -41,7 +43,9 @@ export const useAuthStore = defineStore("auth", () => {
    */
   async function claimGuestThreads(): Promise<void> {
     const token = guestToken();
-    if (!token || !user.value) return;
+    // A link kept without an account uses this same token to open again. Claiming it
+    // would attach the anonymous sends and then delete the only copy of the token.
+    if (!token || !user.value || user.value.can_reply === false) return;
     try {
       await guestApi.claim(token);
       clearGuestToken();
@@ -57,8 +61,22 @@ export const useAuthStore = defineStore("auth", () => {
         user.value = me;
         await claimGuestThreads();
       })
-      .catch(() => {
-        user.value = null;
+      .catch(async () => {
+        const token = guestToken();
+        const paused =
+          typeof sessionStorage !== "undefined" &&
+          sessionStorage.getItem(LINK_PAUSE) === "1";
+        if (!token || paused) {
+          user.value = null;
+          return;
+        }
+        try {
+          const resumed = await guestApi.resumeLink(token);
+          setGuestToken(resumed.guest_token);
+          user.value = resumed.data;
+        } catch {
+          user.value = null;
+        }
       })
       .finally(() => {
         ready.value = true;
@@ -107,6 +125,17 @@ export const useAuthStore = defineStore("auth", () => {
     await claimGuestThreads();
   }
 
+  async function claimLink(username: string) {
+    const result = await guestApi.claimLink(username, guestToken());
+    setGuestToken(result.guest_token);
+    try {
+      sessionStorage.removeItem(LINK_PAUSE);
+    } catch {
+      /* private mode */
+    }
+    user.value = result.data;
+  }
+
   async function setUsername(username: string) {
     user.value = await authApi.setUsername(username);
   }
@@ -125,12 +154,20 @@ export const useAuthStore = defineStore("auth", () => {
   }
 
   async function logout() {
+    const pauseLink = user.value?.can_reply === false;
     try {
       await authApi.logout(); // revokes the bearer token server-side on native
     } finally {
       if (isNativeApp)
         await (await nativeAdapters()).signIn.signOut().catch(() => undefined);
       clear();
+      if (pauseLink) {
+        try {
+          sessionStorage.setItem(LINK_PAUSE, "1");
+        } catch {
+          /* private mode */
+        }
+      }
     }
   }
 
@@ -152,6 +189,7 @@ export const useAuthStore = defineStore("auth", () => {
     signInNative,
     devLogin,
     setUsername,
+    claimLink,
     setPushPreviews,
     clear,
     deleteAccount,

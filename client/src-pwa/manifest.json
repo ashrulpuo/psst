@@ -3,7 +3,7 @@
   "short_name": "Psst",
   "description": "Anonymous messages with two-way chat.",
   "id": "/",
-  "start_url": "/inbox",
+  "start_url": "/link",
   "scope": "/",
   "lang": "en",
   "orientation": "portrait",

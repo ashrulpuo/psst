@@ -185,7 +185,7 @@ await step(
   "sign in (cookie session, same origin) reaches the inbox",
   async () => {
     await page.getByRole("button", { name: "Alice" }).click();
-    await page.waitForURL("**/inbox", { timeout: 8000 });
+    await page.waitForURL("**/link", { timeout: 8000 });
   }
 );
 
