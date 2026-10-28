@@ -17,6 +17,7 @@ import {
 } from "@lucide/vue";
 import type { Message } from "@/api/types";
 import { useMessagingStore } from "@/stores/messaging";
+import { useAuthStore } from "@/stores/auth";
 import { useRealtimeStore } from "@/stores/realtime";
 import { usePolling } from "@/composables/usePolling";
 import { dayLabel } from "@/utils/format";
@@ -31,6 +32,7 @@ const props = defineProps<{ threadId: string; box: "inbox" | "sent" }>();
 const $q = useQuasar();
 const router = useRouter();
 const store = useMessagingStore();
+const auth = useAuthStore();
 const realtime = useRealtimeStore();
 
 const scroller = useTemplateRef<HTMLElement>("scroller");
@@ -60,15 +62,11 @@ const cannotReply = computed(() => {
   const t = thread.value;
   return Boolean(t && "can_reply" in t && !t.can_reply);
 });
-/** The receiver's view of a guest: nothing to reply to until the sender signs in. */
+const needsSignIn = computed(() => auth.user?.can_reply === false);
 const awaitingSignIn = computed(() => {
   const t = thread.value;
   return Boolean(t && "can_chat" in t && !t.can_chat && !t.blocked);
 });
-const composerDisabled = computed(
-  () => blocked.value || cannotReply.value || awaitingSignIn.value
-);
-
 // Messages grouped under day separators, oldest first.
 const groups = computed(() => {
   const result: { day: string; items: Message[] }[] = [];
@@ -139,7 +137,7 @@ async function send(body: string) {
     $q.notify({
       type: "negative",
       message: e instanceof Error ? e.message : "Message not sent",
-      position: "top"
+      position: "bottom"
     });
   } finally {
     sending.value = false;
@@ -172,7 +170,7 @@ async function setBlocked(value: boolean) {
     $q.notify({
       type: "negative",
       message: e instanceof Error ? e.message : "Something went wrong",
-      position: "top"
+      position: "bottom"
     });
   } finally {
     blockBusy.value = false;
@@ -186,6 +184,18 @@ const reportOpen = computed({
 });
 const reportBusy = ref(false);
 const reportError = ref("");
+
+async function react(message: Message, emoji: string) {
+  try {
+    await store.toggleReaction(props.threadId, message.id, emoji);
+  } catch (e) {
+    $q.notify({
+      type: "negative",
+      message: e instanceof Error ? e.message : "Couldn't react",
+      position: "bottom"
+    });
+  }
+}
 async function submitReport(reason: string) {
   if (!reportTarget.value) return;
   reportBusy.value = true;
@@ -196,7 +206,7 @@ async function submitReport(reason: string) {
     $q.notify({
       type: "positive",
       message: "Thanks. We'll take a look.",
-      position: "top"
+      position: "bottom"
     });
   } catch (e) {
     reportError.value = e instanceof Error ? e.message : "Something went wrong";
@@ -297,7 +307,9 @@ async function submitReport(reason: string) {
             :key="message.id"
             :message="message"
             :can-report="true"
+            :reactions-disabled="Boolean(blocked || awaitingSignIn)"
             @report="reportTarget = $event"
+            @react="react"
             @retry="retry"
             @remove="store.discard(threadId, $event.id)"
           />
@@ -318,9 +330,22 @@ async function submitReport(reason: string) {
           @click="setBlocked(false)"
         />
       </p>
-      <p v-else-if="awaitingSignIn" class="notice" role="status">{{
-        $t("thread.guestSender")
-      }}</p>
+      <p v-else-if="needsSignIn" class="notice" role="status">
+        {{ $t("thread.signInToReply") }}
+        <q-btn
+          flat
+          dense
+          no-caps
+          color="primary"
+          :label="$t('profile.signInToChat')"
+          :to="{ path: '/login', query: { next: `/${box}/${threadId}` } }"
+        />
+      </p>
+      <p v-else-if="awaitingSignIn" class="notice" role="status">
+        <span aria-hidden="true">🫥</span>
+        <span class="notice-title">{{ $t("thread.guestTitle") }}</span>
+        {{ $t("thread.guestSender") }}
+      </p>
       <p v-else-if="cannotReply" class="notice" role="status">{{
         $t("thread.cannotReply")
       }}</p>
@@ -360,17 +385,19 @@ async function submitReport(reason: string) {
 .head {
   display: flex;
   align-items: center;
-  gap: var(--s-3);
-  padding: var(--s-2) var(--s-4);
-  background: var(--surface);
-  border-bottom: 1px solid var(--border);
+  gap: var(--s-2);
+  padding: 10px var(--s-4);
+  background: var(--canvas);
+  border-bottom: 2px solid var(--border);
 }
 .title {
   flex: 1;
   min-width: 0;
   overflow: hidden;
-  font-size: var(--text-body);
-  font-weight: 600;
+  font-family: var(--font-display);
+  font-size: 1.02rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -393,10 +420,16 @@ async function submitReport(reason: string) {
 }
 .day {
   justify-self: center;
-  padding: 2px var(--s-3);
+  padding: 4px var(--s-3);
   border-radius: 999px;
-  background: var(--surface);
-  border: 1px solid var(--border);
+  background: var(--cream);
+  border: 1.5px solid var(--border);
+  color: var(--text-2);
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 .older {
   display: flex;
@@ -412,21 +445,25 @@ async function submitReport(reason: string) {
 .foot {
   padding: var(--s-3) var(--s-4) calc(var(--s-3) + env(safe-area-inset-bottom));
   background: var(--canvas);
-  border-top: 1px solid var(--border);
+  border-top: 2px solid var(--border);
 }
 .notice {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  gap: var(--s-2);
-  padding: var(--s-3);
-  border-radius: var(--r-control);
-  background: var(--surface);
-  border: 1px solid var(--border);
+  display: grid;
+  gap: 6px;
+  justify-items: center;
+  padding: 14px;
+  border: 2.5px dashed var(--border-strong);
+  border-radius: var(--r-card);
+  background: color-mix(in srgb, var(--surface) 70%, transparent);
   font-size: var(--text-secondary);
   color: var(--text-2);
   text-align: center;
+}
+.notice-title {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 0.95rem;
+  color: var(--text);
 }
 .menu {
   min-width: 200px;
@@ -452,12 +489,6 @@ async function submitReport(reason: string) {
 @keyframes pulse {
   50% {
     opacity: 0.5;
-  }
-}
-// Wide screens keep the list visible, so there is nowhere to go "back" to.
-@media (min-width: 900px) {
-  .back {
-    display: none;
   }
 }
 </style>

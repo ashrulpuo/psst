@@ -121,11 +121,12 @@ defineExpose({ clear, focus: () => field.value?.focus() });
   flex: 1;
   min-height: 48px;
   max-height: 160px;
-  padding: 11px var(--s-4);
+  padding: 12px 15px;
   resize: none;
-  border: 1px solid var(--border-strong);
-  border-radius: 24px;
+  border: 2.5px solid var(--edge);
+  border-radius: 22px;
   background: var(--surface);
+  box-shadow: 0 3px 0 var(--edge);
   color: var(--text);
   font: inherit;
   line-height: 1.5;
@@ -135,9 +136,8 @@ defineExpose({ clear, focus: () => field.value?.focus() });
   color: var(--text-3);
 }
 .field:focus-visible {
-  outline: 2px solid var(--accent-text);
-  outline-offset: 1px;
-  border-color: var(--accent-text);
+  outline: 3px solid var(--ink);
+  outline-offset: 2px;
 }
 .field:disabled {
   opacity: 0.6;
@@ -154,5 +154,9 @@ defineExpose({ clear, focus: () => field.value?.focus() });
   flex: none;
   width: 48px;
   height: 48px;
+  border: 2.5px solid var(--edge);
+  border-radius: 50%;
+  background: var(--accent-strong) !important;
+  box-shadow: 0 3px 0 var(--edge);
 }
 </style>

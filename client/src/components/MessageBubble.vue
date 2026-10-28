@@ -2,32 +2,52 @@
 import { Flag, RotateCw, Trash2 } from "@lucide/vue";
 import type { Message } from "@/api/types";
 import { clockTime } from "@/utils/format";
+import ReactionBar from "@/components/ReactionBar.vue";
 
-defineProps<{ message: Message; canReport: boolean }>();
+withDefaults(
+  defineProps<{
+    message: Message;
+    canReport: boolean;
+    reactionsDisabled?: boolean;
+  }>(),
+  { reactionsDisabled: false }
+);
+
 defineEmits<{
   report: [message: Message];
   retry: [message: Message];
   remove: [message: Message];
+  react: [message: Message, emoji: string];
 }>();
 </script>
 
 <template>
   <div class="row" :class="{ mine: message.mine }">
-    <div
-      class="bubble"
-      :class="{ pending: message.pending, failed: message.failed }"
-    >
-      <p class="body">{{ message.body }}</p>
-      <span class="text-meta meta">
-        <template v-if="message.failed">{{ $t("thread.notSent") }}</template>
-        <template v-else-if="message.pending">{{
-          $t("thread.sending")
-        }}</template>
-        <template v-else>
-          {{ clockTime(message.created_at)
-          }}<template v-if="message.mine && message.read_at"> · Read</template>
-        </template>
-      </span>
+    <div class="stack">
+      <div
+        class="bubble"
+        :class="{ pending: message.pending, failed: message.failed }"
+      >
+        <p class="body">{{ message.body }}</p>
+        <span class="text-meta meta">
+          <template v-if="message.failed">{{ $t("thread.notSent") }}</template>
+          <template v-else-if="message.pending">{{
+            $t("thread.sending")
+          }}</template>
+          <template v-else>
+            {{ clockTime(message.created_at)
+            }}<template v-if="message.mine && message.read_at">
+              · Read</template
+            >
+          </template>
+        </span>
+      </div>
+
+      <ReactionBar
+        :reactions="message.reactions"
+        :disabled="message.mine || reactionsDisabled"
+        @react="$emit('react', message, $event)"
+      />
     </div>
 
     <template v-if="message.failed">
@@ -69,41 +89,57 @@ defineEmits<{
 <style scoped lang="scss">
 .row {
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   gap: var(--s-1);
   max-width: 100%;
 }
 .row.mine {
   flex-direction: row-reverse;
 }
+.stack {
+  display: grid;
+  justify-items: start;
+  gap: 4px;
+  max-width: min(80%, 34rem);
+}
+.mine .stack {
+  justify-items: end;
+}
 .bubble {
-  max-width: min(78%, 34rem);
-  padding: var(--s-2) var(--s-4);
-  border-radius: 18px 18px 18px 6px;
+  max-width: 100%;
+  padding: 11px 14px;
+  border: 2.5px solid var(--edge);
+  border-radius: 20px 20px 20px 7px;
   background: var(--bubble-theirs);
   color: var(--text);
+  box-shadow: 0 3px 0 var(--edge);
   overflow-wrap: anywhere;
 }
 .mine .bubble {
-  border-radius: 18px 18px 6px 18px;
-  background: var(--accent);
-  color: var(--on-accent);
+  border-radius: 20px 20px 7px 20px;
+  background: var(--grad-pink);
+  color: #fff;
 }
 .mine .bubble .meta {
-  color: color-mix(in srgb, var(--on-accent) 78%, transparent);
+  color: rgba(255, 255, 255, 0.82);
 }
 .body {
   white-space: pre-wrap;
+  font-size: 0.97rem;
+  line-height: 1.5;
 }
 .meta {
   display: block;
-  margin-top: 2px;
+  margin-top: 4px;
+  font-family: var(--font-display);
+  font-size: 0.68rem;
+  font-weight: 700;
 }
 .pending {
   opacity: 0.7;
 }
 .failed {
-  outline: 1px solid var(--danger);
+  box-shadow: 0 3px 0 var(--danger);
 }
 // Quiet until focused or hovered, but always in the DOM and reachable by touch and keyboard.
 .report {

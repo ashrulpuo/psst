@@ -93,6 +93,8 @@ export default {
   thread: {
     hide: "Hide note",
     hidden: "Hidden. A new note brings it back.",
+    guestTitle: "They're still a guest",
+    react: "React to this note",
     back: "Back to messages",
     composerLabel: "Reply",
     send: "Send",
