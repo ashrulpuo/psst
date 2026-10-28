@@ -3,7 +3,7 @@ import { computed } from "vue";
 
 const props = withDefaults(
   defineProps<{
-    variant?: "primary" | "ghost" | "lime";
+    variant?: "primary" | "ghost" | "lime" | "danger";
     size?: "md" | "sm";
     block?: boolean;
     to?: string;
@@ -80,6 +80,13 @@ const tag = computed(() => (props.to ? "router-link" : "button"));
 .app-btn.is-lime {
   background: var(--lime);
   color: var(--ink);
+}
+.app-btn.is-danger {
+  background: var(--danger);
+  color: #fff;
+}
+.app-btn.is-danger:hover {
+  filter: brightness(1.06);
 }
 .app-btn.is-block {
   width: 100%;

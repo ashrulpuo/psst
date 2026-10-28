@@ -327,6 +327,31 @@ html.native-app body {
 }
 
 /* Celebration particles are created imperatively by utils/celebrate.ts. */
+/* Dialogs: the same ink card as the rest of the app, floating above the page. */
+.dialog-card {
+  display: grid;
+  gap: var(--s-3);
+  width: min(92vw, 420px);
+  padding: 22px 20px 18px;
+  border: 2.5px solid var(--edge);
+  border-radius: 26px;
+  background: var(--surface);
+  box-shadow: var(--edge-shadow);
+}
+.dialog-card h3 {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+.dialog-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: var(--s-2);
+}
+
 .celebrate-host {
   position: relative;
 }

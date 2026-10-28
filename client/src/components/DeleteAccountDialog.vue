@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
+import AppButton from "@/components/AppButton.vue";
 
 const props = defineProps<{
   modelValue: boolean;
@@ -38,7 +39,7 @@ function submit() {
   >
     <!-- Quasar only re-enables pointer events on a direct <div> child, so the form lives inside one. -->
     <div
-      class="surface dialog"
+      class="dialog-card"
       role="alertdialog"
       aria-labelledby="del-title"
       aria-describedby="del-body"
@@ -60,17 +61,18 @@ function submit() {
           />
         </label>
         <p v-if="error" class="error" role="alert">{{ error }}</p>
-        <div class="actions">
-          <q-btn flat no-caps label="Cancel" :disable="busy" v-close-popup />
-          <q-btn
+        <div class="dialog-actions">
+          <AppButton variant="ghost" size="sm" :disabled="busy" v-close-popup>
+            Cancel
+          </AppButton>
+          <AppButton
             type="submit"
-            unelevated
-            no-caps
-            color="negative"
-            :label="$t('settings.deleteConfirm')"
-            :loading="busy"
-            :disable="!matches"
-          />
+            variant="danger"
+            size="sm"
+            :disabled="!matches || busy"
+          >
+            {{ $t("settings.deleteConfirm") }}
+          </AppButton>
         </div>
       </form>
     </div>
@@ -78,10 +80,6 @@ function submit() {
 </template>
 
 <style scoped lang="scss">
-.dialog {
-  width: min(92vw, 420px);
-  padding: var(--s-5);
-}
 .form {
   display: grid;
   gap: var(--s-3);
@@ -95,24 +93,18 @@ function submit() {
 .field input {
   min-height: 44px;
   padding: 0 var(--s-3);
-  border: 1px solid var(--border);
+  border: 2px solid var(--edge);
   border-radius: var(--r-control);
-  background: var(--canvas);
+  background: var(--cream);
   color: var(--text);
   font: inherit;
 }
 .field input:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 1px;
+  outline: 3px solid var(--ink);
+  outline-offset: 2px;
 }
 .error {
   color: var(--danger);
   font-size: var(--text-secondary);
-}
-.actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: var(--s-2);
-  margin-top: var(--s-2);
 }
 </style>

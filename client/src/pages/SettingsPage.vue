@@ -352,11 +352,11 @@ async function deleteAccount(typed: string) {
 .seg {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  padding: 4px;
-  gap: 4px;
+  padding: 5px;
+  gap: 5px;
   border-radius: var(--r-control);
-  background: var(--canvas);
-  border: 1px solid var(--border);
+  background: var(--cream);
+  border: 2px solid var(--edge);
 }
 .seg-btn {
   min-height: 44px;
@@ -376,8 +376,9 @@ async function deleteAccount(typed: string) {
 .seg-btn.on {
   background: var(--surface);
   color: var(--text);
-  box-shadow: var(--shadow-soft);
-  border: 1px solid var(--border);
+  border: 2px solid var(--edge);
+  box-shadow: 0 2px 0 var(--edge);
+  font-weight: 700;
 }
 .note {
   padding: var(--s-3) var(--s-4);

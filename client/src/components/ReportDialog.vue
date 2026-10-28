@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
+import AppButton from "@/components/AppButton.vue";
 
 const props = defineProps<{
   modelValue: boolean;
@@ -26,7 +27,7 @@ watch(
     @update:model-value="emit('update:modelValue', $event)"
   >
     <!-- Quasar only re-enables pointer events on a direct <div> child. -->
-    <div class="surface dialog" role="dialog" aria-labelledby="report-title">
+    <div class="dialog-card" role="dialog" aria-labelledby="report-title">
       <form @submit.prevent="valid && emit('submit', reason.trim())">
         <h3 id="report-title">{{ $t("thread.reportTitle") }}</h3>
         <div class="field">
@@ -40,17 +41,11 @@ watch(
           />
           <p v-if="error" class="error" role="alert">{{ error }}</p>
         </div>
-        <div class="actions">
-          <q-btn flat no-caps label="Cancel" v-close-popup />
-          <q-btn
-            type="submit"
-            unelevated
-            no-caps
-            color="primary"
-            :label="$t('thread.reportSubmit')"
-            :loading="busy"
-            :disable="!valid"
-          />
+        <div class="dialog-actions">
+          <AppButton variant="ghost" size="sm" v-close-popup>Cancel</AppButton>
+          <AppButton type="submit" size="sm" :disabled="!valid || busy">
+            {{ $t("thread.reportSubmit") }}
+          </AppButton>
         </div>
       </form>
     </div>
@@ -58,10 +53,6 @@ watch(
 </template>
 
 <style scoped lang="scss">
-.dialog {
-  width: min(92vw, 420px);
-  padding: var(--s-5);
-}
 form {
   display: grid;
   gap: var(--s-4);
@@ -75,25 +66,20 @@ label {
   font-weight: 500;
 }
 .input {
-  padding: var(--s-3) var(--s-4);
+  padding: 10px 12px;
   resize: vertical;
-  border: 1px solid var(--border-strong);
+  border: 2px solid var(--edge);
   border-radius: var(--r-control);
-  background: var(--canvas);
+  background: var(--cream);
   color: var(--text);
   font: inherit;
 }
 .input:focus-visible {
-  outline: 2px solid var(--accent-text);
-  outline-offset: 1px;
+  outline: 3px solid var(--ink);
+  outline-offset: 2px;
 }
 .error {
   color: var(--danger);
   font-size: var(--text-secondary);
-}
-.actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: var(--s-2);
 }
 </style>
