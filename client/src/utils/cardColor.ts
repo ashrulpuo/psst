@@ -4,11 +4,11 @@
  * Stops stay dark enough for white type (WCAG AA).
  */
 export const STORY_GRADIENTS = [
-  "linear-gradient(165deg, #c2185b 0%, #6a1b9a 100%)",
-  "linear-gradient(165deg, #283593 0%, #00695c 100%)",
-  "linear-gradient(165deg, #e65100 0%, #ad1457 100%)",
-  "linear-gradient(160deg, #4a148c 0%, #c2185b 100%)",
-  "linear-gradient(165deg, #00695c 0%, #1a237e 100%)"
+  "linear-gradient(150deg, #d6004f 0%, #7c3aed 100%)",
+  "linear-gradient(150deg, #1d4ed8 0%, #0f766e 100%)",
+  "linear-gradient(150deg, #c2410c 0%, #9d174d 100%)",
+  "linear-gradient(150deg, #6d28d9 0%, #be185d 100%)",
+  "linear-gradient(150deg, #0f766e 0%, #1e3a8a 100%)"
 ] as const;
 
 export const SHARE_GRADIENT =

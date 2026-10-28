@@ -26,6 +26,8 @@ defineEmits<{ pick: [text: string] }>();
   margin-inline: -22px;
   overflow-x: auto;
   scrollbar-width: none;
+  /* Fade the cut-off edge so a scrolling row does not look broken. */
+  mask-image: linear-gradient(90deg, #000 86%, transparent 100%);
 }
 .chips::-webkit-scrollbar {
   display: none;

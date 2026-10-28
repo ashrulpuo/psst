@@ -62,6 +62,7 @@ async function share() {
     <article class="sticker arrive">
       <span class="tag-line">psst.app/</span>
       <h2 class="handle">{{ handle }}</h2>
+      <p class="prompt">{{ $t("link.prompt") }}</p>
       <p class="url">{{ url }}</p>
       <div class="qr" v-html="qr" aria-hidden="true" />
     </article>
@@ -141,6 +142,13 @@ async function share() {
   font-size: 2.35rem;
   letter-spacing: -0.045em;
   line-height: 1;
+}
+.prompt {
+  margin: 4px 0 0;
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  font-weight: 700;
+  opacity: 0.92;
 }
 .url {
   display: inline-block;

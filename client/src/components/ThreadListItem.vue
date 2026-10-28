@@ -22,18 +22,19 @@ const title = computed(() =>
   "receiver" in props.thread ? props.thread.receiver.name : props.thread.label
 );
 const unread = computed(() => props.thread.unread_count > 0);
-const swipe = useSwipe();
+// Refs must be destructured: nested refs are not auto-unwrapped in templates.
+const { offset, open, close, handlers } = useSwipe();
 
 function onCardClick(event: MouseEvent) {
-  if (Math.abs(swipe.offset.value) > 8 || swipe.open.value) {
+  if (Math.abs(offset.value) > 8 || open.value) {
     event.preventDefault();
-    swipe.close();
+    close();
   }
 }
 </script>
 
 <template>
-  <div class="wrap" :class="{ open: swipe.open }">
+  <div class="wrap" :class="{ open }">
     <button
       v-if="canHide"
       type="button"
@@ -48,12 +49,12 @@ function onCardClick(event: MouseEvent) {
       class="note"
       :class="{ 'is-unread': unread }"
       :style="{
-        '--x': `${swipe.offset}px`,
+        '--x': `${offset}px`,
         '--card': storyGradient(thread.id)
       }"
       :aria-current="active ? 'page' : undefined"
       @click="onCardClick"
-      v-on="swipe.handlers"
+      v-on="handlers"
     >
       <span class="mark" aria-hidden="true">
         <Heart v-if="box === 'inbox'" :size="15" />
@@ -68,7 +69,9 @@ function onCardClick(event: MouseEvent) {
         <span v-if="unread" class="new" aria-hidden="true" />
       </span>
       <ChevronRight class="chev" :size="16" aria-hidden="true" />
-      <span v-if="unread" class="sr-only">{{ unread }} unread</span>
+      <span v-if="unread" class="sr-only"
+        >{{ thread.unread_count }} unread</span
+      >
     </router-link>
   </div>
 </template>
@@ -101,6 +104,9 @@ function onCardClick(event: MouseEvent) {
   position: relative;
   display: grid;
   grid-template-columns: 26px minmax(0, 1fr) 16px;
+  grid-template-areas:
+    "mark words chev"
+    "mark sub chev";
   gap: 10px;
   align-items: start;
   padding: 15px 14px 13px;
@@ -110,7 +116,7 @@ function onCardClick(event: MouseEvent) {
   box-shadow: var(--edge-shadow-sm);
   color: #fff;
   text-decoration: none;
-  transform: translateX(var(--x));
+  transform: translateX(var(--x)) rotate(var(--tilt, 0deg));
   transition: transform 180ms var(--ease-pop);
 }
 .wrap.open .note {
@@ -120,7 +126,14 @@ function onCardClick(event: MouseEvent) {
   outline: 3px solid var(--ink);
   outline-offset: 3px;
 }
+.wrap:nth-child(3n + 1) .note {
+  --tilt: -1.1deg;
+}
+.wrap:nth-child(3n + 2) .note {
+  --tilt: 0.9deg;
+}
 .mark {
+  grid-area: mark;
   display: grid;
   place-items: center;
   width: 26px;
@@ -129,6 +142,7 @@ function onCardClick(event: MouseEvent) {
   background: rgba(255, 255, 255, 0.22);
 }
 .words {
+  grid-area: words;
   display: -webkit-box;
   overflow: hidden;
   font-size: 0.97rem;
@@ -141,7 +155,7 @@ function onCardClick(event: MouseEvent) {
   font-weight: 800;
 }
 .sub {
-  grid-column: 2 / span 2;
+  grid-area: sub;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -164,6 +178,7 @@ time {
   background: var(--lime);
 }
 .chev {
+  grid-area: chev;
   align-self: center;
   color: rgba(255, 255, 255, 0.8);
 }

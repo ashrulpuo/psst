@@ -393,10 +393,18 @@ async function copyOwn() {
     0 16px 26px rgba(214, 0, 79, 0.18);
   transform: rotate(-5deg);
 }
+.sticker-avatar :deep(.avatar) {
+  background: transparent;
+  border: 0;
+  color: #fff;
+  font-family: var(--font-display);
+  font-weight: 800;
+}
 .tape {
   position: absolute;
-  right: -34px;
-  bottom: 4px;
+  right: -52px;
+  bottom: -4px;
+  z-index: 2;
   padding: 4px 9px;
   border: 2.5px solid var(--edge);
   border-radius: 7px;
