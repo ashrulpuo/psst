@@ -10,7 +10,6 @@ import { profileApi } from "@/api/endpoints";
 import { config } from "@/utils/config";
 import { guestToken, setGuestToken } from "@/utils/guest";
 import TurnstileBox from "@/components/TurnstileBox.vue";
-import ClaimLinkForm from "@/components/ClaimLinkForm.vue";
 import type { PublicProfile } from "@/api/types";
 import { useAuthStore } from "@/stores/auth";
 import { useMessagingStore } from "@/stores/messaging";
@@ -224,31 +223,25 @@ async function copyOwn() {
     <p v-if="sentAsGuest" class="chat-offer text-secondary-copy">
       {{ $t("profile.chatOffer") }}
     </p>
-    <ClaimLinkForm v-if="sentAsGuest && !auth.isAuthenticated" />
-    <div class="row">
-      <q-btn
-        v-if="sentAsGuest"
-        color="primary"
-        unelevated
-        no-caps
-        :label="$t('profile.signInToChat')"
-        @click="signInToChat"
-      />
-      <q-btn
-        v-else
-        color="primary"
-        unelevated
-        no-caps
-        :label="$t('profile.viewConversation')"
-        :to="`/sent/${sentThreadId}`"
-      />
-      <q-btn
-        outline
-        unelevated
-        no-caps
-        :label="$t('profile.sendAnother')"
-        @click="sentThreadId = null"
-      />
+
+    <AppButton v-if="sentAsGuest" block @click="signInToChat">
+      {{ $t("profile.signInToChat") }}
+    </AppButton>
+    <AppButton v-else block :to="`/sent/${sentThreadId}`">
+      {{ $t("profile.viewConversation") }}
+    </AppButton>
+
+    <div class="after">
+      <button type="button" class="again" @click="sentThreadId = null">
+        {{ $t("profile.sendAnother") }}
+      </button>
+      <router-link
+        v-if="sentAsGuest && !auth.isAuthenticated"
+        to="/get-link"
+        class="own-link"
+      >
+        {{ $t("profile.getOwnLinkInstead") }}
+      </router-link>
     </div>
   </div>
 
@@ -550,11 +543,19 @@ async function copyOwn() {
   font-size: 2rem;
   letter-spacing: -0.04em;
 }
-.row {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: var(--s-2);
+.after {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+}
+.again {
+  border: 0;
+  background: transparent;
+  color: var(--text-2);
+  font: 800 0.8rem / 1 var(--font-display);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
 }
 .skeleton {
   justify-items: center;
