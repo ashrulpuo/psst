@@ -23,6 +23,8 @@ class SentThreadResource extends JsonResource
         return [
             'id' => $this->id,
             'receiver' => new PublicProfileResource($this->whenLoaded('receiver')),
+            // The sender's own label in this thread — safe to show, it is their own anonymity.
+            'label' => 'Anonymous #'.$this->anon_label,
             'unread_count' => $this->sender_unread_count,
             'can_reply' => $this->blocked_at === null,
             'last_message_at' => $this->last_message_at,

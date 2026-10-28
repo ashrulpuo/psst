@@ -61,7 +61,14 @@ const meta = computed(() => {
   const when = current?.last_message_at
     ? shortTime(current.last_message_at)
     : "";
-  const label = isInbox.value ? t("thread.noteMeta") : t("thread.replyMeta");
+  // On the sender's side, name the mask they are wearing instead of describing the thread.
+  const ownLabel =
+    current && "label" in current
+      ? t("thread.youAppearAs", { label: current.label })
+      : "";
+  const label = isInbox.value
+    ? t("thread.noteMeta")
+    : ownLabel || t("thread.replyMeta");
   return when ? `${label} · ${when}` : label;
 });
 

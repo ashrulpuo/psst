@@ -56,6 +56,8 @@ export interface InboxThread {
 export interface SentThread {
   id: string;
   receiver: PublicProfile;
+  /** How the receiver sees this sender in this thread: their own anonymity label. */
+  label: string;
   unread_count: number;
   can_reply: boolean;
   last_message_at: string | null;

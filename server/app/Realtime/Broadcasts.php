@@ -46,6 +46,7 @@ class Broadcasts
                         ]
                         : [
                             'id' => $thread->id,
+                            'label' => 'Anonymous #'.$thread->anon_label,
                             'receiver' => [
                                 'username' => $receiver->username,
                                 'name' => $receiver->name,
