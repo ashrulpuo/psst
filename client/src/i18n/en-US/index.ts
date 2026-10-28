@@ -74,6 +74,8 @@ export default {
   },
 
   inbox: {
+    title: "notes for you",
+    newCount: "{n} new",
     emptyTitle: "No messages yet",
     emptyBody: "Share your link and your first message will show up here.",
     emptyAction: "Share your link",
@@ -83,11 +85,14 @@ export default {
   },
 
   sent: {
+    title: "sent by you",
     emptyTitle: "You haven't sent anything",
     emptyBody: "Open someone's link to send them an anonymous message."
   },
 
   thread: {
+    hide: "Hide note",
+    hidden: "Hidden. A new note brings it back.",
     back: "Back to messages",
     composerLabel: "Reply",
     send: "Send",

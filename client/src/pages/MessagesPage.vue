@@ -2,9 +2,11 @@
 // One screen at a time, at every width. The list, or the open conversation.
 import { computed } from "vue";
 import { useRoute } from "vue-router";
-import { useMeta } from "quasar";
+import { useMeta, useQuasar } from "quasar";
+import { useI18n } from "vue-i18n";
 import { Inbox, Send } from "@lucide/vue";
 import { useMessagingStore } from "@/stores/messaging";
+import type { InboxThread, SentThread } from "@/api/types";
 import EmptyState from "@/components/EmptyState.vue";
 import ThreadListItem from "@/components/ThreadListItem.vue";
 import ConversationPane from "@/features/messaging/ConversationPane.vue";
@@ -24,6 +26,25 @@ const threadId = computed(
 );
 const list = computed(() => (props.box === "inbox" ? store.inbox : store.sent));
 const items = computed(() => list.value.items);
+const unreadTotal = computed(() =>
+  props.box === "inbox" ? store.inboxUnread : 0
+);
+
+const $q = useQuasar();
+const { t } = useI18n();
+
+async function hideThread(thread: InboxThread | SentThread) {
+  try {
+    await store.hideThread(thread.id);
+    $q.notify({ message: t("thread.hidden"), position: "bottom" });
+  } catch (e) {
+    $q.notify({
+      type: "negative",
+      message: e instanceof Error ? e.message : t("errors.generic"),
+      position: "bottom"
+    });
+  }
+}
 </script>
 
 <template>
@@ -33,6 +54,13 @@ const items = computed(() => list.value.items);
       :aria-label="box === 'inbox' ? $t('nav.inbox') : $t('nav.sent')"
     >
       <PushPrompt />
+
+      <header class="list-head">
+        <h1>{{ box === "inbox" ? $t("inbox.title") : $t("sent.title") }}</h1>
+        <span v-if="unreadTotal" class="count-pill">{{
+          $t("inbox.newCount", { n: unreadTotal })
+        }}</span>
+      </header>
 
       <div class="frame">
         <div
@@ -82,6 +110,8 @@ const items = computed(() => list.value.items);
               :thread="thread"
               :box="box"
               :active="thread.id === threadId"
+              :can-hide="box === 'inbox'"
+              @hide="hideThread"
             />
           </li>
         </ul>
@@ -180,9 +210,31 @@ const items = computed(() => list.value.items);
 }
 .threads {
   display: grid;
+  gap: 12px;
   margin: 0;
-  padding: 0;
+  padding: 0 0 6px;
   list-style: none;
+}
+.list-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 4px 2px 12px;
+}
+.list-head h1 {
+  font-family: var(--font-display);
+  font-size: 1.85rem;
+  letter-spacing: -0.04em;
+}
+.count-pill {
+  padding: 6px 11px;
+  border: 2px solid var(--edge);
+  border-radius: 999px;
+  background: var(--lime);
+  box-shadow: 0 3px 0 var(--edge);
+  color: var(--ink);
+  font: 800 0.72rem / 1 var(--font-display);
 }
 .get {
   position: fixed;
