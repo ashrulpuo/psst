@@ -60,15 +60,15 @@ colour.
 - **Your link** — the loudest sticker: gradient card with handle, QR printed inside it, copy/share, two steps, a
   story-card preview.
 - **Settings / auth** — same primitives: bordered sections, sticker empty states, ink focus rings.
-- **Admin** (separate SPA) is the exception: dense and utilitarian, still on the old violet accent. Restyling it is a
-  follow-up, not part of this system.
+- **Admin** (separate SPA) is the exception by register, not by palette: dense, neutral surfaces, but the same
+  hot-pink accent so the two apps read as one product. Sticker treatments stay in the app.
 
 ## Interactions
 
 | | Rule |
 |---|---|
 | **Hide** | Per user, per thread; clears a note from your list only. Any new message restores it for both sides. Hiding never blocks anyone. |
-| **React** | Both participants, six whitelisted emoji, second tap removes. Reactions ride the message payload; the other side sees them on the next refresh (no realtime push yet). |
+| **React** | Both participants, six whitelisted emoji, second tap removes. The tally is pushed to both participants over Reverb, each with their own `mine` flag. |
 | **Block / report** | Receiver-only; block lives in the chat ⋮ menu, report is a chip under the message. |
 
 ## UX rules
