@@ -34,7 +34,7 @@ async function togglePreviews() {
     $q.notify({
       type: "negative",
       message: "Couldn't save that. Please try again.",
-      position: "top"
+      position: "bottom"
     });
   } finally {
     previewsBusy.value = false;
@@ -48,7 +48,7 @@ async function copy() {
   $q.notify({
     type: ok ? "positive" : "warning",
     message: ok ? "Link copied" : auth.profileLink,
-    position: "top"
+    position: "bottom"
   });
 }
 async function share() {
@@ -272,9 +272,12 @@ async function deleteAccount(typed: string) {
           />
           <div class="who-text">
             <strong>{{ auth.user?.name }}</strong>
-            <span class="text-secondary-copy">{{
+            <span v-if="auth.user?.can_reply" class="text-secondary-copy">{{
               $t("settings.signedInAs", { email: auth.user?.email })
             }}</span>
+            <router-link v-else to="/login" class="text-secondary-copy">{{
+              $t("profile.signInToChat")
+            }}</router-link>
           </div>
         </div>
         <q-btn outline unelevated no-caps :loading="signingOut" @click="signOut"
@@ -314,11 +317,17 @@ async function deleteAccount(typed: string) {
   gap: var(--s-4);
   max-width: 640px;
   margin-inline: auto;
+  /* Clear the bottom tab bar: the shell only pads the top. */
+  padding-bottom: calc(84px + env(safe-area-inset-bottom));
 }
 .block {
   display: grid;
   gap: var(--s-4);
   padding: var(--s-5);
+  border: 2.5px solid var(--border-strong);
+  border-radius: var(--r-card);
+  background: var(--surface);
+  box-shadow: 0 4px 0 var(--border);
 }
 .block h2 {
   font-size: var(--text-body);

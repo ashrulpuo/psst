@@ -28,15 +28,20 @@ defineProps<{ icon: Component; title: string; body?: string }>();
 .empty-icon {
   display: grid;
   place-items: center;
-  width: 48px;
-  height: 48px;
-  border-radius: 14px;
-  background: var(--accent-soft);
-  color: var(--accent-text);
+  width: 52px;
+  height: 52px;
+  border: 2.5px solid var(--edge);
+  border-radius: 16px;
+  background: var(--cream);
+  box-shadow: 0 4px 0 var(--edge);
+  color: var(--text);
+  transform: rotate(-4deg);
 }
 .empty-title {
-  font-size: var(--text-body);
-  font-weight: 600;
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
 }
 .empty-action {
   margin-top: var(--s-3);

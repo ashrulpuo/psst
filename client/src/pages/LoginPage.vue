@@ -11,6 +11,7 @@ import AppleSignIn from "@/features/auth/AppleSignIn.vue";
 import DevLogin from "@/features/auth/DevLogin.vue";
 import NativeSignIn from "@/features/auth/NativeSignIn.vue";
 import { isNativeApp } from "@/native/platform";
+import { MessageCircle } from "@lucide/vue";
 
 useMeta({ title: "Sign in · Psst" });
 
@@ -29,15 +30,22 @@ async function done() {
   await router.replace(
     auth.user?.needs_username
       ? { path: "/welcome", query: next ? { next } : {} }
-      : (next ?? "/inbox")
+      : (next ?? "/link")
   );
 }
 </script>
 
 <template>
-  <div class="surface card">
+  <div class="signin">
+    <article class="story arrive">
+      <span class="ring" aria-hidden="true">
+        <MessageCircle :size="28" />
+      </span>
+      <h1>{{ $t("link.prompt") }}</h1>
+    </article>
+
     <header class="head">
-      <h1>{{ $t("login.title") }}</h1>
+      <p class="lede">{{ $t("login.title") }}</p>
       <p class="text-secondary-copy">{{ $t("login.subtitle") }}</p>
     </header>
 
@@ -69,28 +77,74 @@ async function done() {
 </template>
 
 <style scoped lang="scss">
-.card {
+.signin {
   display: grid;
-  gap: var(--s-5);
-  padding: var(--s-6) var(--s-5);
+  justify-items: center;
+  gap: 22px;
+  width: min(100%, 320px);
+}
+.story {
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 14px;
+  width: 100%;
+  aspect-ratio: 1;
+  padding: 24px;
+  text-align: center;
+  border: 2.5px solid var(--edge);
+  border-radius: 28px;
+  background: var(--grad-pink);
+  box-shadow: 0 9px 0 var(--edge);
+}
+.ring {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border: 3px solid var(--edge);
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--accent-strong);
+  transform: rotate(-4deg);
+}
+.story h1 {
+  max-width: 9ch;
+  margin: 0;
+  color: #fff;
+  font-family: var(--font-display);
+  font-size: 2.15rem;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1.02;
 }
 .head {
   display: grid;
   gap: var(--s-2);
   text-align: center;
 }
+.lede {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
 .providers {
   display: grid;
   gap: var(--s-3);
+  width: 100%;
 }
 .error {
   color: var(--danger);
   font-size: var(--text-secondary);
   text-align: center;
 }
-@media (max-width: 480px) {
-  .card {
-    padding: var(--s-5) var(--s-4);
-  }
+.signin > p,
+.signin :deep(.demo) {
+  width: 100%;
+}
+.signin > p {
+  text-align: center;
 }
 </style>

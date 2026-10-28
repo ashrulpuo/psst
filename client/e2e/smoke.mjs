@@ -59,16 +59,18 @@ await A.page.waitForSelector("text=Say it. Psst.");
 await A.page.screenshot({ path: OUT + "01-login-desktop.png" });
 await noOverflow(A.page, "login @1280");
 await A.page.getByRole("button", { name: "Alice" }).click();
-await A.page.waitForURL("**/inbox");
-ok("Alice signs in and lands on /inbox", true);
-await A.page.waitForSelector("text=No messages yet");
+await A.page.waitForURL("**/link");
+ok("Alice signs in and lands on /link", true);
+await A.page.waitForSelector("text=Ask me anything");
+await A.page.goto(`${BASE}/inbox`);
+await A.page.waitForSelector("text=No notes yet");
 await A.page.screenshot({ path: OUT + "02-inbox-empty-desktop.png" });
 await noOverflow(A.page, "inbox empty @1280");
 
 // ---------- Bob (mobile) opens Alice's link as a guest ----------
 const B = await newCtx("mobile");
 await B.page.goto(`${BASE}/alice`);
-await B.page.waitForSelector("text=Send Alice Rahman an anonymous message");
+await B.page.waitForSelector("text=Ask me anything");
 await B.page.screenshot({ path: OUT + "03-profile-mobile.png" });
 await noOverflow(B.page, "profile @375");
 await B.page.fill("#message", "You always make the room feel warmer.");
@@ -76,7 +78,7 @@ const hasSignInToSend = await B.page
   .getByRole("button", { name: "Sign in to send" })
   .count();
 ok("no sign-in needed to send", hasSignInToSend === 0);
-await B.page.getByRole("button", { name: "Send message" }).click();
+await B.page.getByRole("button", { name: "Send anonymously" }).click();
 await B.page.waitForSelector("text=Sent");
 await B.page.screenshot({ path: OUT + "05-sent-mobile.png" });
 ok("guest message sent without an account", true);

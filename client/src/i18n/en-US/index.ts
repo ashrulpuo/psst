@@ -78,8 +78,9 @@ export default {
   inbox: {
     title: "notes for you",
     newCount: "{n} new",
-    emptyTitle: "No messages yet",
-    emptyBody: "Share your link and your first message will show up here.",
+    emptyTitle: "No notes yet",
+    emptyBody:
+      "Share your link. The first note always feels weird — then it's fun.",
     emptyAction: "Share your link",
     getMessages: "Get messages",
     pick: "Select a conversation",
