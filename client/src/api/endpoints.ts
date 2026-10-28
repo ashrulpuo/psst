@@ -30,17 +30,27 @@ export const authApi = {
       device_name: deviceName,
       ...(name ? { name } : {})
     }),
-  signIn: (provider: Provider, idToken: string, nonce: string, name?: string) =>
-    http
-      .post<{ data: Me }>(`/auth/${provider}`, {
-        id_token: idToken,
-        nonce,
-        name
-      })
-      .then(r => r.data),
+  /**
+   * `guest` is the token of a link kept without an account: the server attaches that link
+   * (and its username) to the account being signed in instead of creating a second one.
+   */
+  signIn: (
+    provider: Provider,
+    idToken: string,
+    nonce: string,
+    name?: string,
+    guest?: string | null
+  ) =>
+    request<{ data: Me }>("POST", `/auth/${provider}`, {
+      body: { id_token: idToken, nonce, name },
+      ...(guest ? { headers: { "X-Guest-Token": guest } } : {})
+    }).then(r => r.data),
   /** Local development only; the endpoint does not exist in production. */
-  devLogin: (email: string) =>
-    http.post<{ data: Me } | TokenLogin>("/dev/login", { email }),
+  devLogin: (email: string, guest?: string | null) =>
+    request<{ data: Me } | TokenLogin>("POST", "/dev/login", {
+      body: { email },
+      ...(guest ? { headers: { "X-Guest-Token": guest } } : {})
+    }),
   setUsername: (username: string) =>
     http.patch<{ data: Me }>("/me/username", { username }).then(r => r.data),
   logout: () => http.post<void>("/auth/logout"),

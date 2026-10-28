@@ -16,7 +16,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <section class="surface card">
+  <section class="form-card">
     <header class="head">
       <h1>{{ $t("welcome.title") }}</h1>
       <p class="text-secondary-copy">{{ $t("welcome.subtitle") }}</p>
@@ -26,14 +26,9 @@ onMounted(() => {
 </template>
 
 <style scoped lang="scss">
-.card {
-  display: grid;
-  gap: var(--s-5);
-  padding: var(--s-6) var(--s-5);
-}
 .head {
   display: grid;
-  gap: var(--s-2);
+  gap: 6px;
   text-align: center;
 }
 </style>

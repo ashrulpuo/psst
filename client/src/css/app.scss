@@ -327,6 +327,28 @@ html.native-app body {
 }
 
 /* Celebration particles are created imperatively by utils/celebrate.ts. */
+/* Form cards (username claim): the same ink card as dialogs, sitting on the page. */
+.form-card {
+  display: grid;
+  gap: 18px;
+  width: 100%;
+  padding: 22px 20px 20px;
+  border: 2.5px solid var(--edge);
+  border-radius: 28px;
+  background: var(--surface);
+  box-shadow: var(--edge-shadow);
+}
+.form-card h1 {
+  font-family: var(--font-display);
+  font-size: 1.75rem;
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  line-height: 1.05;
+}
+.form-card .text-secondary-copy {
+  color: var(--text-2);
+}
+
 /* Dialogs: the same ink card as the rest of the app, floating above the page. */
 .dialog-card {
   display: grid;

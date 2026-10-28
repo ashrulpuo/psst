@@ -98,7 +98,13 @@ export const useAuthStore = defineStore("auth", () => {
     nonce: string,
     name?: string
   ) {
-    user.value = await authApi.signIn(provider, idToken, nonce, name);
+    user.value = await authApi.signIn(
+      provider,
+      idToken,
+      nonce,
+      name,
+      guestToken()
+    );
     await claimGuestThreads();
   }
 
@@ -119,7 +125,7 @@ export const useAuthStore = defineStore("auth", () => {
   }
 
   async function devLogin(email: string) {
-    const result = await authApi.devLogin(email);
+    const result = await authApi.devLogin(email, guestToken());
     if ("token" in result) await adoptToken(result);
     else user.value = result.data;
     await claimGuestThreads();

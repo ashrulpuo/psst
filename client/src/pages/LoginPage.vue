@@ -72,6 +72,11 @@ async function done() {
 
     <DevLogin v-if="devOn" @signed-in="done" @failed="failed = true" />
 
+    <p class="alt">
+      {{ $t("login.wantLink") }}
+      <router-link to="/get-link">{{ $t("login.wantLinkAction") }}</router-link>
+    </p>
+
     <p class="text-meta">{{ $t("login.privacy") }}</p>
   </div>
 </template>
@@ -122,6 +127,19 @@ async function done() {
   display: grid;
   gap: var(--s-2);
   text-align: center;
+}
+.alt {
+  padding: 10px 14px;
+  border: 2px dashed var(--border-strong);
+  border-radius: var(--r-card);
+  color: var(--text-2);
+  font-size: 0.85rem;
+  text-align: center;
+}
+.alt a {
+  color: var(--accent-text);
+  font-weight: 700;
+  text-underline-offset: 3px;
 }
 .lede {
   margin: 0;

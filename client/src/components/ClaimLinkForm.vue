@@ -107,16 +107,16 @@ label {
 }
 .input {
   min-height: 48px;
-  padding: 0 var(--s-4);
-  border: 1px solid var(--border-strong);
+  padding: 0 14px;
+  border: 2px solid var(--edge);
   border-radius: var(--r-control);
-  background: var(--canvas);
+  background: var(--cream);
   color: var(--text);
   font: inherit;
 }
 .input:focus-visible {
-  outline: 2px solid var(--accent-text);
-  outline-offset: 1px;
+  outline: 3px solid var(--ink);
+  outline-offset: 2px;
 }
 .input.invalid {
   border-color: var(--danger);
@@ -127,9 +127,10 @@ label {
 .preview {
   display: grid;
   gap: 2px;
-  padding: var(--s-3) var(--s-4);
+  padding: 10px 12px;
+  border: 2px dashed var(--border-strong);
   border-radius: var(--r-control);
-  background: var(--surface);
+  background: var(--cream);
   word-break: break-all;
   text-align: start;
 }

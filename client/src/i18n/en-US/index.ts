@@ -15,6 +15,7 @@ export default {
     title: "your link",
     live: "live",
     storyTitle: "story card",
+    signInToChat: "Sign in to chat",
     storyBody: "9:16 · ready to post",
     prompt: "ask me anything",
     hint: "Share this. New messages land in your inbox.",
@@ -34,6 +35,8 @@ export default {
       "You stay anonymous to the person you message. To keep everyone safe, Psst admins can see which account a message came from.",
     notConfigured: "Sign-in isn't set up on this server yet.",
     failed: "We couldn't sign you in. Please try again.",
+    wantLink: "Just want a link?",
+    wantLinkAction: "Pick a username without an account",
     demo: "Local demo accounts"
   },
 

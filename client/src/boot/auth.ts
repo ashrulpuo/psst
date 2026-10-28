@@ -41,7 +41,13 @@ export default defineBoot(({ router, store }) => {
     if (to.meta.requiresAuth && !auth.isAuthenticated) {
       return { path: "/login", query: { next: to.fullPath } };
     }
-    if (to.meta.guestOnly && auth.isAuthenticated) {
+    // A link kept without an account is "signed in" locally but cannot reply yet:
+    // let it through to /login so it can upgrade by signing in.
+    if (
+      to.meta.guestOnly &&
+      auth.isAuthenticated &&
+      auth.user?.can_reply !== false
+    ) {
       return auth.user?.needs_username ? "/welcome" : "/link";
     }
     // Everyone signed in must claim a handle before using the app.

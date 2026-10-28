@@ -2,6 +2,7 @@
 // Home: one share card. The inbox is where messages are read.
 import { computed } from "vue";
 import { useMeta, useQuasar } from "quasar";
+import { useRouter } from "vue-router";
 import { useI18n } from "vue-i18n";
 import qrcode from "qrcode-generator";
 import { useAuthStore } from "@/stores/auth";
@@ -11,6 +12,7 @@ import AppButton from "@/components/AppButton.vue";
 useMeta({ title: "Your link · Psst" });
 
 const $q = useQuasar();
+const router = useRouter();
 const { t } = useI18n();
 const auth = useAuthStore();
 
@@ -71,6 +73,14 @@ async function share() {
       <AppButton block @click="copy">{{ $t("link.copy") }}</AppButton>
       <AppButton variant="ghost" size="sm" class="share" @click="share">
         {{ $t("link.share") }}
+      </AppButton>
+      <AppButton
+        v-if="auth.user?.can_reply === false"
+        variant="ghost"
+        block
+        @click="router.push({ path: '/login', query: { next: '/link' } })"
+      >
+        {{ $t("link.signInToChat") }}
       </AppButton>
     </div>
 

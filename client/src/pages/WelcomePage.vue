@@ -6,6 +6,7 @@ import { useMeta } from "quasar";
 import { ApiError } from "@/api/http";
 import { useAuthStore } from "@/stores/auth";
 import { safeNext } from "@/features/auth/redirect";
+import AppButton from "@/components/AppButton.vue";
 
 useMeta({ title: "Choose a username · Psst" });
 
@@ -91,26 +92,16 @@ async function submit() {
       <strong>{{ preview }}</strong>
     </p>
 
-    <q-btn
-      type="submit"
-      color="primary"
-      unelevated
-      no-caps
-      :loading="busy"
-      :label="$t('welcome.submit')"
-    />
+    <AppButton type="submit" block :disabled="busy">
+      {{ $t("welcome.submit") }}
+    </AppButton>
   </form>
 </template>
 
 <style scoped lang="scss">
-.card {
-  display: grid;
-  gap: var(--s-5);
-  padding: var(--s-6) var(--s-5);
-}
 .head {
   display: grid;
-  gap: var(--s-2);
+  gap: 6px;
   text-align: center;
 }
 .field {
@@ -123,18 +114,16 @@ label {
 }
 .input {
   min-height: 48px;
-  padding: 0 var(--s-4);
-  border: 1px solid var(--border-strong);
+  padding: 0 14px;
+  border: 2px solid var(--edge);
   border-radius: var(--r-control);
-  background: var(--canvas);
+  background: var(--cream);
   color: var(--text);
   font: inherit;
-  transition: border-color var(--dur) var(--ease);
 }
 .input:focus-visible {
-  outline: 2px solid var(--accent-text);
-  outline-offset: 1px;
-  border-color: var(--accent-text);
+  outline: 3px solid var(--ink);
+  outline-offset: 2px;
 }
 .input.invalid {
   border-color: var(--danger);
@@ -145,9 +134,10 @@ label {
 .preview {
   display: grid;
   gap: 2px;
-  padding: var(--s-3) var(--s-4);
+  padding: 10px 12px;
+  border: 2px dashed var(--border-strong);
   border-radius: var(--r-control);
-  background: var(--accent-soft);
+  background: var(--cream);
   word-break: break-all;
 }
 .preview strong {
