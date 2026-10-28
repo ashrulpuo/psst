@@ -32,7 +32,8 @@
     "build:desktop": "quasar build -m electron",
     "e2e:desktop": "xvfb-run -a node e2e/desktop.mjs",
     "e2e:account": "node e2e/account.mjs",
-    "e2e:guest": "node e2e/guest.mjs"
+    "e2e:guest": "node e2e/guest.mjs",
+    "e2e:two-people": "node e2e/two-people.mjs"
   },
   "dependencies": {
     "@fontsource-variable/bricolage-grotesque": "^5.3.0",
