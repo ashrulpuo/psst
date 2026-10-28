@@ -39,17 +39,24 @@ export default {
   },
 
   login: {
-    title: "Say it. Psst.",
+    heading: "sign in to write back",
     subtitle:
-      "Get your own link to receive anonymous messages, or sign in to chat with people you've messaged.",
+      "Replies only work between accounts. Reading and sending stays free without one.",
+    noteFrom: "a note is waiting for you",
+    noteBody: "i've been trying to say this in person for weeks…",
+    noteAnon: "Anonymous #11",
+    stamp: "sign in",
+    noAccount: "no account?",
+    linkCta: "pick a username instead →",
+    trustPassword: "no password",
+    trustSpam: "no spam",
+    trustDelete: "delete anytime",
     google: "Continue with Google",
     apple: "Continue with Apple",
     privacy:
       "You stay anonymous to the person you message. To keep everyone safe, Psst admins can see which account a message came from.",
     notConfigured: "Sign-in isn't set up on this server yet.",
     failed: "We couldn't sign you in. Please try again.",
-    wantLink: "Just want a link?",
-    wantLinkAction: "Pick a username without an account",
     demo: "Local demo accounts"
   },
 

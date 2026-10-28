@@ -55,7 +55,7 @@ async function noOverflow(page, label) {
 // ---------- Alice (desktop) signs in ----------
 const A = await newCtx("desktop");
 await A.page.goto(`${BASE}/login`);
-await A.page.waitForSelector("text=Say it. Psst.");
+await A.page.waitForSelector("text=sign in to write back");
 await A.page.screenshot({ path: OUT + "01-login-desktop.png" });
 await noOverflow(A.page, "login @1280");
 await A.page.getByRole("button", { name: "Alice" }).click();
