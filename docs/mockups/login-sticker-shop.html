@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Psst — sign-in page mockup (Theme A)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --ink:#1b1024; --paper:#fff6ee; --cream:#ffe9d6; --surface:#fff;
+    --pink:#ff2d6f; --pink-deep:#d6004f; --lime:#c9ff4f; --violet:#7c3aed;
+    --grad-pink:linear-gradient(150deg,#d6004f 0%,#7c3aed 100%);
+    --grad-sunset:linear-gradient(150deg,#c2410c 0%,#d6004f 52%,#7c3aed 100%);
+    --display:"Bricolage Grotesque","Avenir Next",system-ui,sans-serif;
+    --body:"Nunito",ui-rounded,system-ui,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{background:var(--paper);background-image:radial-gradient(rgba(27,16,36,.09) 1px,transparent 1px);background-size:18px 18px;color:var(--ink);font-family:var(--body)}
+  .doc{max-width:1180px;margin:0 auto;padding:48px 24px 8px}
+  .kicker{display:inline-flex;padding:8px 14px;border:2px solid var(--ink);border-radius:999px;background:var(--lime);
+    font:800 12px/1 var(--display);letter-spacing:.12em;text-transform:uppercase;box-shadow:0 3px 0 var(--ink)}
+  h1{font:800 clamp(34px,5vw,56px)/.96 var(--display);letter-spacing:-.04em;margin:16px 0 8px}
+  h1 em{font-style:normal;color:var(--pink);text-shadow:3px 3px 0 var(--ink)}
+  .lede{max-width:66ch;font-size:17px;line-height:1.55;color:#4a3552;margin:0 0 24px}
+  .legend{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin-bottom:26px}
+  .chip-card{border:2px solid var(--ink);border-radius:18px;background:#fff;padding:13px 15px;box-shadow:0 4px 0 rgba(27,16,36,.85)}
+  .chip-card h3{margin:0 0 6px;font:800 10.5px/1 var(--display);letter-spacing:.14em;text-transform:uppercase;color:#7a6782}
+  .chip-card p{margin:0;font-size:13px;line-height:1.55;color:#4a3552}
+
+  .rail{display:flex;gap:56px;overflow-x:auto;padding:4px 4px 36px}
+  .item{flex:0 0 auto;width:430px}
+  .phone{position:relative;width:430px;height:884px;padding:20px;border-radius:62px;background:linear-gradient(160deg,#2b1e35,#120a18 60%);
+    box-shadow:0 30px 60px rgba(60,24,70,.28),inset 0 0 0 2px rgba(255,255,255,.08)}
+  .screen{position:relative;width:390px;height:844px;border-radius:44px;overflow:hidden;display:flex;flex-direction:column;
+    background:linear-gradient(180deg,#fff7ef 0%,#ffeede 100%);isolation:isolate}
+  .sbar{display:flex;justify-content:space-between;align-items:center;padding:14px 26px 0;font:800 13px/1 var(--display);z-index:4}
+  .sbar .dots{display:flex;gap:4px;align-items:center}
+  .sbar .dots i{width:5px;height:5px;border-radius:99px;background:rgba(27,16,36,.55)}
+  .sbar .batt{width:22px;height:11px;border:2px solid rgba(27,16,36,.55);border-radius:3px;position:relative}
+  .sbar .batt::after{content:"";position:absolute;inset:2px;right:6px;background:rgba(27,16,36,.55);border-radius:1px}
+  .homebar{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:128px;height:5px;border-radius:99px;background:rgba(27,16,36,.22);z-index:9}
+  .cap{width:430px;margin-top:16px}
+  .cap h2{font:800 21px/1.15 var(--display);letter-spacing:-.02em;margin:0 0 4px;display:flex;align-items:center;gap:10px}
+  .cap .num{display:grid;place-items:center;width:26px;height:26px;border-radius:9px;background:var(--ink);color:#fff;font:800 12px/1 var(--display)}
+  .cap p{margin:0 0 6px;font-size:13.5px;line-height:1.55;color:#4a3552}
+  .cap .tag{display:inline-block;margin:2px 6px 0 0;padding:4px 9px;border-radius:99px;background:var(--cream);border:1.5px solid rgba(27,16,36,.16);font:700 11px/1 var(--display)}
+
+  /* shared */
+  .top{display:flex;align-items:center;justify-content:space-between;padding:6px 22px 0}
+  .brand{display:inline-flex;align-items:center;gap:8px}
+  .brand img{width:32px;height:32px}
+  .brand b{font:800 24px/1 var(--display);letter-spacing:-.045em;position:relative}
+  .brand b sup{position:absolute;top:-8px;right:-15px;font-size:11px;transform:rotate(12deg)}
+  .pill{display:inline-flex;align-items:center;gap:6px;padding:6px 11px;border:2px solid var(--ink);border-radius:999px;background:#fff;
+    font:800 10.5px/1 var(--display);box-shadow:0 3px 0 rgba(27,16,36,.85)}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:54px;padding:0 18px;border-radius:18px;border:2.5px solid var(--ink);
+    background:var(--pink-deep);color:#fff;box-shadow:0 5px 0 var(--ink);font:800 16px/1 var(--display);cursor:pointer;
+    transition:transform .12s cubic-bezier(.2,0,0,1),box-shadow .12s cubic-bezier(.2,0,0,1);text-decoration:none}
+  .btn:active{transform:translateY(4px);box-shadow:0 0 0 var(--ink)}
+  .btn.block{width:100%}
+  .btn.light{background:#fff;color:var(--ink);box-shadow:0 4px 0 var(--ink)}
+  .btn.lime{background:var(--lime);color:var(--ink)}
+  .btn.sm{min-height:46px;font-size:14.5px;border-radius:16px}
+  .foot{margin-top:auto;padding:0 22px 20px;text-align:center;color:#7a6782;font-size:11px;line-height:1.45}
+  .foot b{color:var(--ink)}
+
+  /* ============ A · two doors ============ */
+  .a-body{flex:1;display:flex;flex-direction:column;justify-content:space-between;gap:12px;padding:26px 22px 0}
+  .a-head{text-align:center}
+  .a-head h1{margin:0;font:800 30px/1.02 var(--display);letter-spacing:-.045em}
+  .a-head h1 em{font-style:normal;color:var(--pink);text-shadow:2px 2px 0 var(--ink)}
+  .a-head p{margin:8px auto 0;max-width:30ch;font-size:12.5px;line-height:1.5;color:#4a3552}
+  .door{border:2.5px solid var(--ink);border-radius:24px;background:#fff;box-shadow:0 5px 0 var(--ink);padding:14px}
+  .door h2{margin:0 0 2px;font:800 16px/1.2 var(--display);letter-spacing:-.02em}
+  .door p{margin:0 0 11px;font-size:11.5px;line-height:1.45;color:#4a3552}
+  .provider{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:48px;margin-top:8px;
+    border:2px solid var(--ink);border-radius:14px;background:#fff;box-shadow:0 3px 0 var(--ink);
+    font:700 13.5px/1 var(--body);color:var(--ink);cursor:pointer}
+  .provider:first-of-type{margin-top:0}
+  .provider .g{font:800 14px/1 var(--display)}
+  .provider.apple{background:var(--ink);color:#fff}
+  .divider{display:flex;align-items:center;gap:10px;color:#7a6782;font:800 10px/1 var(--display);letter-spacing:.16em;text-transform:uppercase}
+  .divider::before,.divider::after{content:"";flex:1;height:2px;background:rgba(27,16,36,.12);border-radius:9px}
+  .door.sticker{background:var(--grad-pink);color:#fff;box-shadow:0 6px 0 var(--ink)}
+  .door.sticker h2{color:#fff}
+  .door.sticker p{color:rgba(255,255,255,.9)}
+  .door.sticker .user-line{display:flex;align-items:center;gap:6px;margin:9px 0 11px;padding:7px 10px;border-radius:11px;
+    background:rgba(255,255,255,.16);border:1.5px dashed rgba(255,255,255,.55);font:700 11.5px/1 var(--mono,monospace)}
+  .dev{padding:10px 12px;border:2px dashed rgba(27,16,36,.22);border-radius:14px;background:rgba(255,255,255,.55)}
+  .dev b{display:block;font:800 9px/1 var(--display);letter-spacing:.14em;text-transform:uppercase;color:#7a6782;margin-bottom:7px}
+  .dev .row{display:flex;gap:6px}
+  .dev button{flex:1;min-height:34px;border:2px solid var(--ink);border-radius:10px;background:#fff;font:800 11.5px/1 var(--display);cursor:pointer}
+
+  /* ============ B · note + stamp ============ */
+  .b-body{flex:1;display:flex;flex-direction:column;justify-content:center;gap:16px;padding:10px 22px 0}
+  .b-note{position:relative;padding:22px 20px 18px;border:3px solid var(--ink);border-radius:26px;background:var(--grad-sunset);color:#fff;
+    box-shadow:0 8px 0 var(--ink);transform:rotate(-1.6deg)}
+  .b-note .tape{position:absolute;top:-13px;left:50%;margin-left:-46px;width:92px;height:24px;background:rgba(255,226,190,.92);
+    border:1px solid rgba(180,140,100,.35);transform:rotate(-2deg)}
+  .b-note .from{font:800 9.5px/1 var(--display);letter-spacing:.18em;text-transform:uppercase;opacity:.9}
+  .b-note blockquote{margin:10px 0 12px;font:800 23px/1.15 var(--display);letter-spacing:-.03em}
+  .b-note .waiting{display:inline-flex;align-items:center;gap:7px;padding:6px 10px;border-radius:99px;background:rgba(0,0,0,.25);
+    border:1.5px solid rgba(255,255,255,.45);font:800 10px/1 var(--display);letter-spacing:.08em;text-transform:uppercase}
+  .b-stamp{position:absolute;right:16px;bottom:8px;transform:rotate(6deg);padding:8px 13px;border:3px dashed #fff;border-radius:10px;
+    font:800 12px/1 var(--display);letter-spacing:.14em;text-transform:uppercase;color:#fff;opacity:.95}
+  .b-actions{display:grid;gap:9px}
+  .b-title{text-align:center;margin-top:4px}
+  .b-title h1{margin:0;font:800 26px/1.05 var(--display);letter-spacing:-.04em}
+  .b-title p{margin:6px auto 0;max-width:30ch;font-size:12px;line-height:1.5;color:#4a3552}
+  .b-link{margin:2px auto 0;font:700 12.5px/1.4 var(--body);color:#4a3552;text-align:center}
+  .b-link a{color:var(--pink-deep);font-weight:800;text-underline-offset:3px}
+  .b-trust{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin:2px 0 0;padding:0;list-style:none}
+  .b-trust li{display:grid;justify-items:center;gap:3px;padding:9px 4px;border:2px dashed rgba(27,16,36,.22);border-radius:14px;
+    background:rgba(255,255,255,.55);font:800 8.5px/1.2 var(--display);letter-spacing:.06em;text-transform:uppercase;color:#4a3552}
+  .b-trust b{font-size:14px;line-height:1}
+
+  .notes{max-width:1180px;margin:0 auto;padding:6px 24px 70px}
+  .notes h2{font:800 27px/1.1 var(--display);letter-spacing:-.03em;margin:30px 0 12px}
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:12px}
+  .card{border:2px solid var(--ink);border-radius:20px;background:#fff;padding:16px 17px;box-shadow:0 4px 0 rgba(27,16,36,.85)}
+  .card h3{font:800 14.5px/1.3 var(--display);margin:0 0 7px}
+  .card p,.card li{font-size:13px;line-height:1.6;color:#4a3552}
+  .card p{margin:0}
+  .card ul{margin:0;padding-left:17px}
+  .card li::marker{color:var(--pink)}
+  .footer{margin-top:22px;font-size:12px;color:#7a6782}
+</style>
+</head>
+<body>
+
+<header class="doc">
+  <span class="kicker">Sign-in page · Theme A</span>
+  <h1>Two ways to <em>sign in</em></h1>
+  <p class="lede">Today <code>/login</code> opens with a big gradient card that just says “ask me anything”, then a stack of buttons. The page never says what signing in is <em>for</em>. These two versions lead with the reason — chatting back — and keep “I only want a link” visible without competing with it.</p>
+  <div class="legend">
+    <div class="chip-card"><h3>What the page must do</h3><p>Sign in (Google / Apple), or skip it and take a link. Both in one screen, with sign-in clearly primary for returning people.</p></div>
+    <div class="chip-card"><h3>Reality of the buttons</h3><p>Google and Apple draw their own buttons in production; the mockup shows their footprint and styling around them. The dev demo accounts stay, in a clearly marked local-only strip.</p></div>
+    <div class="chip-card"><h3>Same parts</h3><p>BrandMark, <code>.form-card</code> / sticker cards, AppButton, the ink + pink tokens. Nothing new to build.</p></div>
+  </div>
+</header>
+
+<section class="rail">
+
+  <!-- ============ A ============ -->
+  <figure class="item" style="margin:0">
+    <div class="phone">
+      <div class="screen">
+        <div class="sbar"><span>9:41</span><span class="dots"><i></i><i></i><i></i><span class="batt"></span></span></div>
+        <div class="top">
+          <span class="brand"><img src="logo/psst-whisper.svg" alt="" /><b>psst<sup>🤫</sup></b></span>
+          <span class="pill">🔒 private</span>
+        </div>
+
+        <div class="a-body">
+          <div class="a-head">
+            <h1>welcome <em>back.</em></h1>
+            <p>Sign in to chat with the people you’ve messaged — or skip it and just take a link.</p>
+          </div>
+
+          <section class="door">
+            <h2>I have an account</h2>
+            <p>No passwords. Google or Apple vouches for you, we never see one.</p>
+            <button class="provider"><span class="g">G</span> Continue with Google</button>
+            <button class="provider apple"><span class="g"></span> Continue with Apple</button>
+          </section>
+
+          <div class="divider">or</div>
+
+          <section class="door sticker">
+            <h2>I just want a link</h2>
+            <p>Pick a username and start receiving notes. No account, and you can add one later.</p>
+            <div class="user-line">localhost:9000/<b>yourname</b></div>
+            <a class="btn light block" href="#">pick my username →</a>
+          </section>
+
+          <div class="dev">
+            <b>Local demo accounts</b>
+            <div class="row"><button>Alice</button><button>Bob</button><button>Carol</button></div>
+          </div>
+        </div>
+
+        <p class="foot">🔒 You stay anonymous to the person you message. <b>Admins</b> can see which account a note came from.</p>
+        <div class="homebar"></div>
+      </div>
+    </div>
+    <figcaption class="cap">
+      <h2><span class="num">A</span> Two doors</h2>
+      <p>One screen, two labelled doors: a white card for people with an account, a pink sticker for people who just want a link. The demo strip is visibly “local only”.</p>
+      <p><span class="tag">clearest</span><span class="tag">one primary</span><span class="tag">least new CSS</span></p>
+    </figcaption>
+  </figure>
+
+  <!-- ============ B ============ -->
+  <figure class="item" style="margin:0">
+    <div class="phone">
+      <div class="screen">
+        <div class="sbar"><span>9:41</span><span class="dots"><i></i><i></i><i></i><span class="batt"></span></span></div>
+        <div class="top">
+          <span class="brand"><img src="logo/psst-whisper.svg" alt="" /><b>psst<sup>🤫</sup></b></span>
+          <span class="pill" style="background:var(--lime)">no password</span>
+        </div>
+
+        <div class="b-body">
+          <div class="b-note">
+            <span class="tape"></span>
+            <div class="from">a note is waiting for you</div>
+            <blockquote>“i’ve been trying to say this in person for weeks…”</blockquote>
+            <span class="waiting">👻 Anonymous #11 · 1h</span>
+            <span class="b-stamp">sign in</span>
+          </div>
+
+          <div class="b-title">
+            <h1>sign in to write back</h1>
+            <p>Replies only work between accounts. Reading and sending stays free without one.</p>
+          </div>
+
+          <div class="b-actions">
+            <button class="btn block"><span class="g">G</span> Continue with Google</button>
+            <button class="btn light block"><span class="g"></span> Continue with Apple</button>
+          </div>
+
+          <p class="b-link">no account? <a href="#">pick a username instead →</a></p>
+
+          <ul class="b-trust">
+            <li><b>🔑</b>no password</li>
+            <li><b>🚫</b>no spam</li>
+            <li><b>🧹</b>delete anytime</li>
+          </ul>
+        </div>
+
+        <p class="foot">🔒 You stay anonymous to the person you message. <b>Admins</b> can see which account a note came from.</p>
+        <div class="homebar"></div>
+      </div>
+    </div>
+    <figcaption class="cap">
+      <h2><span class="num">B</span> Note + stamp</h2>
+      <p>Starts with the thing you’re missing — a note with nobody to answer — then offers “sign in to write back”. The link-only path is a quiet line underneath.</p>
+      <p><span class="tag">most emotional</span><span class="tag">story-card feel</span><span class="tag">provider buttons lead</span></p>
+    </figcaption>
+  </figure>
+
+</section>
+
+<section class="notes">
+  <h2>Notes for the build</h2>
+  <div class="cards">
+    <div class="card">
+      <h3>What changes from today</h3>
+      <ul>
+        <li>The gradient hero card with “ask me anything” goes — it belongs on the public link page, not the sign-in page.</li>
+        <li>Headline becomes “welcome back.” and explains what sign-in unlocks.</li>
+        <li>“I just want a link” stops being a text line and becomes a real second door with the username preview.</li>
+        <li>Demo accounts move into a dashed, labelled local-only strip.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Provider buttons</h3>
+      <p>Keep <code>GoogleSignIn.vue</code> / <code>AppleSignIn.vue</code> untouched — they render Google’s and Apple’s own widgets. Style the <em>container</em>: the mockup shows the footprint, the real widget drops into that slot. Where no client IDs are set, the existing “sign-in isn’t set up” line replaces them.</p>
+    </div>
+    <div class="card">
+      <h3>Behaviour that must survive</h3>
+      <ul>
+        <li><code>next</code> query is honoured after sign-in.</li>
+        <li>A link-only guest can reach this page (already fixed) and keeps their username.</li>
+        <li>Error state: “We couldn’t sign you in” stays visible above the buttons.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Motion &amp; a11y</h3>
+      <p>Entrance rise only; the note in B tilts but never drifts. Both buttons ≥48px, ink focus rings, provider widgets keep their own accessible names, and the demo strip is hidden outside dev.</p>
+    </div>
+  </div>
+  <p class="footer">static mockup · open in a browser · press states are live</p>
+</section>
+
+</body>
+</html>
