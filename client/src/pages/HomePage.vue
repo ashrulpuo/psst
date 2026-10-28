@@ -99,8 +99,10 @@ const body = (key: string) => (te(key) ? t(key) : "");
   flex: 1;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  /* Start the pitch under the brand with a little air, and keep the action low. */
+  justify-content: flex-start;
   gap: 14px;
+  padding-top: 30px;
 }
 .hero {
   text-align: center;
@@ -129,7 +131,7 @@ const body = (key: string) => (te(key) ? t(key) : "");
 /* The wall: three notes that drift, like the inbox they come from. */
 .wall {
   position: relative;
-  height: 332px;
+  height: 352px;
   margin-inline: -8px;
 }
 .note {
@@ -172,13 +174,13 @@ const body = (key: string) => (te(key) ? t(key) : "");
   --r: -4deg;
 }
 .n2 {
-  top: 70px;
+  top: 92px;
   right: -2px;
   width: 192px;
   --r: 3deg;
 }
 .n3 {
-  top: 190px;
+  top: 228px;
   left: 22px;
   width: 204px;
   --r: 1.5deg;
