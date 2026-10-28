@@ -37,6 +37,14 @@ class MessageResource extends JsonResource
             'mine' => $this->from_receiver === $viewerIsReceiver,
             'read_at' => $this->read_at,
             'created_at' => $this->created_at,
+            'reactions' => $this->whenLoaded('reactions', fn () => $this->reactions
+                ->groupBy('emoji')
+                ->map(fn ($group, $emoji) => [
+                    'emoji' => $emoji,
+                    'count' => $group->count(),
+                    'mine' => $group->contains('user_id', auth()->id()),
+                ])
+                ->values()),
         ];
     }
 }

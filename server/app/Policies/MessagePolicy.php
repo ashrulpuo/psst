@@ -17,4 +17,15 @@ class MessagePolicy
 
         return $message->from_receiver !== $userIsReceiver;
     }
+
+    /**
+     * Either participant may react to any message in the thread, including their own.
+     */
+    public function react(User $user, Message $message): bool
+    {
+        return Thread::query()
+            ->whereKey($message->thread_id)
+            ->forParticipant($user)
+            ->exists();
+    }
 }

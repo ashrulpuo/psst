@@ -15,6 +15,7 @@ use App\Http\Controllers\MeController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PushController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\Threads\ReactionController;
 use App\Http\Controllers\Threads\ThreadListController;
 use App\Http\Controllers\Threads\ThreadMessageController;
 use App\Http\Controllers\Threads\ThreadStateController;
@@ -73,6 +74,10 @@ Route::middleware(['auth:sanctum', 'not-banned'])->group(function () {
     });
 
     Route::post('messages/{message}/report', [ReportController::class, 'store'])
+        ->whereUuid('message')
+        ->middleware('throttle:reports');
+
+    Route::post('messages/{message}/reactions', [ReactionController::class, 'store'])
         ->whereUuid('message')
         ->middleware('throttle:reports');
 });

@@ -23,7 +23,7 @@ class ThreadMessageController extends Controller
         MessageResource::viewingAs($thread->receiver_id === $request->user()->id);
 
         return MessageResource::collection(
-            $thread->messages()->orderByDesc('id')->cursorPaginate(self::PAGE_SIZE)
+            $thread->messages()->with('reactions')->orderByDesc('id')->cursorPaginate(self::PAGE_SIZE)
         );
     }
 

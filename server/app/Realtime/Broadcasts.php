@@ -60,6 +60,7 @@ class Broadcasts
                         'mine' => $authoredByRecipient,
                         'read_at' => null,
                         'created_at' => $message->created_at,
+                        'reactions' => [],
                     ],
                 ],
             );
