@@ -1,0 +1,708 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Psst — Direction A · Sticker Shop</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --ink:#1b1024;
+    --ink-2:#4a3552;
+    --paper:#fff6ee;
+    --cream:#ffe9d6;
+    --pink:#ff2d6f;
+    --pink-deep:#d6004f;
+    --orange:#ff8a3d;
+    --lime:#c9ff4f;
+    --blue:#2c6bff;
+    --violet:#7c3aed;
+    --muted:#7a6782;
+    --white:#fff;
+    --display:"Bricolage Grotesque","Avenir Next",system-ui,sans-serif;
+    --body:"Nunito",ui-rounded,system-ui,sans-serif;
+    --hard:0 6px 0 var(--ink);
+    --r-lg:28px;
+    --r-md:20px;
+    --r-sm:14px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    background:var(--paper);
+    background-image:radial-gradient(rgba(27,16,36,.09) 1px,transparent 1px);
+    background-size:18px 18px;
+    color:var(--ink);
+    font-family:var(--body);
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:inherit}
+  .doc{max-width:1240px;margin:0 auto;padding:56px 24px 24px}
+  .kicker{
+    display:inline-flex;align-items:center;gap:8px;
+    padding:8px 14px;border:2px solid var(--ink);border-radius:999px;
+    background:var(--lime);font:800 12px/1 var(--display);letter-spacing:.12em;text-transform:uppercase;
+    box-shadow:0 3px 0 var(--ink);
+  }
+  h1{font:800 clamp(38px,6vw,72px)/0.95 var(--display);letter-spacing:-.035em;margin:18px 0 10px}
+  h1 em{font-style:normal;color:var(--pink);text-shadow:3px 3px 0 var(--ink)}
+  .lede{max-width:62ch;font-size:18px;line-height:1.5;color:var(--ink-2);margin:0 0 26px}
+  .metagrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;margin:0 0 34px}
+  .meta{border:2px solid var(--ink);border-radius:var(--r-md);background:var(--white);padding:14px 16px;box-shadow:0 4px 0 rgba(27,16,36,.85)}
+  .meta h3{margin:0 0 8px;font:800 11px/1 var(--display);letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+  .meta p{margin:0;font-size:14px;line-height:1.55;color:var(--ink-2)}
+  .swatches{display:flex;flex-wrap:wrap;gap:8px}
+  .sw{display:flex;align-items:center;gap:7px;font:700 12px/1 var(--display)}
+  .sw i{width:22px;height:22px;border-radius:7px;border:2px solid var(--ink);display:block}
+  .sw code{font:600 11px/1 ui-monospace,monospace;color:var(--muted)}
+  .type-row{display:grid;gap:6px}
+  .type-row b{font-family:var(--display);font-weight:800;letter-spacing:-.02em;font-size:19px}
+  .type-row span{font-size:13px;color:var(--muted)}
+  .rail{display:flex;gap:46px;overflow-x:auto;padding:6px 4px 44px;scroll-snap-type:x mandatory;scrollbar-color:#d9c6b7 transparent}
+  .rail::-webkit-scrollbar{height:8px}
+  .rail::-webkit-scrollbar-thumb{background:#d9c6b7;border-radius:99px}
+  .item{flex:0 0 auto;scroll-snap-align:center;width:430px}
+  .phone{
+    position:relative;width:430px;height:884px;padding:20px;border-radius:62px;
+    background:linear-gradient(160deg,#2b1e35,#120a18 60%);
+    box-shadow:0 30px 60px rgba(60,24,70,.28),inset 0 0 0 2px rgba(255,255,255,.08);
+  }
+  .screen{
+    position:relative;width:390px;height:844px;border-radius:44px;overflow:hidden;
+    background:linear-gradient(180deg,#fff7ef 0%,#ffeede 100%);
+    display:flex;flex-direction:column;isolation:isolate;
+  }
+  .screen::after{
+    content:"";position:absolute;inset:0;pointer-events:none;border-radius:44px;
+    box-shadow:inset 0 0 0 1px rgba(27,16,36,.08);
+  }
+  .sbar{display:flex;justify-content:space-between;align-items:center;padding:14px 26px 0;font:800 13px/1 var(--display);letter-spacing:.02em;z-index:4}
+  .sbar .dots{display:flex;gap:4px;align-items:center}
+  .sbar .dots i{display:block;width:5px;height:5px;border-radius:99px;background:rgba(27,16,36,.55)}
+  .sbar .batt{width:22px;height:11px;border:2px solid rgba(27,16,36,.55);border-radius:3px;position:relative}
+  .sbar .batt::after{content:"";position:absolute;inset:2px;right:6px;background:rgba(27,16,36,.55);border-radius:1px}
+  .homebar{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:128px;height:5px;border-radius:99px;background:rgba(27,16,36,.22);z-index:9}
+  .cap{width:430px;margin-top:18px}
+  .cap h2{font:800 21px/1.15 var(--display);letter-spacing:-.02em;margin:0 0 4px;display:flex;align-items:center;gap:10px}
+  .cap .num{display:grid;place-items:center;width:26px;height:26px;border-radius:9px;background:var(--ink);color:#fff;font:800 12px/1 var(--display)}
+  .cap .route{font:700 11px/1 ui-monospace,monospace;color:var(--pink-deep);letter-spacing:.02em;margin:0 0 8px}
+  .cap p{margin:0 0 6px;font-size:13.5px;line-height:1.55;color:var(--ink-2)}
+  .cap .tag{display:inline-block;margin:2px 6px 0 0;padding:4px 9px;border-radius:99px;background:var(--cream);border:1.5px solid rgba(27,16,36,.16);font:700 11px/1 var(--display)}
+
+  /* ============ shared bits ============ */
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:9px;
+    height:56px;padding:0 22px;border-radius:18px;border:3px solid var(--ink);
+    background:var(--pink);color:#fff;box-shadow:var(--hard);
+    font:800 17px/1 var(--display);letter-spacing:-.01em;cursor:pointer;
+    transition:transform .12s cubic-bezier(.2,0,0,1),box-shadow .12s cubic-bezier(.2,0,0,1),background .15s;
+    -webkit-tap-highlight-color:transparent;user-select:none;
+  }
+  .btn:hover{background:#ff4780}
+  .btn:active{transform:translateY(5px);box-shadow:0 1px 0 var(--ink)}
+  .btn.ghost{background:#fff;color:var(--ink);box-shadow:0 5px 0 rgba(27,16,36,.9)}
+  .btn.ghost:hover{background:#fff4e9}
+  .btn.lime{background:var(--lime);color:var(--ink)}
+  .btn.sm{height:46px;font-size:15px;border-width:2.5px;border-radius:15px;box-shadow:0 4px 0 var(--ink)}
+  .btn.block{width:100%}
+  .pill{display:inline-flex;align-items:center;gap:6px;padding:7px 12px;border-radius:99px;border:2px solid var(--ink);background:#fff;font:800 12px/1 var(--display);box-shadow:0 3px 0 rgba(27,16,36,.85)}
+  .sticker{filter:drop-shadow(0 2px 0 rgba(27,16,36,.25))}
+  .tape{
+    position:absolute;width:86px;height:24px;background:rgba(255,255,255,.62);
+    border:1px solid rgba(27,16,36,.08);transform:rotate(-3deg);
+    box-shadow:0 1px 3px rgba(27,16,36,.08);
+  }
+  @keyframes pop-in{from{opacity:0;transform:translateY(14px) scale(.94)}to{opacity:1;transform:none}}
+  @keyframes floaty{0%,100%{transform:translateY(0) rotate(-6deg)}50%{transform:translateY(-5px) rotate(-6deg)}}
+  @keyframes wiggle{0%,100%{transform:rotate(-6deg)}50%{transform:rotate(4deg)}}
+  @keyframes dotpulse{0%,100%{opacity:.25;transform:translateY(0)}50%{opacity:1;transform:translateY(-3px)}}
+  @keyframes confetti-fly{
+    from{transform:translate(0,0) rotate(0) scale(.4);opacity:1}
+    to{transform:translate(var(--dx),var(--dy)) rotate(var(--rot)) scale(1);opacity:0}
+  }
+  .enter{animation:pop-in .5s cubic-bezier(.2,1.2,.3,1) both}
+
+  /* ============ A1 · send ============ */
+  .s-send{padding:0 22px;display:flex;flex-direction:column}
+  .send-foot{margin-top:auto;padding-bottom:16px;display:grid;justify-items:center;gap:2px}
+  .brand{display:flex;align-items:center;justify-content:space-between;margin-top:14px}
+  .wordmark{font:800 26px/1 var(--display);letter-spacing:-.04em;position:relative}
+  .wordmark sup{position:absolute;top:-7px;right:-15px;font-size:13px;transform:rotate(12deg)}
+  .hero{position:relative;display:grid;justify-items:center;margin-top:16px;text-align:center}
+  .avatar-sticker{
+    width:96px;height:96px;border-radius:50%;display:grid;place-items:center;
+    background:linear-gradient(150deg,#ff9d5c,#ff3d7f 52%,#7c3aed);
+    border:5px solid #fff;box-shadow:0 10px 0 rgba(27,16,36,.9),0 16px 26px rgba(255,45,111,.22);
+    font:800 40px/1 var(--display);color:#fff;transform:rotate(-6deg);
+    animation:floaty 4.5s ease-in-out infinite;
+  }
+  .tape-label{
+    position:absolute;left:calc(50% + 22px);top:74px;transform:rotate(7deg);
+    background:var(--lime);border:2.5px solid var(--ink);border-radius:8px;
+    padding:5px 10px;font:800 11px/1 var(--display);letter-spacing:.04em;box-shadow:0 3px 0 var(--ink);
+    white-space:nowrap;
+  }
+  .spark{position:absolute;font-size:22px;animation:wiggle 3s ease-in-out infinite}
+  .spark.s1{left:14px;top:2px;animation-delay:.2s}
+  .spark.s2{right:8px;top:38px;animation-delay:.9s}
+  .spark.s3{left:34px;top:92px;font-size:16px;animation-delay:1.4s}
+  .name{font:800 31px/1 var(--display);letter-spacing:-.04em;margin:16px 0 2px}
+  .name span{font-weight:400;color:var(--muted);font-size:16px;letter-spacing:0}
+  .prompt{font-size:14.5px;color:var(--ink-2);margin:0}
+  .chips{display:flex;gap:8px;margin:16px -22px 0;padding:2px 22px 6px;overflow-x:auto;scrollbar-width:none}
+  .chips::-webkit-scrollbar{display:none}
+  .chip{
+    flex:0 0 auto;padding:9px 13px;border-radius:99px;border:2px solid var(--ink);background:#fff;
+    font:700 12.5px/1 var(--body);cursor:pointer;box-shadow:0 3px 0 rgba(27,16,36,.8);
+    transition:transform .12s,box-shadow .12s,background .15s;
+  }
+  .chip:hover{background:#ffe9d6}
+  .chip:active{transform:translateY(3px);box-shadow:0 0 0 var(--ink)}
+  .paper{
+    position:relative;margin-top:14px;padding:18px 16px 12px;border-radius:24px;
+    border:3px solid var(--ink);background:#fff;box-shadow:0 6px 0 rgba(27,16,36,.9);
+  }
+  .paper .tape{top:-12px;left:50%;margin-left:-43px}
+  .paper textarea{
+    width:100%;height:88px;border:0;outline:0;resize:none;background:transparent;
+    font:600 16.5px/1.45 var(--body);color:var(--ink);
+  }
+  .paper textarea::placeholder{color:#b6a5bd;font-weight:600}
+  .paper-foot{display:flex;align-items:center;justify-content:space-between;border-top:2px dashed rgba(27,16,36,.14);padding-top:9px;margin-top:2px}
+  .emojis{display:flex;gap:4px}
+  .emojis button{border:0;background:transparent;font-size:19px;line-height:1;padding:4px;border-radius:10px;cursor:pointer;transition:transform .12s}
+  .emojis button:hover{transform:translateY(-3px) scale(1.14)}
+  .emojis button:active{transform:scale(.86)}
+  .count{font:700 11.5px/1 ui-monospace,monospace;color:var(--muted)}
+  .send-wrap{margin-top:14px;position:relative}
+  .send-btn{width:100%;height:60px;font-size:18px;background:linear-gradient(180deg,#ff4c86,#ff1f63)}
+  .later{margin:12px 0 0;text-align:center;font-size:12.5px;color:var(--ink-2)}
+  .later b{background:linear-gradient(transparent 62%,var(--lime) 62%)}
+  .own{margin-top:11px;text-align:center;font-size:13px;font-weight:800;color:var(--pink-deep);text-decoration:none;border-bottom:2px solid rgba(214,0,79,.3);align-self:center}
+  .confetti{position:absolute;inset:0;pointer-events:none;z-index:8;overflow:hidden;border-radius:44px}
+  .confetti i{position:absolute;font-size:20px;animation:confetti-fly .9s ease-out forwards}
+
+  /* ============ A2 · sent ============ */
+  .s-sent{padding:0 26px;text-align:center;background:radial-gradient(120% 80% at 50% 12%,#ffd9e6 0%,#fff7ef 58%)}
+  .sent-mid{flex:1;display:grid;align-content:center;width:100%;position:relative}
+  .sent-card{
+    position:relative;width:100%;padding:26px 22px 24px;border-radius:30px;border:3px solid var(--ink);
+    background:#fff;box-shadow:0 9px 0 rgba(27,16,36,.9);
+    animation:pop-in .55s cubic-bezier(.2,1.4,.3,1) both;
+  }
+  .sent-card .tape{top:-13px;left:50%;margin-left:-43px;width:96px}
+  .big-emoji{font-size:56px;line-height:1;display:block;margin-bottom:6px;animation:floaty 3.6s ease-in-out infinite;transform-origin:center}
+  .sent-card h2{font:800 30px/1 var(--display);letter-spacing:-.035em;margin:0 0 8px}
+  .sent-card p{margin:0;font-size:14.5px;line-height:1.55;color:var(--ink-2)}
+  .who-pill{display:inline-flex;align-items:center;gap:7px;margin-top:12px;padding:8px 14px;border-radius:99px;background:#fff1e5;border:2px dashed rgba(27,16,36,.3);font:800 13px/1 var(--display)}
+  .receipt{width:100%;margin:16px 0 0;padding:11px 14px;border-radius:14px;background:#fff8f1;border:2px dashed rgba(27,16,36,.2);display:flex;justify-content:space-between;font:700 11.5px/1 ui-monospace,monospace;color:var(--muted)}
+  .sent-actions{width:100%;margin-top:18px;display:grid;gap:10px}
+  .tiny-note{margin:12px 0 0;font-size:12px;color:var(--muted)}
+  .next-row{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-top:16px}
+  .next-chip{padding:7px 10px;border-radius:99px;background:#fff;border:2px solid rgba(27,16,36,.16);font:800 10.5px/1 var(--display);color:var(--ink-2)}
+  .peek{position:absolute;right:-4px;top:0;transform:rotate(6deg);background:var(--blue);color:#fff;border:2.5px solid var(--ink);border-radius:12px;padding:8px 11px;font:800 11px/1.2 var(--display);box-shadow:0 4px 0 var(--ink);z-index:3}
+
+  /* ============ A3 · inbox ============ */
+  .s-inbox{padding:0 20px}
+  .inbox-head{display:flex;align-items:flex-end;justify-content:space-between;margin:18px 0 4px}
+  .inbox-head h1{font:800 32px/1 var(--display);letter-spacing:-.04em;margin:0}
+  .inbox-head .sub{font-size:12.5px;color:var(--muted);margin:5px 0 0}
+  .stack{position:relative;margin-top:16px;display:grid;gap:13px}
+  .note{
+    position:relative;border-radius:24px;padding:16px 16px 13px;color:#fff;overflow:hidden;
+    border:3px solid var(--ink);box-shadow:0 6px 0 rgba(27,16,36,.9);
+    transition:transform .18s cubic-bezier(.2,1.2,.3,1),box-shadow .18s;
+    touch-action:pan-y;cursor:pointer;
+  }
+  .note:nth-child(1){background:linear-gradient(150deg,#ff3d7f,#7c3aed);transform:rotate(-1.6deg)}
+  .note:nth-child(2){background:linear-gradient(150deg,#2c6bff,#00b3a4);transform:rotate(1.2deg)}
+  .note:nth-child(3){background:linear-gradient(150deg,#ff8a3d,#d6004f);transform:rotate(-.7deg)}
+  .note:hover{transform:rotate(0) translateY(-3px);box-shadow:0 9px 0 rgba(27,16,36,.9)}
+  .note p{margin:0 0 12px;font:700 16px/1.4 var(--body)}
+  .note-foot{display:flex;justify-content:space-between;align-items:center;font:800 11px/1 var(--display);letter-spacing:.02em;color:rgba(255,255,255,.86)}
+  .note-foot .dot{width:9px;height:9px;border-radius:99px;background:var(--lime);border:2px solid #fff;display:inline-block;margin-right:6px;vertical-align:-1px;box-shadow:0 0 0 0 rgba(201,255,79,.7);animation:dotpulse 1.7s ease-in-out infinite}
+  .note .swipe{position:absolute;right:14px;top:-4px;font-size:15px;opacity:.8}
+  .note .hidden{position:absolute;inset:0;display:grid;place-items:center;background:rgba(27,16,36,.86);font:800 15px/1 var(--display);letter-spacing:.02em;transform:translateX(100%);transition:transform .22s;border-radius:20px}
+  .note.swiped .hidden{transform:none}
+  .empty-tip{
+    margin-top:14px;padding:12px 14px;border-radius:18px;border:2px dashed rgba(27,16,36,.32);
+    display:flex;gap:10px;align-items:center;font-size:12.5px;color:var(--ink-2);background:rgba(255,255,255,.6);
+  }
+  .empty-tip b{font-family:var(--display)}
+  .tabbar{
+    margin-top:auto;margin-bottom:22px;display:flex;justify-content:space-between;align-items:center;
+    padding:9px 12px;border-radius:26px;border:3px solid var(--ink);background:#fff;box-shadow:0 6px 0 rgba(27,16,36,.9);
+  }
+  .tab{display:grid;justify-items:center;gap:3px;padding:5px 10px;border-radius:16px;font:800 9.5px/1 var(--display);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);cursor:pointer;transition:background .15s,color .15s,transform .12s}
+  .tab .ico{font-size:19px;line-height:1}
+  .tab[aria-current]{background:var(--pink);color:#fff;box-shadow:0 3px 0 var(--pink-deep);transform:translateY(-2px)}
+  .tab:active{transform:translateY(1px)}
+
+  /* ============ A4 · chat ============ */
+  .s-chat{padding:0}
+  .chat-head{display:flex;align-items:center;gap:10px;padding:12px 16px 12px;border-bottom:2px solid rgba(27,16,36,.1);background:rgba(255,247,239,.9);backdrop-filter:blur(6px)}
+  .icon-btn{width:38px;height:38px;border-radius:12px;border:2px solid var(--ink);background:#fff;display:grid;place-items:center;font-size:16px;cursor:pointer;box-shadow:0 3px 0 rgba(27,16,36,.8);transition:transform .1s,box-shadow .1s}
+  .icon-btn:active{transform:translateY(3px);box-shadow:none}
+  .chat-avatar{width:40px;height:40px;border-radius:50%;border:2.5px solid var(--ink);background:linear-gradient(150deg,#7c3aed,#2c6bff);display:grid;place-items:center;font-size:19px;color:#fff;font-family:var(--display);font-weight:800}
+  .chat-title{flex:1;min-width:0}
+  .chat-title b{display:block;font:800 15px/1.2 var(--display)}
+  .chat-title span{font-size:11.5px;color:var(--muted)}
+  .chat-body{flex:1;padding:16px 16px 0;display:flex;flex-direction:column;gap:10px;overflow:hidden}
+  .day{align-self:center;padding:5px 12px;border-radius:99px;background:rgba(27,16,36,.06);font:800 10.5px/1 var(--display);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+  .msg{max-width:82%;display:grid;gap:5px;animation:pop-in .4s cubic-bezier(.2,1.2,.3,1) both}
+  .msg.theirs{justify-self:start}
+  .msg.mine{justify-self:end;justify-items:end}
+  .bubble{padding:12px 15px;border-radius:20px;font:600 15px/1.45 var(--body);border:2.5px solid var(--ink);box-shadow:0 4px 0 rgba(27,16,36,.85)}
+  .theirs .bubble{background:#fff;border-bottom-left-radius:7px}
+  .mine .bubble{background:linear-gradient(160deg,#ff4c86,#ff1f63);color:#fff;border-bottom-right-radius:7px}
+  .stamp{font:800 10.5px/1 var(--display);color:var(--muted);letter-spacing:.04em;padding-left:4px}
+  .reaction{display:inline-flex;align-items:center;gap:5px;padding:4px 9px;border-radius:99px;background:#fff;border:2px solid var(--ink);font:800 11px/1 var(--display);box-shadow:0 2px 0 rgba(27,16,36,.8);cursor:pointer;transition:transform .12s}
+  .reaction:hover{transform:translateY(-2px) rotate(-3deg)}
+  .typing{display:inline-flex;gap:4px;align-items:center;padding:10px 14px;border-radius:18px;background:#fff;border:2px solid rgba(27,16,36,.14);align-self:start;margin-left:2px}
+  .typing i{width:6px;height:6px;border-radius:99px;background:var(--pink);animation:dotpulse 1.2s infinite}
+  .typing i:nth-child(2){animation-delay:.15s}
+  .typing i:nth-child(3){animation-delay:.3s}
+  .locked{
+    margin:12px 16px 22px;padding:14px;border-radius:22px;border:3px dashed rgba(27,16,36,.34);
+    background:rgba(255,255,255,.66);text-align:center;display:grid;gap:8px;justify-items:center;position:relative;
+  }
+  .locked .lock{font-size:26px;animation:floaty 3.4s ease-in-out infinite}
+  .locked b{font:800 14.5px/1.3 var(--display)}
+  .locked p{margin:0;font-size:12px;line-height:1.5;color:var(--ink-2);max-width:28ch}
+  .locked .badge{position:absolute;right:-6px;top:-12px;transform:rotate(8deg);background:var(--lime);border:2.5px solid var(--ink);border-radius:9px;padding:4px 8px;font:800 10px/1 var(--display);box-shadow:0 3px 0 var(--ink)}
+
+  /* ============ A5 · link ============ */
+  .s-link{padding:0 22px;background:radial-gradient(130% 70% at 50% 0%,#fff2c9 0%,#fff7ef 55%)}
+  .link-head{display:flex;align-items:center;justify-content:space-between;margin:16px 0 2px}
+  .link-head h1{font:800 28px/1 var(--display);letter-spacing:-.04em;margin:0}
+  .link-card{
+    position:relative;margin-top:18px;padding:22px 20px 20px;border-radius:28px;border:3px solid var(--ink);
+    background:linear-gradient(150deg,#ff8a3d 0%,#ff2d6f 46%,#7c3aed 100%);color:#fff;
+    box-shadow:0 9px 0 rgba(27,16,36,.9);overflow:hidden;transform:rotate(-1.2deg);
+  }
+  .link-card::before{content:"";position:absolute;width:220px;height:220px;border-radius:50%;background:rgba(255,255,255,.14);right:-70px;top:-90px}
+  .link-card .tag-line{font:800 10.5px/1 var(--display);letter-spacing:.16em;text-transform:uppercase;opacity:.85}
+  .handle{font:800 38px/1 var(--display);letter-spacing:-.045em;margin:8px 0 2px}
+  .url{display:inline-flex;align-items:center;gap:7px;margin-top:8px;padding:7px 11px;border-radius:99px;background:rgba(255,255,255,.2);border:1.5px solid rgba(255,255,255,.5);font:700 12px/1 ui-monospace,monospace}
+  .qr{display:grid;grid-template-columns:repeat(11,1fr);gap:2px;width:96px;height:96px;padding:7px;background:#fff;border-radius:14px;border:2.5px solid var(--ink);position:absolute;right:18px;bottom:20px;box-shadow:0 4px 0 var(--ink)}
+  .qr i{background:transparent;border-radius:1px}
+  .qr i.on{background:var(--ink)}
+  .share-row{display:grid;grid-template-columns:1fr auto;gap:9px;margin-top:16px}
+  .steps{display:grid;gap:8px;margin-top:16px}
+  .step{display:flex;align-items:center;gap:10px;padding:10px 13px;border-radius:16px;background:#fff;border:2px solid rgba(27,16,36,.14);font-size:12.5px;font-weight:700}
+  .step .n{width:22px;height:22px;flex:none;border-radius:8px;background:var(--ink);color:#fff;display:grid;place-items:center;font:800 11px/1 var(--display)}
+  .empty-notes{margin-top:16px;padding:16px;border-radius:22px;border:3px dashed rgba(27,16,36,.3);display:flex;gap:12px;align-items:center;background:rgba(255,255,255,.55)}
+  .story-strip{display:flex;gap:11px;align-items:center;margin-top:14px;padding:10px;border-radius:20px;background:#fff;border:2px solid rgba(27,16,36,.14)}
+  .story-mini{flex:none;width:56px;height:96px;border-radius:12px;padding:7px 6px;display:flex;flex-direction:column;justify-content:space-between;
+    background:linear-gradient(165deg,#ff8a3d,#ff2d6f 48%,#7c3aed);border:2px solid var(--ink);box-shadow:0 3px 0 var(--ink);transform:rotate(-3deg)}
+  .story-mini span{font:700 5.5px/1.3 ui-monospace,monospace;color:rgba(255,255,255,.9);word-break:break-all}
+  .story-mini b{font:800 9px/1.15 var(--display);color:#fff}
+  .story-copy{display:grid;gap:3px}
+  .story-copy b{font:800 13.5px/1.2 var(--display)}
+  .story-copy span{font-size:11.5px;color:var(--muted)}
+  .empty-notes .pile{font-size:26px;transform:rotate(-8deg)}
+  .empty-notes b{display:block;font:800 14px/1.2 var(--display)}
+  .empty-notes span{font-size:12px;color:var(--ink-2)}
+
+  /* ============ notes section ============ */
+  .notes{max-width:1240px;margin:0 auto;padding:10px 24px 80px}
+  .notes h2{font:800 30px/1.1 var(--display);letter-spacing:-.03em;margin:34px 0 14px}
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+  .card{border:2px solid var(--ink);border-radius:22px;background:#fff;padding:18px 18px 16px;box-shadow:0 5px 0 rgba(27,16,36,.85)}
+  .card h3{font:800 15px/1.3 var(--display);margin:0 0 8px;display:flex;gap:8px;align-items:center}
+  .card ul{margin:0;padding-left:18px;font-size:13.5px;line-height:1.65;color:var(--ink-2)}
+  .card li::marker{color:var(--pink)}
+  .card p{margin:0;font-size:13.5px;line-height:1.6;color:var(--ink-2)}
+  .footer{margin-top:26px;font-size:12.5px;color:var(--muted)}
+  @media (prefers-reduced-motion:reduce){
+    *{animation:none!important;transition:none!important}
+  }
+</style>
+</head>
+<body>
+
+<header class="doc">
+  <span class="kicker">Direction A · bright</span>
+  <h1>Sticker <em>Shop</em></h1>
+  <p class="lede">Psst as a table full of stickers and marker pens: cream paper canvas, candy-gradient note cards, chunky ink-outlined buttons that physically press in, and emoji that pop when you tap. Loud enough to screenshot, cheap enough to feel casual — the app is a toy, not a tool.</p>
+
+  <div class="metagrid">
+    <div class="meta">
+      <h3>Palette</h3>
+      <div class="swatches">
+        <span class="sw"><i style="background:#1b1024"></i>ink <code>#1B1024</code></span>
+        <span class="sw"><i style="background:#fff6ee"></i>paper <code>#FFF6EE</code></span>
+        <span class="sw"><i style="background:#ff2d6f"></i>hot pink <code>#FF2D6F</code></span>
+        <span class="sw"><i style="background:#ff8a3d"></i>tangerine <code>#FF8A3D</code></span>
+        <span class="sw"><i style="background:#7c3aed"></i>violet <code>#7C3AED</code></span>
+        <span class="sw"><i style="background:#2c6bff"></i>ink blue <code>#2C6BFF</code></span>
+        <span class="sw"><i style="background:#c9ff4f"></i>lime <code>#C9FF4F</code></span>
+      </div>
+    </div>
+    <div class="meta">
+      <h3>Type</h3>
+      <div class="type-row">
+        <b>Bricolage Grotesque 800</b>
+        <span>Display · 31 / 28 / 22 / 17 · tracking −0.03em</span>
+        <b style="font-family:var(--body)">Nunito 600–800</b>
+        <span>Body · 16.5 message, 14.5 copy, 11.5 meta</span>
+      </div>
+    </div>
+    <div class="meta">
+      <h3>Feel</h3>
+      <p>Ink outlines, hard offset shadows, 3px borders, 18–28px radii. Every tappable thing moves down 4–5px and loses its shadow on press — the tactile "keyboard key" effect.</p>
+    </div>
+  </div>
+</header>
+
+<section class="rail" aria-label="Screens">
+
+  <!-- A1 SEND -->
+  <figure class="item" style="margin:0">
+    <div class="phone">
+      <div class="screen s-send">
+        <div class="sbar"><span>9:41</span><span class="dots"><i></i><i></i><i></i><span class="batt"></span></span></div>
+        <div class="brand">
+          <span class="wordmark">psst<sup>🤫</sup></span>
+          <span class="pill" style="cursor:pointer">get your own</span>
+        </div>
+        <div class="hero">
+          <span class="spark s1">✨</span><span class="spark s2">💫</span><span class="spark s3">✨</span>
+          <div class="avatar-sticker">a</div>
+          <div class="tape-label">ask me anything</div>
+          <div class="name">aisyah <span>@aisyah</span></div>
+          <p class="prompt">drop me a note. i won't know it's you 🤍</p>
+        </div>
+        <div class="chips" aria-label="Prompt ideas">
+          <button class="chip">say something nice 💌</button>
+          <button class="chip">confess 🤫</button>
+          <button class="chip">roast me 🔥</button>
+          <button class="chip">a secret 🫣</button>
+        </div>
+        <div class="paper">
+          <span class="tape"></span>
+          <textarea id="draft" placeholder="type it. they'll never know it's you 👀"></textarea>
+          <div class="paper-foot">
+            <div class="emojis">
+              <button data-emoji="🥰">🥰</button>
+              <button data-emoji="😂">😂</button>
+              <button data-emoji="😭">😭</button>
+              <button data-emoji="🤍">🤍</button>
+              <button data-emoji="🔥">🔥</button>
+            </div>
+            <span class="count">0 / 1000</span>
+          </div>
+        </div>
+        <div class="send-wrap">
+          <button class="btn send-btn" data-confetti="1">Send it 🚀</button>
+          <div class="confetti" data-layer></div>
+        </div>
+        <div class="send-foot">
+          <p class="later">🔒 They see a nickname. <b>Not your name.</b></p>
+          <a class="own" href="#">get your own psst link →</a>
+        </div>
+        <div class="homebar"></div>
+      </div>
+    </div>
+    <figcaption class="cap">
+      <h2><span class="num">1</span> The note</h2>
+      <p class="route">GET /{username} · sender, no account</p>
+      <p>Avatar as a physical sticker, prompt chips that fill the card with one tap, paper-texture composer, and the only loud thing on screen is the send button.</p>
+      <p><span class="tag">sticker float</span><span class="tag">chip → textarea</span><span class="tag">emoji pop</span></p>
+    </figcaption>
+  </figure>
+
+  <!-- A2 SENT -->
+  <figure class="item" style="margin:0">
+    <div class="phone">
+      <div class="screen s-sent">
+        <div class="sbar" style="width:100%"><span>9:41</span><span class="dots"><i></i><i></i><i></i><span class="batt"></span></span></div>
+        <div class="sent-mid">
+        <div class="peek">psst! delivered</div>
+        <div class="sent-card">
+          <span class="tape"></span>
+          <span class="big-emoji">💌</span>
+          <h2>Sent!</h2>
+          <p>aisyah has your note. she sees you as</p>
+          <div class="who-pill">👻 Anonymous #12</div>
+          <div class="receipt"><span>just now</span><span>no account needed</span></div>
+        </div>
+        <div class="sent-actions">
+          <button class="btn block">Sign in to hear back 💬</button>
+          <button class="btn ghost block">Send another note</button>
+        </div>
+        <p class="tiny-note">signing in is optional. the note is already gone.</p>
+        <div class="next-row">
+          <span class="next-chip">👻 anonymous</span>
+          <span class="next-chip">🔁 can send more</span>
+          <span class="next-chip">💬 replies need an account</span>
+        </div>
+        </div>
+        <div class="homebar"></div>
+      </div>
+    </div>
+    <figcaption class="cap">
+      <h2><span class="num">2</span> Sent (guest)</h2>
+      <p class="route">POST /profiles/{username}/messages</p>
+      <p>The reward moment: confetti burst, a tape-stuck card, and the anonymity receipt stated plainly. Sign-in is offered as an upgrade, never a wall.</p>
+      <p><span class="tag">emoji confetti burst</span><span class="tag">card pops 1.08 → 1</span><span class="tag">receipt slide-in</span></p>
+    </figcaption>
+  </figure>
+
+  <!-- A3 INBOX -->
+  <figure class="item" style="margin:0">
+    <div class="phone">
+      <div class="screen s-inbox">
+        <div class="sbar"><span>9:41</span><span class="dots"><i></i><i></i><i></i><span class="batt"></span></span></div>
+        <div class="inbox-head">
+          <div>
+            <h1>notes for you</h1>
+            <p class="sub">4 new since you last looked 👀</p>
+          </div>
+          <span class="pill" style="background:var(--lime)">3 new</span>
+        </div>
+        <div class="stack">
+          <div class="note">
+            <p>you're the only person in this group chat who makes me laugh. just so you know 🤍</p>
+            <div class="note-foot"><span><span class="dot"></span>Anonymous #7 · 2m</span><span>💬 2</span></div>
+            <div class="hidden">hide note 🙈</div>
+          </div>
+          <div class="note">
+            <p>ok but your playlist from last night?? drop the link pls</p>
+            <div class="note-foot"><span><span class="dot"></span>Anonymous #4 · 18m</span><span></span></div>
+            <div class="hidden">hide note 🙈</div>
+          </div>
+          <div class="note">
+            <p>i've been trying to say this in person for weeks…</p>
+            <div class="note-foot"><span>Anonymous #11 · 1h</span><span>✓ read</span></div>
+            <div class="hidden">hide note 🙈</div>
+          </div>
+        </div>
+        <div class="empty-tip"><span style="font-size:20px">👉</span><span>swipe a note to hide it. block or report lives inside the chat.</span></div>
+        <div class="tabbar">
+          <span class="tab"><span class="ico">🔗</span>link</span>
+          <span class="tab" aria-current="page"><span class="ico">💌</span>inbox</span>
+          <span class="tab"><span class="ico">📮</span>sent</span>
+          <span class="tab"><span class="ico">⚙️</span>you</span>
+        </div>
+        <div class="homebar"></div>
+      </div>
+    </div>
+    <figcaption class="cap">
+      <h2><span class="num">3</span> Inbox</h2>
+      <p class="route">GET /inbox · receiver</p>
+      <p>Each note is its own gradient sticker — the list reads as a pile of notes, not a table. Unread is a lime pulse; swipe left hides, delete is never one stray tap away.</p>
+      <p><span class="tag">swipe-to-hide</span><span class="tag">unread lime pulse</span><span class="tag">hover: card straightens</span></p>
+    </figcaption>
+  </figure>
+
+  <!-- A4 CHAT -->
+  <figure class="item" style="margin:0">
+    <div class="phone">
+      <div class="screen s-chat">
+        <div class="sbar"><span>9:41</span><span class="dots"><i></i><i></i><i></i><span class="batt"></span></span></div>
+        <div class="chat-head">
+          <button class="icon-btn">←</button>
+          <div class="chat-avatar">?</div>
+          <div class="chat-title"><b>Anonymous #4</b><span>sent you a note · 18m</span></div>
+          <button class="icon-btn">⋮</button>
+        </div>
+        <div class="chat-body">
+          <span class="day">today</span>
+          <div class="msg theirs" style="animation-delay:.05s">
+            <div class="bubble">ok but your playlist from last night?? drop the link pls</div>
+            <button class="reaction">😂 <span>2</span></button>
+            <span class="stamp">18m</span>
+          </div>
+          <div class="msg mine" style="animation-delay:.15s">
+            <div class="bubble">haha okay it's called "3am roti canai" — sending it now 🫡</div>
+            <span class="stamp">17m · read ✓✓</span>
+          </div>
+          <div class="typing" aria-label="typing"><i></i><i></i><i></i></div>
+        </div>
+        <div class="locked">
+          <span class="badge">🔒 guest</span>
+          <span class="lock">🫥</span>
+          <b>They're still a guest</b>
+          <p>Reply unlocks the second they sign in. They sent this without an account — that's the point.</p>
+          <button class="btn ghost sm">Got it</button>
+        </div>
+        <div class="homebar"></div>
+      </div>
+    </div>
+    <figcaption class="cap">
+      <h2><span class="num">4</span> Chat · guest locked</h2>
+      <p class="route">GET /threads/{id}/messages · can_chat=false</p>
+      <p>Their bubble is paper, yours is candy. One tap on a bubble adds a reaction. The locked composer is a friendly dashed card, not a disabled input with an error.</p>
+      <p><span class="tag">bubble pop-in stagger</span><span class="tag">tap-to-react</span><span class="tag">typing dots</span><span class="tag">live unlock</span></p>
+    </figcaption>
+  </figure>
+
+  <!-- A5 LINK -->
+  <figure class="item" style="margin:0">
+    <div class="phone">
+      <div class="screen s-link">
+        <div class="sbar"><span>9:41</span><span class="dots"><i></i><i></i><i></i><span class="batt"></span></span></div>
+        <div class="link-head">
+          <h1>your link</h1>
+          <span class="pill">🔗 live</span>
+        </div>
+        <div class="link-card">
+          <div class="tag-line">psst.app/</div>
+          <div class="handle">aisyah</div>
+          <div class="url">🔗 psst.app/aisyah</div>
+          <div class="qr" data-qr></div>
+        </div>
+        <div class="share-row">
+          <button class="btn sm" style="height:52px">copy my link 📋</button>
+          <button class="btn ghost sm" style="height:52px;width:52px;padding:0;font-size:18px">↗</button>
+        </div>
+        <div class="steps">
+          <div class="step"><span class="n">1</span>copy the link</div>
+          <div class="step"><span class="n">2</span>post it on your story (the gradient card is story-sized)</div>
+        </div>
+        <div class="story-strip">
+          <div class="story-mini"><span>psst.app/aisyah</span><b>ask me anything</b></div>
+          <div class="story-copy"><b>story card ready</b><span>9:16 · tap to save</span></div>
+        </div>
+        <div class="empty-notes">
+          <span class="pile">🗒️</span>
+          <div><b>0 notes yet</b><span>the first one always feels weird. then it's fun.</span></div>
+        </div>
+        <div class="homebar"></div>
+      </div>
+    </div>
+    <figcaption class="cap">
+      <h2><span class="num">5</span> Your link</h2>
+      <p class="route">GET /link · receiver</p>
+      <p>The link is the product, so it gets the loudest card in the app. Copy is one chunky button; the QR sits inside the sticker so it survives a screenshot.</p>
+      <p><span class="tag">copy → "copied!" swap</span><span class="tag">QR pulses on scan</span><span class="tag">story-size export</span></p>
+    </figcaption>
+  </figure>
+
+</section>
+
+<section class="notes">
+  <h2>Signature touches &amp; motion rules</h2>
+  <div class="cards">
+    <div class="card">
+      <h3>🫸 The press</h3>
+      <p>Every button sits on a 4–6px hard ink shadow. Touch it and it drops onto the page (translateY + shadow to 0) in 120ms — no scale, no fade. Release and it springs back at 220ms with a tiny overshoot.</p>
+    </div>
+    <div class="card">
+      <h3>🎉 Send = celebration</h3>
+      <p>Tapping send fires 12 emoji (💌✨🤍🎉) outward from the button with random arcs, the card scales 0.96 → 1.04 → 1, and the receipt row slides up 200ms later. Capped at 900ms; skipped entirely for reduced motion.</p>
+    </div>
+    <div class="card">
+      <h3>👆 Swipe the stack</h3>
+      <p>Notes drag horizontally with the finger (no scripted animation), snap open past 72px to reveal a full-card "hide 🙈" layer, snap back otherwise. Vertical scroll always wins the gesture if the first movement is vertical.</p>
+    </div>
+    <div class="card">
+      <h3>✨ Stickers are alive</h3>
+      <p>Avatar floats ±5px on a 4.5s loop; sparkles wiggle out of phase; the "ask me anything" tape label sits at 7°. Motion is slow and shallow so it never competes with reading.</p>
+    </div>
+    <div class="card">
+      <h3>😄 Tap-to-react</h3>
+      <p>Tap a bubble → the reaction chip pops in with a 1.25 overshoot, and the bubble nudges 2px. Long-press opens block / report, which stay in the ⋮ menu too — never hidden behind gesture only.</p>
+    </div>
+    <div class="card">
+      <h3>♿ Guardrails</h3>
+      <p>Ink on paper is 14.5:1; white on the pink button is 4.9:1; white on gradients always has a dark end-stop. 44px minimum targets, focus rings are 3px ink, all motion honors <code>prefers-reduced-motion</code>.</p>
+    </div>
+  </div>
+
+  <h2>What changes from today</h2>
+  <div class="cards">
+    <div class="card"><h3>Kept</h3><ul><li>Warm cream canvas, one accent family, Nunito display type</li><li>Story-gradient cards and the two-pane desktop shell</li><li>Guest-first flow: send → optional sign-in → chat</li></ul></div>
+    <div class="card"><h3>Dialled up</h3><ul><li>Cards tilt, buttons have hard shadows and real press feedback</li><li>Prompt chips, emoji quick-row, reactions, swipe-to-hide</li><li>Wordmark with a winking sticker instead of a plain wordmark</li></ul></div>
+    <div class="card"><h3>Watch out</h3><ul><li>Bright gradients + big shadows tempt low contrast — every card keeps a dark gradient end</li><li>Too many animations can feel cheap; cap at one celebratory moment per action</li><li>Desktop needs the tilt toned down (‑0.5° max) or it reads as broken layout</li></ul></div>
+  </div>
+  <p class="footer">Static HTML mockup · open in any browser · every interaction above is live (press, swipe, tap, send)</p>
+</section>
+
+<script>
+  // prompt chips fill the composer
+  const draft = document.getElementById('draft');
+  document.querySelectorAll('.chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      draft.value = chip.textContent.replace(/\s*[\u{1F000}-\u{1FAFF}\u2600-\u27BF]+\s*$/u, '') + ' — ';
+      draft.focus();
+      updateCount();
+    });
+  });
+  // emoji quick-row appends
+  document.querySelectorAll('[data-emoji]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      draft.value += btn.dataset.emoji;
+      draft.focus();
+      updateCount();
+    });
+  });
+  const countEl = document.querySelector('.count');
+  function updateCount(){ countEl.textContent = `${draft.value.length} / 1000`; }
+  draft.addEventListener('input', updateCount);
+
+  // emoji confetti from the send button
+  const GIFTS = ['💌','✨','🤍','🎉','💫','🔥'];
+  document.querySelector('[data-confetti]').addEventListener('click', (e) => {
+    const layer = document.querySelector('[data-layer]');
+    const host = e.currentTarget.parentElement;
+    for (let i = 0; i < 14; i++) {
+      const s = document.createElement('i');
+      s.textContent = GIFTS[i % GIFTS.length];
+      s.style.left = '50%';
+      s.style.top = '22px';
+      s.style.setProperty('--dx', (Math.random() * 240 - 120).toFixed(0) + 'px');
+      s.style.setProperty('--dy', (-90 - Math.random() * 150).toFixed(0) + 'px');
+      s.style.setProperty('--rot', (Math.random() * 360 - 180).toFixed(0) + 'deg');
+      s.style.animationDelay = (i * 18) + 'ms';
+      layer.appendChild(s);
+      setTimeout(() => s.remove(), 1100 + i * 18);
+    }
+    host.animate([{ transform: 'scale(1)' }, { transform: 'scale(.96)' }, { transform: 'scale(1)' }], { duration: 260, easing: 'cubic-bezier(.2,1.4,.3,1)' });
+  });
+
+  // swipe-to-hide on inbox notes
+  document.querySelectorAll('.note').forEach(note => {
+    let x0 = null, dx = 0, vertical = false;
+    note.addEventListener('pointerdown', e => { x0 = e.clientX; dx = 0; vertical = false; note.setPointerCapture(e.pointerId); });
+    note.addEventListener('pointermove', e => {
+      if (x0 === null) return;
+      const d = e.clientX - x0;
+      if (Math.abs(d) < 6) return;
+      if (!vertical && Math.abs(e.movementY || 0) > Math.abs(d) && Math.abs(d) < 14) { vertical = true; x0 = null; return; }
+      if (vertical) return;
+      dx = Math.max(-110, Math.min(0, d));
+      note.style.transform = `translateX(${dx}px) rotate(${(-dx / 90) * 1.5}deg)`;
+    });
+    const settle = () => {
+      if (x0 === null) return;
+      x0 = null;
+      note.style.transform = '';
+      note.classList.toggle('swiped', dx < -70);
+      dx = 0;
+    };
+    note.addEventListener('pointerup', settle);
+    note.addEventListener('pointercancel', settle);
+    note.addEventListener('click', () => note.classList.toggle('swiped'));
+  });
+
+  // fake but deterministic QR
+  document.querySelectorAll('[data-qr]').forEach(qr => {
+    let seed = 7;
+    for (let i = 0; i < 121; i++) {
+      seed = (seed * 1103515245 + 12345) % 2147483648;
+      const cell = document.createElement('i');
+      const ring = i < 11 || i >= 110 || i % 11 === 0 || i % 11 === 10;
+      const corner = (i < 22 && i % 11 < 4) || (i >= 99 && i % 11 < 4) || (i >= 33 && i < 44 && i % 11 > 7);
+      const edgeBlank = (i < 11 && i < 3) || false;
+      if (corner || (!edgeBlank && seed % 100 > 45)) cell.className = 'on';
+      if (ring && seed % 100 > 70) cell.className = '';
+      qr.appendChild(cell);
+    }
+  });
+</script>
+</body>
+</html>

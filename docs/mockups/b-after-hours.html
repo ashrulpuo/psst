@@ -1,0 +1,719 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Psst — Direction B · After Hours</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --bg:#07060c;
+    --bg-2:#0d0a17;
+    --panel:rgba(255,255,255,.055);
+    --panel-2:rgba(255,255,255,.09);
+    --line:rgba(255,255,255,.11);
+    --line-2:rgba(255,255,255,.2);
+    --text:#f4f1ff;
+    --muted:#a49bc4;
+    --dim:#7c739c;
+    --violet:#8b5cff;
+    --violet-deep:#6d3bff;
+    --cyan:#35f0d0;
+    --pink:#ff4fa3;
+    --display:"Space Grotesk",system-ui,sans-serif;
+    --body:"Inter",system-ui,sans-serif;
+    --mono:"JetBrains Mono",ui-monospace,monospace;
+    --r:26px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    background:var(--bg);
+    background-image:
+      radial-gradient(900px 500px at 12% -8%, rgba(139,92,255,.22), transparent 60%),
+      radial-gradient(700px 420px at 92% 4%, rgba(53,240,208,.1), transparent 62%),
+      radial-gradient(800px 600px at 50% 110%, rgba(255,79,163,.13), transparent 62%);
+    background-repeat:no-repeat;
+    color:var(--text);
+    font-family:var(--body);
+    -webkit-font-smoothing:antialiased;
+    min-height:100vh;
+  }
+  .doc{max-width:1240px;margin:0 auto;padding:56px 24px 20px}
+  .kicker{display:inline-flex;align-items:center;gap:9px;padding:7px 13px;border-radius:99px;border:1px solid rgba(53,240,208,.3);
+    background:rgba(53,240,208,.08);color:var(--cyan);font:600 11px/1 var(--mono);letter-spacing:.18em;text-transform:uppercase}
+  .kicker .led{width:6px;height:6px;border-radius:99px;background:var(--cyan);box-shadow:0 0 12px var(--cyan)}
+  h1{font:700 clamp(40px,6vw,76px)/0.92 var(--display);letter-spacing:-.045em;margin:18px 0 12px}
+  h1 span{background:linear-gradient(100deg,#8b5cff,#ff4fa3 52%,#35f0d0);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .lede{max-width:64ch;color:var(--muted);font-size:17.5px;line-height:1.6;margin:0 0 28px}
+  .metagrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin-bottom:30px}
+  .meta{border:1px solid var(--line);border-radius:20px;background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02));padding:16px}
+  .meta h3{margin:0 0 10px;font:600 10px/1 var(--mono);letter-spacing:.18em;text-transform:uppercase;color:var(--dim)}
+  .meta p{margin:0;font-size:13.5px;line-height:1.6;color:var(--muted)}
+  .swatches{display:flex;flex-wrap:wrap;gap:9px 12px}
+  .sw{display:flex;align-items:center;gap:7px;font-size:11.5px;color:var(--muted)}
+  .sw i{width:20px;height:20px;border-radius:6px;border:1px solid var(--line-2);display:block}
+  .sw code{font:400 10.5px var(--mono);color:var(--dim)}
+  .type-row{display:grid;gap:6px}
+  .type-row b{font-family:var(--display);font-weight:600;font-size:18px;letter-spacing:-.02em}
+  .type-row em{font-style:normal;font-family:var(--mono);font-size:11px;color:var(--dim);letter-spacing:.04em}
+
+  .rail{display:flex;gap:44px;overflow-x:auto;padding:4px 4px 42px;scroll-snap-type:x mandatory}
+  .rail::-webkit-scrollbar{height:8px}
+  .rail::-webkit-scrollbar-thumb{background:rgba(255,255,255,.14);border-radius:99px}
+  .item{flex:0 0 auto;scroll-snap-align:center;width:430px;margin:0}
+  .phone{position:relative;width:430px;height:884px;padding:20px;border-radius:62px;
+    background:linear-gradient(160deg,#1c1728,#0a0810 62%);
+    box-shadow:0 40px 90px rgba(0,0,0,.65),inset 0 0 0 2px rgba(255,255,255,.09),0 0 0 1px rgba(139,92,255,.14)}
+  .screen{position:relative;width:390px;height:844px;border-radius:44px;overflow:hidden;display:flex;flex-direction:column;
+    background:radial-gradient(120% 60% at 50% -8%,rgba(139,92,255,.28),transparent 62%),linear-gradient(180deg,#0b0913,#07060c 62%,#0a0712);
+    isolation:isolate}
+  .screen::before{content:"";position:absolute;inset:0;pointer-events:none;z-index:1;opacity:.5;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='.16'/%3E%3C/svg%3E")}
+  .aura{position:absolute;border-radius:50%;filter:blur(52px);pointer-events:none;z-index:0}
+  .sbar{display:flex;justify-content:space-between;align-items:center;padding:13px 26px 0;font:600 12px/1 var(--display);letter-spacing:.04em;color:rgba(255,255,255,.8);z-index:5}
+  .sbar .dots{display:flex;gap:4px;align-items:center}
+  .sbar .dots i{width:5px;height:5px;border-radius:99px;background:rgba(255,255,255,.5)}
+  .sbar .batt{width:22px;height:11px;border:1.5px solid rgba(255,255,255,.5);border-radius:3px;position:relative}
+  .sbar .batt::after{content:"";position:absolute;inset:2px;right:6px;background:rgba(255,255,255,.55);border-radius:1px}
+  .homebar{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:128px;height:5px;border-radius:99px;background:rgba(255,255,255,.24);z-index:9}
+  .cap{width:430px;margin-top:18px}
+  .cap h2{font:600 20px/1.2 var(--display);letter-spacing:-.02em;margin:0 0 4px;display:flex;align-items:center;gap:10px}
+  .cap .num{display:grid;place-items:center;width:24px;height:24px;border-radius:8px;border:1px solid var(--line-2);background:rgba(255,255,255,.07);
+    font:600 11px var(--mono);color:var(--cyan)}
+  .cap .route{font:400 10.5px/1 var(--mono);letter-spacing:.06em;color:var(--dim);margin:0 0 9px;text-transform:uppercase}
+  .cap p{font-size:13.3px;line-height:1.6;color:var(--muted);margin:0 0 7px}
+  .cap .tag{display:inline-block;margin:2px 6px 0 0;padding:4px 9px;border-radius:99px;border:1px solid var(--line);background:rgba(255,255,255,.05);
+    font:400 10px/1 var(--mono);color:var(--muted);letter-spacing:.04em}
+
+  /* shared */
+  .mono{font-family:var(--mono);letter-spacing:.14em;text-transform:uppercase}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;height:54px;padding:0 20px;border-radius:18px;border:1px solid rgba(255,255,255,.16);
+    background:linear-gradient(180deg,var(--violet-deep),#5426e8);color:#fff;font:600 15.5px/1 var(--display);letter-spacing:-.01em;
+    box-shadow:0 10px 30px rgba(109,59,255,.35),inset 0 1px 0 rgba(255,255,255,.22);cursor:pointer;
+    transition:transform .16s cubic-bezier(.2,1.4,.3,1),box-shadow .2s,filter .2s}
+  .btn:hover{filter:brightness(1.08);box-shadow:0 14px 38px rgba(109,59,255,.45),inset 0 1px 0 rgba(255,255,255,.28)}
+  .btn:active{transform:scale(.965)}
+  .btn.ghost{background:rgba(255,255,255,.05);border-color:var(--line-2);box-shadow:none;color:var(--text)}
+  .btn.ghost:hover{background:rgba(255,255,255,.09)}
+  .btn.cyan{background:linear-gradient(180deg,#4dffe4,#12d4b3);color:#032421;box-shadow:0 10px 30px rgba(53,240,208,.25),inset 0 1px 0 rgba(255,255,255,.5)}
+  .btn.block{width:100%}
+  .glass{border:1px solid var(--line);background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.03));
+    backdrop-filter:blur(14px);border-radius:var(--r)}
+  .chip{display:inline-flex;align-items:center;gap:6px;padding:7px 11px;border-radius:99px;border:1px solid var(--line);background:rgba(255,255,255,.04);
+    font:500 11px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+  .chip.live{color:var(--cyan);border-color:rgba(53,240,208,.3);background:rgba(53,240,208,.07)}
+
+  @keyframes rise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+  @keyframes breathe{0%,100%{transform:scale(1);opacity:.75}50%{transform:scale(1.07);opacity:1}}
+  @keyframes ringout{0%{transform:scale(.55);opacity:.9}100%{transform:scale(1.9);opacity:0}}
+  @keyframes typedot{0%,100%{opacity:.3;transform:translateY(0)}50%{opacity:1;transform:translateY(-3px)}}
+  @keyframes scanline{0%{transform:translateY(-120%)}100%{transform:translateY(820%)}}
+  @keyframes eq{0%,100%{transform:scaleY(.35)}50%{transform:scaleY(1)}}
+  .rise{animation:rise .6s cubic-bezier(.2,1,.3,1) both}
+
+  /* B1 send */
+  .s-send{padding:0 22px}
+  .topline{display:flex;justify-content:space-between;align-items:center;margin-top:12px;font:500 10px/1 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--dim)}
+  .topline b{color:var(--text);font-weight:500}
+  .orb-wrap{position:relative;display:grid;place-items:center;margin:22px 0 0;height:168px}
+  .orb{position:relative;width:104px;height:104px;border-radius:50%;display:grid;place-items:center;
+    background:radial-gradient(circle at 34% 28%,#ff9de0,#8b5cff 46%,#3a1a8c 88%);
+    box-shadow:0 0 60px rgba(139,92,255,.55),inset 0 0 24px rgba(255,255,255,.25);
+    font:600 40px/1 var(--display);color:#fff;z-index:2}
+  .orb::after{content:"";position:absolute;inset:-14px;border-radius:50%;border:1px solid rgba(139,92,255,.4);animation:breathe 5s ease-in-out infinite}
+  .orb-wrap .halo{position:absolute;width:150px;height:150px;border-radius:50%;border:1px solid rgba(255,255,255,.1);animation:ringout 6s ease-out infinite}
+  .orb-wrap .halo.h2{animation-delay:3s}
+  .orb-wrap .spark{position:absolute;font-size:16px;opacity:.9}
+  .orb-wrap .spark.a{left:44px;top:24px;animation:breathe 4s ease-in-out infinite}
+  .orb-wrap .spark.b{right:52px;top:118px;animation:breathe 5.5s ease-in-out infinite}
+  .heading{text-align:center;margin-top:2px}
+  .heading h2{font:600 30px/1.02 var(--display);letter-spacing:-.04em;margin:0 0 7px}
+  .heading h2 em{font-style:normal;background:linear-gradient(100deg,#ff4fa3,#c9a2ff 60%,#35f0d0);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .heading p{margin:0;font-size:13px;color:var(--muted)}
+  .prompts{display:flex;gap:7px;justify-content:center;margin-top:15px}
+  .prompt{padding:8px 11px;border-radius:99px;border:1px solid var(--line);background:rgba(255,255,255,.04);
+    color:var(--muted);font:500 11.5px/1 var(--display);cursor:pointer;transition:.16s}
+  .prompt:hover{color:var(--text);border-color:rgba(139,92,255,.55);background:rgba(139,92,255,.14)}
+  .composer{margin-top:14px;padding:14px 15px 11px;border-radius:24px;border:1px solid var(--line-2);
+    background:linear-gradient(180deg,rgba(255,255,255,.085),rgba(255,255,255,.035));box-shadow:0 18px 50px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.12);position:relative}
+  .composer::after{content:"";position:absolute;inset:-1px;border-radius:24px;pointer-events:none;
+    background:linear-gradient(140deg,rgba(139,92,255,.55),transparent 32%,transparent 68%,rgba(53,240,208,.35));mask:linear-gradient(#000,#000) content-box,linear-gradient(#000,#000);mask-composite:exclude;padding:1px}
+  .composer textarea{width:100%;height:84px;background:transparent;border:0;outline:0;resize:none;color:var(--text);caret-color:var(--cyan);
+    font:400 16px/1.5 var(--body)}
+  .composer textarea::placeholder{color:#6f6690}
+  .composer-foot{display:flex;justify-content:space-between;align-items:center;border-top:1px solid rgba(255,255,255,.08);padding-top:9px;margin-top:4px}
+  .modes{display:flex;gap:5px}
+  .mode{padding:5px 10px;border-radius:99px;background:rgba(255,255,255,.05);border:1px solid transparent;font:500 10px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--dim);cursor:pointer;transition:.15s}
+  .mode[aria-pressed="true"]{background:rgba(139,92,255,.22);border-color:rgba(139,92,255,.5);color:#dcd0ff}
+  .count{font:400 10.5px var(--mono);color:var(--dim)}
+  .hold-row{display:flex;align-items:center;gap:14px;margin-top:16px}
+  .hold{position:relative;width:84px;height:84px;flex:none;border-radius:50%;border:0;cursor:pointer;background:transparent;padding:0;touch-action:none}
+  .hold .ring{position:absolute;inset:0;border-radius:50%;
+    background:conic-gradient(var(--cyan) calc(var(--p,0)*1%),rgba(255,255,255,.12) 0);
+    -webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 5px),#000 calc(100% - 4px));
+    mask:radial-gradient(farthest-side,transparent calc(100% - 5px),#000 calc(100% - 4px));transition:--p .1s linear}
+  .hold .core{position:absolute;inset:8px;border-radius:50%;display:grid;place-items:center;font-size:22px;
+    background:radial-gradient(circle at 36% 28%,#a98bff,#6d3bff 60%,#3c1bab);box-shadow:0 0 34px rgba(139,92,255,.6),inset 0 1px 0 rgba(255,255,255,.35);
+    transition:transform .14s cubic-bezier(.2,1.4,.3,1)}
+  .hold:active .core,.hold.pressing .core{transform:scale(.92)}
+  .hold-note{flex:1}
+  .hold-note b{display:block;font:600 14px/1.3 var(--display)}
+  .hold-note span{font-size:11.5px;color:var(--muted);line-height:1.5}
+  .privacy-strip{display:flex;gap:9px;align-items:flex-start;margin-top:auto;padding:11px 12px;border-radius:16px;
+    border:1px solid rgba(53,240,208,.18);background:rgba(53,240,208,.05);font-size:10.5px;line-height:1.5;color:var(--muted)}
+  .privacy-strip b{color:#d9fff8;font-weight:600}
+  .ps-ico{font-size:12px;line-height:1.2}
+  .trace{display:flex;justify-content:center;gap:8px;margin-top:10px;padding-bottom:18px;
+    font:400 9.5px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+  .trace b{color:var(--cyan);font-weight:400}
+
+  /* B2 sent */
+  .s-sent{align-items:center;text-align:center;padding:0 26px}
+  .pulse-stage{position:relative;display:grid;place-items:center;width:100%;height:250px;margin-top:26px}
+  .pulse{position:absolute;width:120px;height:120px;border-radius:50%;border:1px solid rgba(53,240,208,.5);animation:ringout 4.2s ease-out infinite}
+  .pulse.p2{animation-delay:1.4s}
+  .pulse.p3{animation-delay:2.8s}
+  .sent-core{position:relative;width:96px;height:96px;border-radius:50%;display:grid;place-items:center;font-size:34px;
+    background:radial-gradient(circle at 36% 28%,#88ffe9,#16b79c 60%,#0a5f52);box-shadow:0 0 60px rgba(53,240,208,.45)}
+  .sent-core::after{content:"";position:absolute;inset:-9px;border-radius:50%;border:1px dashed rgba(255,255,255,.25)}
+  .s-sent h2{font:600 32px/1 var(--display);letter-spacing:-.04em;margin:2px 0 8px}
+  .s-sent h2 em{font-style:normal;color:var(--cyan)}
+  .s-sent .sub{font-size:13.5px;color:var(--muted);margin:0;max-width:30ch}
+  .receipt-card{width:100%;margin-top:20px;padding:0;overflow:hidden}
+  .receipt-row{display:flex;justify-content:space-between;align-items:center;padding:11px 15px;border-bottom:1px solid rgba(255,255,255,.07);
+    font:400 10.5px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--dim)}
+  .receipt-row:last-child{border-bottom:0}
+  .receipt-row b{color:var(--text);font-weight:500;letter-spacing:.04em}
+  .receipt-row b.cy{color:var(--cyan)}
+  .sent-actions{width:100%;display:grid;gap:9px;margin-top:16px}
+  .foot-mono{margin-top:auto;padding-bottom:22px;font:400 9.5px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+  .scan{position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(53,240,208,.7),transparent);animation:scanline 6s linear infinite;opacity:.35}
+
+  /* B3 inbox */
+  .s-inbox{padding:0 20px}
+  .inbox-top{display:flex;justify-content:space-between;align-items:center;margin-top:16px}
+  .inbox-top h1{font:600 30px/1 var(--display);letter-spacing:-.04em;margin:0}
+  .inbox-top h1 span{color:var(--dim);font:400 12px var(--mono);letter-spacing:.12em;margin-left:8px;vertical-align:middle}
+  .filters{display:flex;gap:6px;margin-top:14px}
+  .filter{padding:7px 12px;border-radius:99px;border:1px solid var(--line);background:rgba(255,255,255,.03);
+    font:500 10.5px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--dim);cursor:pointer;transition:.16s}
+  .filter[aria-selected="true"]{background:rgba(139,92,255,.18);border-color:rgba(139,92,255,.45);color:#e3d9ff;box-shadow:0 0 24px rgba(139,92,255,.18)}
+  .feed{margin-top:14px;display:grid;gap:8px}
+  .signal{position:relative;display:grid;grid-template-columns:auto 1fr auto;gap:11px;align-items:start;padding:14px 14px 13px;border-radius:20px;
+    border:1px solid var(--line);background:linear-gradient(180deg,rgba(255,255,255,.055),rgba(255,255,255,.02));
+    cursor:pointer;transition:transform .18s cubic-bezier(.2,1.3,.3,1),border-color .2s,background .2s}
+  .signal:hover{transform:translateX(3px);border-color:rgba(139,92,255,.45);background:linear-gradient(180deg,rgba(139,92,255,.12),rgba(255,255,255,.02))}
+  .signal.unread{border-color:rgba(53,240,208,.34);box-shadow:0 0 32px rgba(53,240,208,.08)}
+  .led{width:8px;height:8px;border-radius:99px;margin-top:6px;background:rgba(255,255,255,.22)}
+  .unread .led{background:var(--cyan);box-shadow:0 0 12px var(--cyan);animation:breathe 2.2s ease-in-out infinite}
+  .signal p{margin:0 0 8px;font-size:14.5px;line-height:1.45;color:var(--text)}
+  .signal:not(.unread) p{color:#cfc8e4}
+  .sig-meta{display:flex;gap:8px;align-items:center;font:400 9.5px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--dim)}
+  .sig-meta .who{color:#c9bfff}
+  .sig-meta .badge{padding:3px 6px;border-radius:5px;background:rgba(255,79,163,.16);border:1px solid rgba(255,79,163,.35);color:#ff9fc8;font-size:8.5px}
+  .sig-time{font:400 9.5px var(--mono);color:var(--dim);white-space:nowrap;padding-top:3px}
+  .sig-actions{display:flex;gap:6px;margin-top:2px}
+  .mini{width:26px;height:26px;border-radius:8px;border:1px solid var(--line);background:rgba(255,255,255,.04);display:grid;place-items:center;font-size:11px;color:var(--muted);cursor:pointer}
+  .mini:hover{background:rgba(255,79,163,.16);color:#ff9fc8}
+  .tabbar{margin-top:auto;margin-bottom:22px;display:flex;justify-content:space-between;padding:8px;border-radius:22px}
+  .tab{display:grid;justify-items:center;gap:4px;flex:1;padding:6px 2px;border-radius:14px;font:500 8.5px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--dim);cursor:pointer;transition:.16s}
+  .tab .ico{font-size:17px;line-height:1;filter:grayscale(.4);opacity:.75}
+  .tab[aria-current]{background:rgba(139,92,255,.18);color:#efe9ff;box-shadow:inset 0 0 0 1px rgba(139,92,255,.4),0 0 24px rgba(139,92,255,.2)}
+  .tab[aria-current] .ico{filter:none;opacity:1}
+
+  /* B4 chat */
+  .chat-head{display:flex;align-items:center;gap:11px;padding:12px 16px;border-bottom:1px solid rgba(255,255,255,.08);
+    background:rgba(10,8,18,.75);backdrop-filter:blur(16px);z-index:4}
+  .ibtn{width:34px;height:34px;border-radius:11px;border:1px solid var(--line);background:rgba(255,255,255,.05);display:grid;place-items:center;color:var(--muted);font-size:14px;cursor:pointer}
+  .ibtn:hover{color:var(--text);border-color:var(--line-2)}
+  .ghost-av{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font:600 17px var(--display);color:#fff;
+    background:radial-gradient(circle at 34% 28%,#a98bff,#5a2be0 70%);box-shadow:0 0 20px rgba(139,92,255,.45)}
+  .chat-title{flex:1;min-width:0}
+  .chat-title b{display:block;font:600 14px/1.25 var(--display)}
+  .chat-title span{font:400 9.5px/1.4 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--dim)}
+  .chat-body{flex:1;padding:16px 16px 0;display:flex;flex-direction:column;justify-content:flex-end;gap:12px;overflow:hidden}
+  .day{align-self:center;font:400 9px/1 var(--mono);letter-spacing:.18em;text-transform:uppercase;color:var(--dim);
+    padding:5px 10px;border-radius:99px;border:1px solid rgba(255,255,255,.09);background:rgba(255,255,255,.03)}
+  .msg{max-width:84%;display:grid;gap:5px;animation:rise .45s cubic-bezier(.2,1,.3,1) both}
+  .msg.theirs{justify-self:start}
+  .msg.mine{justify-self:end;justify-items:end}
+  .bubble{padding:12px 15px;border-radius:20px;font:400 14.5px/1.5 var(--body)}
+  .theirs .bubble{background:rgba(255,255,255,.06);border:1px solid rgba(53,240,208,.26);border-bottom-left-radius:6px;color:#eae4ff;
+    box-shadow:0 0 30px rgba(53,240,208,.07)}
+  .mine .bubble{background:linear-gradient(160deg,#7a48ff,#5426e8);border:1px solid rgba(255,255,255,.16);border-bottom-right-radius:6px;color:#fff;
+    box-shadow:0 10px 26px rgba(84,38,232,.4)}
+  .stamp{font:400 9px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--dim);padding:0 3px}
+  .voice{display:flex;align-items:center;gap:10px;padding:10px 13px;border-radius:18px;border:1px solid rgba(53,240,208,.26);background:rgba(255,255,255,.05)}
+  .play{width:28px;height:28px;flex:none;border-radius:50%;display:grid;place-items:center;background:var(--cyan);color:#032421;font-size:11px}
+  .wave{display:flex;align-items:center;gap:2.5px;height:26px}
+  .wave i{width:2.5px;border-radius:99px;background:linear-gradient(180deg,#7ffbe6,#1abfa4);height:100%;animation:eq 1.6s ease-in-out infinite;transform-origin:center}
+  .dur{font:400 9.5px var(--mono);color:var(--dim)}
+  .typing{align-self:start;display:inline-flex;gap:4px;padding:11px 14px;border-radius:16px;border:1px solid var(--line);background:rgba(255,255,255,.05)}
+  .typing i{width:5px;height:5px;border-radius:99px;background:var(--cyan);animation:typedot 1.3s infinite}
+  .typing i:nth-child(2){animation-delay:.16s}.typing i:nth-child(3){animation-delay:.32s}
+  .composer-row{display:flex;align-items:center;gap:9px;margin:12px 14px 20px;padding:8px 8px 8px 15px;border-radius:22px;border:1px solid var(--line-2);
+    background:rgba(255,255,255,.055);backdrop-filter:blur(14px)}
+  .composer-row input{flex:1;border:0;background:transparent;outline:0;color:var(--text);font:400 14px var(--body);min-width:0}
+  .composer-row input::placeholder{color:#6f6690}
+  .mic{width:42px;height:42px;flex:none;border-radius:50%;border:0;display:grid;place-items:center;font-size:16px;cursor:pointer;
+    background:linear-gradient(180deg,#7cefff,#12c9ae);color:#032421;box-shadow:0 0 24px rgba(53,240,208,.4);transition:transform .15s cubic-bezier(.2,1.4,.3,1)}
+  .mic:active{transform:scale(.9)}
+
+  /* B5 share */
+  .s-link{padding:0 22px}
+  .link-top{display:flex;justify-content:space-between;align-items:center;margin-top:16px}
+  .link-top h1{font:600 28px/1 var(--display);letter-spacing:-.04em;margin:0}
+  .beacon{position:relative;margin-top:16px;padding:20px;border-radius:28px;overflow:hidden;
+    border:1px solid rgba(139,92,255,.35);
+    background:radial-gradient(120% 100% at 20% 0%,rgba(139,92,255,.35),rgba(255,79,163,.08) 45%,rgba(7,6,12,.4) 78%),
+      linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02));
+    box-shadow:0 24px 60px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.14)}
+  .beacon::after{content:"";position:absolute;inset:0;pointer-events:none;
+    background:linear-gradient(120deg,transparent 30%,rgba(255,255,255,.12) 48%,transparent 62%);transform:translateX(-120%)}
+  .beacon:hover::after{animation:none}
+  .beacon .label{font:400 9px/1 var(--mono);letter-spacing:.2em;text-transform:uppercase;color:#c3b6ea}
+  .beacon .handle{font:600 34px/1 var(--display);letter-spacing:-.04em;margin:7px 0 4px}
+  .beacon .url{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:99px;background:rgba(0,0,0,.35);
+    border:1px solid rgba(255,255,255,.14);font:400 10.5px var(--mono);color:#d7ccff}
+  .bqr{position:absolute;right:18px;bottom:18px;width:92px;height:92px;padding:7px;border-radius:16px;background:rgba(7,6,12,.72);
+    border:1px solid rgba(53,240,208,.5);display:grid;grid-template-columns:repeat(11,1fr);gap:2px;box-shadow:0 0 34px rgba(53,240,208,.25)}
+  .bqr i{border-radius:1px;background:transparent}
+  .bqr i.on{background:var(--cyan);box-shadow:0 0 5px rgba(53,240,208,.7)}
+  .stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:12px}
+  .stat{padding:11px 12px;border-radius:16px;border:1px solid var(--line);background:rgba(255,255,255,.04)}
+  .stat b{display:block;font:600 20px/1 var(--display);letter-spacing:-.02em}
+  .stat span{font:400 8.5px/1.4 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--dim)}
+  .share-actions{display:grid;grid-template-columns:1fr 52px;gap:8px;margin-top:12px}
+  .story-row{display:flex;gap:10px;align-items:center;margin-top:12px;padding:10px 12px;border-radius:18px;border:1px solid var(--line);background:rgba(255,255,255,.035)}
+  .story-thumb{width:46px;height:78px;flex:none;border-radius:10px;transform:rotate(-4deg);border:1px solid rgba(255,255,255,.25);
+    background:radial-gradient(120% 80% at 20% 10%,#ff4fa3,#6d3bff 55%,#0a0712 95%);display:grid;place-items:end center;padding:7px;
+    font:600 7px/1 var(--display);color:#fff;text-align:center}
+  .quick-share{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+  .qs{display:grid;justify-items:center;gap:5px;padding:11px 6px;border-radius:16px;border:1px solid var(--line);
+    background:rgba(255,255,255,.04);cursor:pointer;transition:.16s}
+  .qs:hover{border-color:rgba(139,92,255,.5);background:rgba(139,92,255,.12)}
+  .qs span{font-size:15px;line-height:1}
+  .qs b{font:400 8.5px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+  .story-row div b{display:block;font:600 12.5px/1.2 var(--display)}
+  .story-row div span{font:400 9.5px/1.4 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}
+
+  .notes{max-width:1240px;margin:0 auto;padding:10px 24px 80px}
+  .notes h2{font:600 28px/1.15 var(--display);letter-spacing:-.03em;margin:34px 0 14px}
+  .notes h2 em{font-style:normal;color:var(--cyan)}
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px}
+  .card{border:1px solid var(--line);border-radius:20px;padding:18px;background:linear-gradient(180deg,rgba(255,255,255,.055),rgba(255,255,255,.02))}
+  .card h3{font:600 14.5px/1.3 var(--display);margin:0 0 8px;display:flex;gap:8px;align-items:center}
+  .card p{margin:0;font-size:13px;line-height:1.65;color:var(--muted)}
+  .card ul{margin:0;padding-left:17px;font-size:13px;line-height:1.7;color:var(--muted)}
+  .card li::marker{color:var(--cyan)}
+  .footer{margin-top:24px;font:400 10px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<header class="doc">
+  <span class="kicker"><span class="led"></span>Direction B · after dark</span>
+  <h1>After <span>Hours</span></h1>
+  <p class="lede">The same playful product, lit from below. Deep ink canvas, aurora bleed, glass notes with a neon edge, and one signature gesture: <strong>hold to whisper</strong> — press, watch the ring fill, release to send. It's the version you open at 1am when the good messages happen.</p>
+
+  <div class="metagrid">
+    <div class="meta">
+      <h3>Palette</h3>
+      <div class="swatches">
+        <span class="sw"><i style="background:#07060c"></i>ink <code>#07060C</code></span>
+        <span class="sw"><i style="background:#0d0a17"></i>panel <code>#0D0A17</code></span>
+        <span class="sw"><i style="background:#8b5cff"></i>violet <code>#8B5CFF</code></span>
+        <span class="sw"><i style="background:#ff4fa3"></i>hot pink <code>#FF4FA3</code></span>
+        <span class="sw"><i style="background:#35f0d0"></i>cyan <code>#35F0D0</code></span>
+        <span class="sw"><i style="background:#f4f1ff"></i>text <code>#F4F1FF</code></span>
+        <span class="sw"><i style="background:#a49bc4"></i>muted <code>#A49BC4</code></span>
+      </div>
+    </div>
+    <div class="meta">
+      <h3>Type</h3>
+      <div class="type-row">
+        <b>Space Grotesk 600</b>
+        <em>display · 30 / 28 / 20 / 15 · tracking −0.04em</em>
+        <b style="font-family:var(--body);font-weight:400">Inter 400–600</b>
+        <em>body · 16 message, 13.5 copy</em>
+        <b style="font-family:var(--mono);font-weight:500">JetBrains Mono 400</b>
+        <em>labels · 9–11px · 0.14em · uppercase</em>
+      </div>
+    </div>
+    <div class="meta">
+      <h3>Feel</h3>
+      <p>Dark-first, light is the sequel. Depth comes from glow and edge light, never from a grey box. One accent per moment: cyan = live / private, violet = action, pink = anonymous sender.</p>
+    </div>
+  </div>
+</header>
+
+<section class="rail" aria-label="Screens">
+
+  <!-- B1 SEND -->
+  <figure class="item">
+    <div class="phone">
+      <div class="screen s-send">
+        <span class="aura" style="width:280px;height:280px;left:-40px;top:-90px;background:rgba(139,92,255,.45)"></span>
+        <span class="aura" style="width:200px;height:200px;right:-70px;top:180px;background:rgba(255,79,163,.28)"></span>
+        <div class="sbar"><span>1:12</span><span class="dots"><i></i><i></i><i></i><span class="batt"></span></span></div>
+        <div class="topline"><span>private line <b>· @aisyah</b></span><span class="chip live">● open</span></div>
+        <div class="orb-wrap">
+          <span class="halo"></span><span class="halo h2"></span>
+          <span class="spark a">✦</span><span class="spark b">✦</span>
+          <div class="orb">a</div>
+        </div>
+        <div class="heading">
+          <h2>leave a note<br><em>they'll never trace</em></h2>
+          <p>no account. no name. she just gets the words.</p>
+        </div>
+        <div class="prompts">
+          <button class="prompt">say it nice 🤍</button>
+          <button class="prompt">a secret 🫣</button>
+          <button class="prompt">roast me 🔥</button>
+        </div>
+        <div class="composer">
+          <textarea id="draft2" placeholder="say the thing you'd never text…"></textarea>
+          <div class="composer-foot">
+            <div class="modes">
+              <button class="mode" aria-pressed="true">text</button>
+              <button class="mode" aria-pressed="false">whisper</button>
+            </div>
+            <span class="count">0 / 1000</span>
+          </div>
+        </div>
+        <div class="hold-row">
+          <button class="hold" data-hold aria-label="Hold to send">
+            <span class="ring"></span><span class="core">🚀</span>
+          </button>
+          <div class="hold-note">
+            <b>hold to send</b>
+            <span>the ring fills, then it flies. let go early and nothing happens — no accidental confessions.</span>
+          </div>
+        </div>
+        <div class="privacy-strip">
+          <span class="ps-ico">🔒</span>
+          <span><b>anonymous to aisyah.</b> only psst admins can see which account a note came from — guests stay unknown to everyone.</span>
+        </div>
+        <div class="trace"><span>no account</span><span>·</span><span>no name</span><span>·</span><span>no trace</span></div>
+        <div class="homebar"></div>
+      </div>
+    </div>
+    <figcaption class="cap">
+      <h2><span class="num">01</span> the drop</h2>
+      <p class="route">GET /{username} · sender, no account</p>
+      <p>An orb instead of a photo — the receiver's avatar becomes a glow, so the screen belongs to the message. The hold-to-send ring is the one thing you'll remember.</p>
+      <p><span class="tag">hold 700ms to send</span><span class="tag">ring fills</span><span class="tag">haptic tick at 50%</span></p>
+    </figcaption>
+  </figure>
+
+  <!-- B2 SENT -->
+  <figure class="item">
+    <div class="phone">
+      <div class="screen s-sent">
+        <span class="aura" style="width:340px;height:340px;left:20px;top:-60px;background:rgba(53,240,208,.18)"></span>
+        <span class="scan"></span>
+        <div class="sbar" style="width:100%"><span>1:12</span><span class="dots"><i></i><i></i><i></i><span class="batt"></span></span></div>
+        <div class="pulse-stage">
+          <span class="pulse"></span><span class="pulse p2"></span><span class="pulse p3"></span>
+          <div class="sent-core">💌</div>
+        </div>
+        <h2>signal <em>sent</em></h2>
+        <p class="sub">It landed. aisyah sees a ghost, not a name.</p>
+        <div class="receipt-card glass">
+          <div class="receipt-row"><span>trace</span><b class="cy">4F2A · anonymous #12</b></div>
+          <div class="receipt-row"><span>delivered</span><b>00:02 · just now</b></div>
+          <div class="receipt-row"><span>account</span><b>none needed</b></div>
+        </div>
+        <div class="sent-actions">
+          <button class="btn block">Open a channel 💬</button>
+          <button class="btn ghost block">Send another</button>
+          <p style="margin:2px 0 0;font-size:11px;color:var(--dim)">opening a channel = signing in, so she can reply</p>
+        </div>
+        <p class="foot-mono">psst / delivered</p>
+        <div class="homebar"></div>
+      </div>
+    </div>
+    <figcaption class="cap">
+      <h2><span class="num">02</span> signal sent</h2>
+      <p class="route">POST /profiles/{username}/messages</p>
+      <p>The receipt is the reward — a mono trace code makes an anonymous action feel logged and safe, without ever showing who sent it.</p>
+      <p><span class="tag">ring pulses ×3</span><span class="tag">receipt rows stagger 80ms</span><span class="tag">haptic success</span></p>
+    </figcaption>
+  </figure>
+
+  <!-- B3 INBOX -->
+  <figure class="item">
+    <div class="phone">
+      <div class="screen s-inbox">
+        <span class="aura" style="width:260px;height:260px;right:-60px;top:-70px;background:rgba(139,92,255,.4)"></span>
+        <div class="sbar"><span>1:12</span><span class="dots"><i></i><i></i><i></i><span class="batt"></span></span></div>
+        <div class="inbox-top">
+          <h1>signals <span>04</span></h1>
+          <span class="chip live">● live</span>
+        </div>
+        <div class="filters">
+          <button class="filter" aria-selected="true">all</button>
+          <button class="filter" aria-selected="false">unread 3</button>
+          <button class="filter" aria-selected="false">sent</button>
+        </div>
+        <div class="feed">
+          <div class="signal unread">
+            <span class="led"></span>
+            <div>
+              <p>you're the only person in this group chat who makes me laugh. just so you know 🤍</p>
+              <div class="sig-meta"><span class="who">anonymous #7</span><span class="badge">new</span></div>
+            </div>
+            <span class="sig-time">2m</span>
+          </div>
+          <div class="signal unread">
+            <span class="led"></span>
+            <div>
+              <p>ok but your playlist from last night?? drop the link pls</p>
+              <div class="sig-meta"><span class="who">anonymous #4</span><span class="badge">new</span></div>
+            </div>
+            <span class="sig-time">18m</span>
+          </div>
+          <div class="signal unread">
+            <span class="led"></span>
+            <div>
+              <p>i've been trying to say this in person for weeks…</p>
+              <div class="sig-meta"><span class="who">anonymous #11</span><span class="badge">new</span></div>
+            </div>
+            <span class="sig-time">1h</span>
+          </div>
+          <div class="signal">
+            <span class="led"></span>
+            <div>
+              <p>your story made my whole morning, thank you</p>
+              <div class="sig-meta"><span class="who">anonymous #9</span></div>
+            </div>
+            <span class="sig-time">yest</span>
+          </div>
+        </div>
+        <div class="tabbar glass">
+          <span class="tab"><span class="ico">🔗</span>link</span>
+          <span class="tab" aria-current="page"><span class="ico">💌</span>signals</span>
+          <span class="tab"><span class="ico">📮</span>sent</span>
+          <span class="tab"><span class="ico">⚙️</span>you</span>
+        </div>
+        <div class="homebar"></div>
+      </div>
+    </div>
+    <figcaption class="cap">
+      <h2><span class="num">03</span> signals</h2>
+      <p class="route">GET /inbox · receiver</p>
+      <p>Rows, not cards, so unread density reads at a glance. A cyan LED marks new, pink badges mark anonymous senders, and the whole row lights up on hover/touch.</p>
+      <p><span class="tag">LED pulse</span><span class="tag">row slide 3px on hover</span><span class="tag">filter morphs list</span></p>
+    </figcaption>
+  </figure>
+
+  <!-- B4 CHAT -->
+  <figure class="item">
+    <div class="phone">
+      <div class="screen s-chat">
+        <span class="aura" style="width:240px;height:240px;left:-60px;top:120px;background:rgba(255,79,163,.2)"></span>
+        <div class="sbar"><span>1:12</span><span class="dots"><i></i><i></i><i></i><span class="batt"></span></span></div>
+        <div class="chat-head">
+          <button class="ibtn">←</button>
+          <div class="ghost-av">?</div>
+          <div class="chat-title"><b>Anonymous #4</b><span>channel open · 18m</span></div>
+          <button class="ibtn">⋮</button>
+        </div>
+        <div class="chat-body">
+          <span class="day">tonight</span>
+          <div class="msg theirs" style="animation-delay:.05s">
+            <div class="bubble">ok but your playlist from last night?? drop the link pls</div>
+            <span class="stamp">18m · anonymous</span>
+          </div>
+          <div class="msg mine" style="animation-delay:.14s">
+            <div class="bubble">haha it's called "3am roti canai" 🫡</div>
+            <span class="stamp">17m · read ✓✓</span>
+          </div>
+          <div class="msg mine" style="animation-delay:.22s">
+            <div class="voice"><span class="play">▶</span><span class="wave"><i style="animation-delay:0s"></i><i style="animation-delay:.1s"></i><i style="animation-delay:.2s"></i><i style="animation-delay:.3s"></i><i style="animation-delay:.15s"></i><i style="animation-delay:.35s"></i><i style="animation-delay:.05s"></i><i style="animation-delay:.25s"></i><i style="animation-delay:.4s"></i><i style="animation-delay:.1s"></i></span><span class="dur">0:07</span></div>
+            <span class="stamp">17m · whisper</span>
+          </div>
+          <div class="typing" aria-label="typing"><i></i><i></i><i></i></div>
+        </div>
+        <div class="composer-row">
+          <input placeholder="reply as yourself — they still won't see your name" />
+          <button class="mic">🎙</button>
+        </div>
+        <div class="homebar"></div>
+      </div>
+    </div>
+    <figcaption class="cap">
+      <h2><span class="num">04</span> the channel</h2>
+      <p class="route">GET /threads/{id}/messages · can_chat=true</p>
+      <p>Once the sender signs in the channel opens. Their bubble is glass with a cyan edge; yours is solid violet. Whispers are voice notes that play in place with a live waveform.</p>
+      <p><span class="tag">bubbles rise + fade</span><span class="tag">waveform eq</span><span class="tag">mic hold-to-record</span></p>
+    </figcaption>
+  </figure>
+
+  <!-- B5 LINK -->
+  <figure class="item">
+    <div class="phone">
+      <div class="screen s-link">
+        <span class="aura" style="width:300px;height:300px;right:-90px;top:-40px;background:rgba(139,92,255,.4)"></span>
+        <span class="aura" style="width:220px;height:220px;left:-70px;bottom:40px;background:rgba(53,240,208,.16)"></span>
+        <div class="sbar"><span>1:12</span><span class="dots"><i></i><i></i><i></i><span class="batt"></span></span></div>
+        <div class="link-top">
+          <h1>your frequency</h1>
+          <span class="chip live">● live</span>
+        </div>
+        <div class="beacon">
+          <div class="label">psst.app/</div>
+          <div class="handle">aisyah</div>
+          <div class="url">🔗 psst.app/aisyah</div>
+          <div class="bqr" data-qr></div>
+        </div>
+        <div class="stats">
+          <div class="stat"><b>04</b><span>signals</span></div>
+          <div class="stat"><b>01</b><span>channel</span></div>
+          <div class="stat"><b>3</b><span>new</span></div>
+        </div>
+        <div class="share-actions">
+          <button class="btn">copy link 📋</button>
+          <button class="btn ghost" style="width:52px;padding:0;font-size:16px">↗</button>
+        </div>
+        <div class="story-row">
+          <div class="story-thumb">ask me<br>anything</div>
+          <div><b>story card</b><span>9:16 · ready to post</span></div>
+        </div>
+        <div class="quick-share">
+          <div class="qs"><span>💬</span><b>whatsapp</b></div>
+          <div class="qs"><span>📸</span><b>story</b></div>
+          <div class="qs"><span>💾</span><b>save qr</b></div>
+        </div>
+        <div class="trace" style="margin-top:auto;padding-bottom:20px"><span>your link is the whole product</span></div>
+        <div class="homebar"></div>
+      </div>
+    </div>
+    <figcaption class="cap">
+      <h2><span class="num">05</span> your frequency</h2>
+      <p class="route">GET /link · receiver</p>
+      <p>The link is framed as a broadcast: a glowing beacon card, live counters, a QR you can screenshot, and a story-sized card ready for Instagram.</p>
+      <p><span class="tag">beacon sheen sweep</span><span class="tag">copy → "copied"</span><span class="tag">QR glows on focus</span></p>
+    </figcaption>
+  </figure>
+
+</section>
+
+<section class="notes">
+  <h2>Motion &amp; <em>micro-interactions</em></h2>
+  <div class="cards">
+    <div class="card">
+      <h3>⏳ hold to whisper</h3>
+      <p>Press anywhere on the orb: the cyan ring fills over 700ms with a haptic tick at 50%, the core squashes to 0.92, and releasing early snaps back with a 1.06 overshoot. Only a full hold sends — an accidental tap can never post a confession.</p>
+    </div>
+    <div class="card">
+      <h3>🌊 aurora drift</h3>
+      <p>Two blurred gradient orbs drift 6–10px over 12s behind the content. It's the only continuous animation, and it never touches text contrast (orbs sit at 0.18–0.45 alpha behind a solid panel).</p>
+    </div>
+    <div class="card">
+      <h3>📡 the receipt</h3>
+      <p>After send, three mono rows stagger in 80ms apart and the trace code types itself in 240ms. Then a single haptic "success". No confetti — the calm is the reward at this hour.</p>
+    </div>
+    <div class="card">
+      <h3>💬 bubbles with weight</h3>
+      <p>Their glass bubble enters from 12px below at 0.96 scale; yours enters from the right with a 1.02 overshoot. Read receipts shift cyan → white rather than swapping glyphs.</p>
+    </div>
+    <div class="card">
+      <h3>🎚 live LED</h3>
+      <p>Unread rows carry a cyan LED that breathes every 2.2s. Opening a thread drains the LED out over 300ms and flips the badge to "read", in sync with the realtime read receipt.</p>
+    </div>
+    <div class="card">
+      <h3>♿ Guardrails</h3>
+      <p>Text #F4F1FF on #07060C is 17.8:1; muted #A49BC4 is 7.4:1; violet buttons use #5426E8 so white stays above 4.5:1. Glow never carries meaning alone — every state also has a label. All loops stop for reduced motion, and dark mode still ships a light palette for daytime.</p>
+    </div>
+  </div>
+
+  <h2>Signature touches</h2>
+  <div class="cards">
+    <div class="card"><h3>🧿 the orb</h3><p>The receiver has no photo on the send screen — just a glowing orb with their initial. It makes the sender's screen feel like a private channel, and avoids the awkward "which photo did they pick" question.</p></div>
+    <div class="card"><h3>🔢 trace codes</h3><p>Every send gets a 4-character trace ("4F2A"). It's not identifiable — it's a comfort object. It also gives support a handle if someone reports a message.</p></div>
+    <div class="card"><h3>🌗 day mode</h3><p>Same layout, inverted tokens: warm off-white canvas, violet-to-pink beacon, glass becomes paper. The neon is replaced by saturated gradient edges — playful stays, the mood lightens.</p></div>
+  </div>
+
+  <h2>Watch out</h2>
+  <div class="cards">
+    <div class="card"><h3>Glow fatigue</h3><p>Nine glowing things is noise. Keep glow for: live state, the send action, and the link beacon. Everything else earns contrast from borders.</p></div>
+    <div class="card"><h3>Hold discoverability</h3><p>A hold-only send is unusual — pair it with the visible "hold to send" label and allow a normal tap on the text mode's send button. Never make hold the only path.</p></div>
+    <div class="card"><h3>Battery &amp; blur</h3><p>Backdrop blur + big blurs are expensive on low-end Android. Cap at two blurred layers, drop them under 360px width or when the device reports reduced motion.</p></div>
+  </div>
+  <p class="footer">static html mockup · press and hold the orb · swipe the rail · open in any browser</p>
+</section>
+
+<script>
+  // fake but deterministic QR
+  document.querySelectorAll('[data-qr]').forEach(qr => {
+    let seed = 11;
+    for (let i = 0; i < 121; i++) {
+      seed = (seed * 1103515245 + 12345) % 2147483648;
+      const cell = document.createElement('i');
+      if (seed % 100 > 46) cell.className = 'on';
+      qr.appendChild(cell);
+    }
+  });
+
+  // hold-to-whisper ring
+  document.querySelectorAll('[data-hold]').forEach(hold => {
+    const ring = hold.querySelector('.ring');
+    let raf = null, start = 0, held = false;
+    const DUR = 700;
+    const tick = () => {
+      const p = Math.min(1, (performance.now() - start) / DUR);
+      ring.style.setProperty('--p', (p * 100).toFixed(1));
+      if (p < 1) raf = requestAnimationFrame(tick);
+      else { held = true; release(true); }
+    };
+    function begin(e) {
+      e.preventDefault();
+      hold.setPointerCapture?.(e.pointerId);
+      hold.classList.add('pressing');
+      start = performance.now();
+      raf = requestAnimationFrame(tick);
+    }
+    function release(done) {
+      cancelAnimationFrame(raf);
+      hold.classList.remove('pressing');
+      if (done) {
+        hold.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.12)' }, { transform: 'scale(1)' }], { duration: 320, easing: 'cubic-bezier(.2,1.5,.3,1)' });
+        setTimeout(() => ring.style.setProperty('--p', 0), 260);
+      } else {
+        ring.style.setProperty('--p', 0);
+      }
+    }
+    hold.addEventListener('pointerdown', begin);
+    hold.addEventListener('pointerup', () => { if (!held) release(false); });
+    hold.addEventListener('pointercancel', () => release(false));
+    hold.addEventListener('pointerleave', () => { if (!held) release(false); });
+  });
+
+  // composer counter
+  const draft = document.getElementById('draft2');
+  const count = document.querySelector('.count');
+  draft.addEventListener('input', () => { count.textContent = `${draft.value.length} / 1000`; });
+
+  // mode toggle
+  document.querySelectorAll('.mode').forEach(m => m.addEventListener('click', () => {
+    document.querySelectorAll('.mode').forEach(x => x.setAttribute('aria-pressed', 'false'));
+    m.setAttribute('aria-pressed', 'true');
+  }));
+
+  // bottom nav / filter demo
+  document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(x => x.removeAttribute('aria-current'));
+    t.setAttribute('aria-current', 'page');
+  }));
+  document.querySelectorAll('.filter').forEach(f => f.addEventListener('click', () => {
+    document.querySelectorAll('.filter').forEach(x => x.setAttribute('aria-selected', 'false'));
+    f.setAttribute('aria-selected', 'true');
+  }));
+</script>
+</body>
+</html>
