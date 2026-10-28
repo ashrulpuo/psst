@@ -8,9 +8,15 @@
   "lang": "en",
   "orientation": "portrait",
   "display": "standalone",
-  "background_color": "#f6f6f9",
-  "theme_color": "#5b4bf0",
+  "background_color": "#fff6ee",
+  "theme_color": "#d6004f",
   "icons": [
+    {
+      "src": "icons/mark.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
     {
       "src": "icons/icon-128x128.png",
       "sizes": "128x128",

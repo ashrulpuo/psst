@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" role="img" aria-label="Psst">
+  <!-- Notification badge: a single white silhouette, tinted by the platform. -->
+  <path d="M512 232c-160 0-290 98-290 218 0 72 48 136 122 175-7 50-30 92-65 122 65-5 124-27 170-62 20 4 41 6 63 6 160 0 290-98 290-218S672 232 512 232Z"
+        fill="#ffffff"/>
+  <circle cx="386" cy="466" r="40" fill="#0000" stroke="#14101c" stroke-width="0"/>
+</svg>

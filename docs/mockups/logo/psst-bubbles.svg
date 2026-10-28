@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" role="img" aria-label="Psst">
+  <defs>
+    <linearGradient id="pb-pink" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#d6004f"/>
+      <stop offset="1" stop-color="#7c3aed"/>
+    </linearGradient>
+  </defs>
+
+  <!-- back bubble: the reply -->
+  <g transform="translate(-46 -58) rotate(-8 512 512)">
+    <path d="M300 300h420c46 0 84 38 84 84v216c0 46-38 84-84 84H520l-118 96 8-96h-110c-46 0-84-38-84-84V384c0-46 38-84 84-84Z"
+          fill="#c9ff4f" stroke="#1b1024" stroke-width="42" stroke-linejoin="round"/>
+  </g>
+
+  <!-- front bubble: the whisper -->
+  <g transform="translate(40 30) rotate(5 512 512)">
+    <path d="M300 300h420c46 0 84 38 84 84v216c0 46-38 84-84 84H520l-118 96 8-96h-110c-46 0-84-38-84-84V384c0-46 38-84 84-84Z"
+          fill="url(#pb-pink)" stroke="#1b1024" stroke-width="42" stroke-linejoin="round"/>
+    <circle cx="396" cy="492" r="30" fill="#ffffff"/>
+    <circle cx="510" cy="492" r="30" fill="#ffffff"/>
+    <circle cx="624" cy="492" r="30" fill="#ffffff"/>
+  </g>
+</svg>

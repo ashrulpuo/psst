@@ -3,6 +3,7 @@
 import { useMeta } from "quasar";
 import { useI18n } from "vue-i18n";
 import AppButton from "@/components/AppButton.vue";
+import BrandMark from "@/components/BrandMark.vue";
 import { STORY_GRADIENTS } from "@/utils/cardColor";
 
 useMeta({ title: "Psst — say it anonymously" });
@@ -21,7 +22,7 @@ const body = (key: string) => (te(key) ? t(key) : "");
 <template>
   <div class="home">
     <header class="top">
-      <span class="wordmark">psst<sup aria-hidden="true">🤫</sup></span>
+      <BrandMark :size="34" />
       <span class="pill">🔒 {{ $t("home.badge") }}</span>
     </header>
 
@@ -82,21 +83,6 @@ const body = (key: string) => (te(key) ? t(key) : "");
   align-items: center;
   justify-content: space-between;
   padding: 4px 0 0;
-}
-.wordmark {
-  position: relative;
-  font-family: var(--font-display);
-  font-size: 1.7rem;
-  font-weight: 800;
-  letter-spacing: -0.04em;
-  line-height: 1;
-}
-.wordmark sup {
-  position: absolute;
-  top: -8px;
-  right: -16px;
-  font-size: 0.85rem;
-  transform: rotate(12deg);
 }
 .pill {
   display: inline-flex;

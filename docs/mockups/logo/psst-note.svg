@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" role="img" aria-label="Psst">
+  <defs>
+    <clipPath id="pn-clip">
+      <rect x="104" y="104" width="816" height="816" rx="228"/>
+    </clipPath>
+  </defs>
+
+  <g transform="rotate(4 512 512)">
+    <rect x="104" y="104" width="816" height="816" rx="228" fill="#ffe9d6" stroke="#1b1024" stroke-width="42"/>
+    <g clip-path="url(#pn-clip)">
+      <!-- folded corner, the note giveaway -->
+      <path d="M920 104v250L670 104Z" fill="#ffffff" opacity=".55"/>
+      <circle cx="232" cy="820" r="180" fill="#ffffff" opacity=".35"/>
+    </g>
+  </g>
+
+  <g transform="rotate(4 512 512)" fill="none" stroke="#1b1024" stroke-linecap="round">
+    <!-- the p: stem + bowl -->
+    <rect x="318" y="286" width="92" height="474" rx="46" fill="#1b1024" stroke="none"/>
+    <circle cx="546" cy="470" r="164" stroke-width="92"/>
+  </g>
+
+  <!-- lime dot: the wink -->
+  <circle cx="742" cy="306" r="58" fill="#c9ff4f" stroke="#1b1024" stroke-width="20"/>
+</svg>

@@ -1,9 +1,15 @@
+<script setup lang="ts">
+import BrandMark from "@/components/BrandMark.vue";
+</script>
+
 <template>
   <q-layout view="hHh lpR fFf" class="phone">
     <q-page-container>
       <q-page class="auth-shell">
         <main class="auth-main">
-          <router-link to="/" class="brand">Psst</router-link>
+          <router-link to="/" class="brand" aria-label="Psst home">
+            <BrandMark :size="30" />
+          </router-link>
           <router-view />
         </main>
       </q-page>
@@ -41,12 +47,6 @@
   min-height: 44px;
   display: inline-flex;
   align-items: center;
-  color: var(--text);
-  font-family: var(--font-display);
-  font-size: 1.45rem;
-  font-weight: 800;
-  letter-spacing: -0.04em;
-  line-height: 1;
   text-decoration: none;
 }
 .brand:focus-visible {
