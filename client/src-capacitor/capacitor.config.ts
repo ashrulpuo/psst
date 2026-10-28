@@ -12,7 +12,7 @@ export default defineCapacitorConfig({
     SplashScreen: {
       // The app hides it once it has rendered (see src/native/shell.ts), so there is no white flash.
       launchAutoHide: false,
-      backgroundColor: "#5b4bf0",
+      backgroundColor: "#d6004f",
       androidSplashResourceName: "splash",
       showSpinner: false
     },
