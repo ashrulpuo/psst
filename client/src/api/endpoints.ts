@@ -87,7 +87,19 @@ export const guestApi = {
     request<{ data: { claimed: number } }>("POST", "/guest/claim", {
       body: {},
       headers: { "X-Guest-Token": token }
-    }).then(r => r.data.claimed)
+    }).then(r => r.data.claimed),
+  /** Pick a username and keep the link in this browser, without signing in. */
+  claimLink: (username: string, token: string | null) =>
+    request<{ data: Me; guest_token: string }>("POST", "/guest/link", {
+      body: { username },
+      headers: token ? { "X-Guest-Token": token } : {}
+    }),
+  /** Open the link this browser already claimed. */
+  resumeLink: (token: string) =>
+    request<{ data: Me; guest_token: string }>("POST", "/guest/link/resume", {
+      body: {},
+      headers: { "X-Guest-Token": token }
+    })
 };
 
 export const threadApi = {
@@ -105,6 +117,13 @@ export const threadApi = {
   block: (threadId: string) => http.put<void>(`/threads/${threadId}/block`),
   unblock: (threadId: string) =>
     http.delete<void>(`/threads/${threadId}/block`),
+  /** Clear a thread out of my list. A new message brings it back. */
+  hide: (threadId: string) => http.put<void>(`/threads/${threadId}/hide`),
+  unhide: (threadId: string) => http.delete<void>(`/threads/${threadId}/hide`),
+  react: (messageId: string, emoji: string) =>
+    http
+      .post<{ data: Message }>(`/messages/${messageId}/reactions`, { emoji })
+      .then(r => r.data),
   report: (messageId: string, reason: string) =>
     http.post<void>(`/messages/${messageId}/report`, { reason })
 };

@@ -4,10 +4,12 @@ export interface Me {
   id: string;
   username: string | null;
   name: string;
-  email: string;
+  email: string | null;
   avatar_url: string | null;
   role: "user" | "admin";
   needs_username: boolean;
+  /** False until they sign in. They can read the inbox, not reply. */
+  can_reply: boolean;
   /** Show message text in push notifications (off by default: lock screens are public). */
   push_previews: boolean;
 }
@@ -18,6 +20,13 @@ export interface PublicProfile {
   avatar_url: string | null;
 }
 
+export interface Reaction {
+  emoji: string;
+  count: number;
+  /** True when the signed-in user is one of the people who reacted. */
+  mine: boolean;
+}
+
 export interface Message {
   id: string;
   body: string;
@@ -25,6 +34,7 @@ export interface Message {
   mine: boolean;
   read_at: string | null;
   created_at: string;
+  reactions: Reaction[];
   /** Client-only: optimistic message awaiting server confirmation. */
   pending?: boolean;
   failed?: boolean;

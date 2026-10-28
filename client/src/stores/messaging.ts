@@ -183,6 +183,7 @@ export const useMessagingStore = defineStore("messaging", () => {
       mine: true,
       read_at: null,
       created_at: new Date().toISOString(),
+      reactions: [],
       pending: true
     };
     messages[threadId] = [...(messages[threadId] ?? []), temp];
@@ -224,6 +225,61 @@ export const useMessagingStore = defineStore("messaging", () => {
     await (blocked ? threadApi.block(threadId) : threadApi.unblock(threadId));
     const thread = inbox.items.find(t => t.id === threadId);
     if (thread) thread.blocked = blocked;
+  }
+
+  /**
+   * Hide is a per-user archive: drop the thread from my list now, put it back if
+   * the server refuses. A new message from the other side restores it anyway.
+   */
+  async function hideThread(threadId: string) {
+    const fromInbox = inbox.items.findIndex(t => t.id === threadId);
+    const fromSent = sent.items.findIndex(t => t.id === threadId);
+    const inboxItem =
+      fromInbox === -1 ? null : inbox.items.splice(fromInbox, 1)[0];
+    const sentItem = fromSent === -1 ? null : sent.items.splice(fromSent, 1)[0];
+
+    try {
+      await threadApi.hide(threadId);
+    } catch (e) {
+      if (inboxItem) inbox.items.splice(fromInbox, 0, inboxItem);
+      if (sentItem) sent.items.splice(fromSent, 0, sentItem);
+      throw e;
+    }
+  }
+
+  /**
+   * Optimistic reaction: the chip changes on tap, then the server's aggregate
+   * replaces it. On failure the previous list is put back exactly as it was.
+   */
+  async function toggleReaction(
+    threadId: string,
+    messageId: string,
+    emoji: string
+  ) {
+    const list = messages[threadId] ?? [];
+    const target = list.find(m => m.id === messageId);
+    if (!target) return;
+
+    const before = target.reactions.map(r => ({ ...r }));
+    const existing = target.reactions.find(r => r.emoji === emoji);
+
+    if (existing) {
+      existing.count += existing.mine ? -1 : 1;
+      existing.mine = !existing.mine;
+      if (existing.count <= 0) {
+        target.reactions = target.reactions.filter(r => r.emoji !== emoji);
+      }
+    } else {
+      target.reactions = [...target.reactions, { emoji, count: 1, mine: true }];
+    }
+
+    try {
+      const updated = await threadApi.react(messageId, emoji);
+      target.reactions = updated.reactions;
+    } catch (e) {
+      target.reactions = before;
+      throw e;
+    }
   }
 
   async function report(messageId: string, reason: string) {
@@ -323,6 +379,8 @@ export const useMessagingStore = defineStore("messaging", () => {
     applyMessagesRead,
     resync,
     setBlocked,
+    hideThread,
+    toggleReaction,
     report,
     reset
   };
