@@ -26,6 +26,10 @@ Client: [`client/README.md`](client/README.md). Admin: [`admin/README.md`](admin
 
 Needs PHP 8.3 (`pdo_pgsql`), Composer and PostgreSQL 16.
 
+Fastest path: `scripts/dev-stack.sh --seed` reseeds, then starts the API, Reverb, a self-restarting
+queue worker and the dev server. It exists because `migrate:fresh` drops the `jobs` table and silently
+kills a running worker — after which nothing arrives live and the app quietly falls back to polling.
+
 ```sh
 # one-time database setup
 sudo -u postgres psql -c "CREATE ROLE psst LOGIN PASSWORD 'psst' CREATEDB;" \
