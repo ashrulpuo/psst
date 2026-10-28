@@ -7,13 +7,13 @@
   </defs>
 
   <!-- back bubble: the reply -->
-  <g transform="translate(-46 -58) rotate(-8 512 512)">
+  <g transform="translate(-104 -96) rotate(-11 512 512)">
     <path d="M300 300h420c46 0 84 38 84 84v216c0 46-38 84-84 84H520l-118 96 8-96h-110c-46 0-84-38-84-84V384c0-46 38-84 84-84Z"
           fill="#c9ff4f" stroke="#1b1024" stroke-width="42" stroke-linejoin="round"/>
   </g>
 
   <!-- front bubble: the whisper -->
-  <g transform="translate(40 30) rotate(5 512 512)">
+  <g transform="translate(46 42) rotate(4 512 512)">
     <path d="M300 300h420c46 0 84 38 84 84v216c0 46-38 84-84 84H520l-118 96 8-96h-110c-46 0-84-38-84-84V384c0-46 38-84 84-84Z"
           fill="url(#pb-pink)" stroke="#1b1024" stroke-width="42" stroke-linejoin="round"/>
     <circle cx="396" cy="492" r="30" fill="#ffffff"/>
