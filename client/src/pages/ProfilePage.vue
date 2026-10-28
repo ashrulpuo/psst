@@ -263,7 +263,10 @@ async function copyOwn() {
         <AppAvatar :name="profile.name" :src="profile.avatar_url" :size="88" />
         <span class="tape">{{ $t("profile.prompt") }}</span>
       </span>
-      <h1>{{ profile.name }}</h1>
+      <h1>
+        {{ profile.name }}
+        <span class="handle">@{{ profile.username }}</span>
+      </h1>
       <p class="prompt-line">{{ $t("profile.subtitle") }}</p>
     </header>
 
@@ -385,7 +388,7 @@ async function copyOwn() {
   display: grid;
   place-items: center;
   padding: 4px;
-  border: 4px solid var(--surface);
+  border: 5px solid var(--surface);
   border-radius: 50%;
   background: var(--grad-pink);
   box-shadow:
@@ -424,13 +427,20 @@ async function copyOwn() {
   line-height: 1.05;
 }
 .prompt-line {
-  max-width: 28ch;
+  max-width: 40ch;
   color: var(--text-2);
-  font-size: 0.9rem;
+  font-size: 0.82rem;
+}
+.handle {
+  color: var(--text-3);
+  font-family: var(--font-sans);
+  font-size: 0.62em;
+  font-weight: 600;
+  letter-spacing: 0;
 }
 .paper {
   position: relative;
-  padding: 16px 14px 10px;
+  padding: 20px 14px 10px;
   border: 2.5px solid var(--edge);
   border-radius: var(--r-card);
   background: var(--surface);
@@ -446,6 +456,23 @@ async function copyOwn() {
   font: inherit;
   resize: none;
   outline: 0;
+}
+.paper::before {
+  content: "";
+  position: absolute;
+  top: -11px;
+  left: 50%;
+  width: 92px;
+  height: 22px;
+  background: rgba(255, 226, 190, 0.9);
+  border: 1px solid rgba(180, 140, 100, 0.28);
+  box-shadow: 0 1px 3px rgba(27, 16, 36, 0.1);
+  transform: translateX(-50%) rotate(-2deg);
+}
+.paper:focus-within {
+  box-shadow:
+    var(--edge-shadow-sm),
+    0 0 0 3px var(--accent-soft);
 }
 .paper .input::placeholder {
   color: var(--text-3);
@@ -488,8 +515,7 @@ async function copyOwn() {
   padding-bottom: 8px;
 }
 .paper .input:focus-visible {
-  outline: 2px solid var(--accent-text);
-  outline-offset: 1px;
+  outline: 0;
 }
 .help {
   display: flex;

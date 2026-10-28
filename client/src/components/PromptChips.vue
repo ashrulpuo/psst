@@ -20,7 +20,7 @@ defineEmits<{ pick: [text: string] }>();
 <style scoped lang="scss">
 .chips {
   display: flex;
-  gap: 8px;
+  gap: 6px;
   width: 100%;
   padding: 2px 22px 6px;
   margin-inline: -22px;
@@ -34,14 +34,14 @@ defineEmits<{ pick: [text: string] }>();
 }
 .chip {
   flex: none;
-  min-height: 38px;
-  padding: 0 13px;
+  min-height: 34px;
+  padding: 0 11px;
   border: 2px solid var(--edge);
   border-radius: 999px;
   background: var(--surface);
   box-shadow: 0 3px 0 var(--edge);
   color: var(--text);
-  font: 700 0.8rem / 1 var(--font-sans);
+  font: 700 0.74rem / 1 var(--font-sans);
   cursor: pointer;
   transition:
     transform 120ms var(--ease),

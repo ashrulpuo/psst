@@ -105,12 +105,13 @@ async function hideThread(thread: InboxThread | SentThread) {
         />
 
         <ul v-else class="threads" :key="box">
-          <li v-for="thread in items" :key="thread.id">
+          <li v-for="(thread, index) in items" :key="thread.id">
             <ThreadListItem
               :thread="thread"
               :box="box"
               :active="thread.id === threadId"
               :can-hide="box === 'inbox'"
+              :tone="index"
               @hide="hideThread"
             />
           </li>

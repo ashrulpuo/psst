@@ -143,8 +143,15 @@ defineEmits<{
 }
 // Quiet until focused or hovered, but always in the DOM and reachable by touch and keyboard.
 .report {
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+  min-height: 28px;
+  border: 2px solid var(--border);
+  border-radius: 50%;
+  background: var(--surface);
   color: var(--text-3);
-  opacity: 0.55;
+  opacity: 0.7;
   transition: opacity var(--dur) var(--ease);
 }
 .report:hover,

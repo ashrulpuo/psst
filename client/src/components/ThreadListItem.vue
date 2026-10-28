@@ -12,6 +12,7 @@ const props = withDefaults(
     box: "inbox" | "sent";
     active: boolean;
     canHide?: boolean;
+    tone?: number;
   }>(),
   { canHide: false }
 );
@@ -50,7 +51,7 @@ function onCardClick(event: MouseEvent) {
       :class="{ 'is-unread': unread }"
       :style="{
         '--x': `${offset}px`,
-        '--card': storyGradient(thread.id)
+        '--card': storyGradient(thread.id, tone)
       }"
       :aria-current="active ? 'page' : undefined"
       @click="onCardClick"

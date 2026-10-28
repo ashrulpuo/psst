@@ -9,6 +9,7 @@ import {
 } from "vue";
 import { useRouter } from "vue-router";
 import { useQuasar } from "quasar";
+import { useI18n } from "vue-i18n";
 import {
   ArrowLeft,
   EllipsisVertical,
@@ -20,7 +21,7 @@ import { useMessagingStore } from "@/stores/messaging";
 import { useAuthStore } from "@/stores/auth";
 import { useRealtimeStore } from "@/stores/realtime";
 import { usePolling } from "@/composables/usePolling";
-import { dayLabel } from "@/utils/format";
+import { dayLabel, shortTime } from "@/utils/format";
 import AppAvatar from "@/components/AppAvatar.vue";
 import MessageBubble from "@/components/MessageBubble.vue";
 import MessageComposer from "@/components/MessageComposer.vue";
@@ -30,6 +31,7 @@ import ReportDialog from "@/components/ReportDialog.vue";
 const props = defineProps<{ threadId: string; box: "inbox" | "sent" }>();
 
 const $q = useQuasar();
+const { t } = useI18n();
 const router = useRouter();
 const store = useMessagingStore();
 const auth = useAuthStore();
@@ -52,6 +54,15 @@ const title = computed(() => {
 const avatar = computed(() => {
   const t = thread.value;
   return t && "receiver" in t ? t.receiver.avatar_url : null;
+});
+
+const meta = computed(() => {
+  const current = thread.value;
+  const when = current?.last_message_at
+    ? shortTime(current.last_message_at)
+    : "";
+  const label = isInbox.value ? t("thread.noteMeta") : t("thread.replyMeta");
+  return when ? `${label} · ${when}` : label;
 });
 
 const blocked = computed(() => {
@@ -230,7 +241,10 @@ async function submitReport(reason: string) {
         <ArrowLeft :size="20" />
       </q-btn>
       <AppAvatar :name="title || '?'" :src="avatar" :size="40" />
-      <h2 class="title">{{ title }}</h2>
+      <div class="who">
+        <h2 class="title">{{ title }}</h2>
+        <span class="sub">{{ meta }}</span>
+      </div>
 
       <q-btn
         v-if="isInbox"
@@ -390,8 +404,30 @@ async function submitReport(reason: string) {
   background: var(--canvas);
   border-bottom: 2px solid var(--border);
 }
-.title {
+.head :deep(.avatar) {
+  border: 0;
+  background: var(--grad-pink);
+  color: #fff;
+  font-family: var(--font-display);
+  font-weight: 800;
+}
+.who {
   flex: 1;
+  min-width: 0;
+  display: grid;
+  gap: 1px;
+}
+.sub {
+  overflow: hidden;
+  color: var(--text-3);
+  font-family: var(--font-mono, var(--font-sans));
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.title {
   min-width: 0;
   overflow: hidden;
   font-family: var(--font-display);
@@ -408,6 +444,8 @@ async function submitReport(reason: string) {
   display: flex;
   flex: 1;
   flex-direction: column;
+  /* A short conversation sits near the composer, like a chat should. */
+  justify-content: flex-end;
   gap: var(--s-4);
   min-height: 0;
   padding: var(--s-4);

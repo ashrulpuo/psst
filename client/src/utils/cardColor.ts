@@ -14,7 +14,12 @@ export const STORY_GRADIENTS = [
 export const SHARE_GRADIENT =
   "linear-gradient(165deg, #c2185b 0%, #6a1b9a 46%, #283593 100%)";
 
-export function storyGradient(id: string): string {
+/** Pass `tone` (the card's position in the list) so neighbouring notes never share a colour. */
+export function storyGradient(id: string, tone?: number): string {
+  if (tone !== undefined) {
+    return STORY_GRADIENTS[tone % STORY_GRADIENTS.length] ?? STORY_GRADIENTS[0];
+  }
+
   let n = 0;
   for (let i = 0; i < id.length; i++)
     n = (n + id.charCodeAt(i)) % STORY_GRADIENTS.length;

@@ -3,6 +3,7 @@ export default {
   app: { name: "Psst" },
 
   nav: {
+    you: "you",
     link: "Link",
     inbox: "Inbox",
     sent: "Sent",
@@ -13,6 +14,8 @@ export default {
   link: {
     title: "your link",
     live: "live",
+    storyTitle: "story card",
+    storyBody: "9:16 · ready to post",
     prompt: "ask me anything",
     hint: "Share this. New messages land in your inbox.",
     step1: "Step 1: Copy your link",
@@ -97,6 +100,8 @@ export default {
     hide: "Hide note",
     hidden: "Hidden. A new note brings it back.",
     guestTitle: "They're still a guest",
+    noteMeta: "sent you a note",
+    replyMeta: "you started this",
     react: "React to this note",
     back: "Back to messages",
     composerLabel: "Reply",

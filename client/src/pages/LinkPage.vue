@@ -78,6 +78,14 @@ async function share() {
       <li>{{ $t("link.step1") }}</li>
       <li>{{ $t("link.step2") }}</li>
     </ol>
+
+    <div class="story-row">
+      <div class="story-thumb">{{ $t("link.prompt") }}</div>
+      <div class="story-copy">
+        <b>{{ $t("link.storyTitle") }}</b>
+        <span>{{ $t("link.storyBody") }}</span>
+      </div>
+    </div>
   </main>
 </template>
 
@@ -115,7 +123,7 @@ async function share() {
   padding: 22px 116px 26px 20px;
   border: 2.5px solid var(--edge);
   border-radius: 28px;
-  background: var(--grad-sunset);
+  background: var(--grad-link);
   box-shadow: 0 9px 0 var(--edge);
   color: #fff;
   transform: rotate(-1.2deg);
@@ -206,6 +214,43 @@ async function share() {
   font-size: 0.8rem;
   font-weight: 700;
   counter-increment: step;
+}
+.story-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-top: 2px;
+  padding: 10px 12px;
+  border: 2px solid var(--border);
+  border-radius: var(--r-card);
+  background: var(--surface);
+}
+.story-thumb {
+  flex: none;
+  width: 46px;
+  height: 78px;
+  padding: 7px 5px;
+  border: 2.5px solid var(--edge);
+  border-radius: 11px;
+  background: var(--grad-link);
+  box-shadow: 0 3px 0 var(--edge);
+  color: #fff;
+  font: 800 0.42rem / 1.15 var(--font-display);
+  text-align: center;
+  transform: rotate(-4deg);
+}
+.story-copy {
+  display: grid;
+  gap: 2px;
+}
+.story-copy b {
+  font-family: var(--font-display);
+  font-size: 0.86rem;
+}
+.story-copy span {
+  color: var(--text-3);
+  font-size: 0.7rem;
+  font-weight: 700;
 }
 .steps li::before {
   content: counter(step);

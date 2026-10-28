@@ -51,7 +51,7 @@ usePolling(
         :aria-label="$t('nav.settings')"
       >
         <span class="ico" aria-hidden="true">⚙️</span>
-        {{ $t("nav.settings") }}
+        {{ $t("nav.you") }}
       </router-link>
     </nav>
 
@@ -108,17 +108,17 @@ usePolling(
   text-decoration: none;
 }
 .tab .ico {
-  font-size: 1.05rem;
+  font-family:
+    "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
+  font-size: 1.25rem;
   line-height: 1;
-  filter: grayscale(1);
-  opacity: 0.7;
+  opacity: 0.72;
 }
 .tab.is-active {
   background: var(--accent-strong);
   color: #fff;
 }
 .tab.is-active .ico {
-  filter: none;
   opacity: 1;
 }
 .tab:focus-visible {
