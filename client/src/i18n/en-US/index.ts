@@ -2,6 +2,19 @@
 export default {
   app: { name: "Psst" },
 
+  home: {
+    badge: "anonymous",
+    line1: "say the thing.",
+    line2: "no name attached.",
+    sub: "Send a note to anyone with a Psst link — or get your own and see what people are too shy to say.",
+    primary: "get my link 🚀 · free",
+    secondary: "I have an account — sign in",
+    privacy: "They see a nickname. Not your name.",
+    sample1: "you were the best part of that meeting. just so you know 🤍",
+    sample2: "coffee sometime? your talk gave me ideas.",
+    sample3: "i've been trying to say this in person for weeks…"
+  },
+
   nav: {
     you: "you",
     link: "Link",

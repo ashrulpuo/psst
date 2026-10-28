@@ -38,6 +38,10 @@ export default defineBoot(({ router, store }) => {
   router.beforeEach(async to => {
     await auth.init();
 
+    // The homepage is for people without a link; everyone else opens straight into the app.
+    if (to.name === "home" && auth.isAuthenticated) {
+      return "/link";
+    }
     if (to.meta.requiresAuth && !auth.isAuthenticated) {
       return { path: "/login", query: { next: to.fullPath } };
     }

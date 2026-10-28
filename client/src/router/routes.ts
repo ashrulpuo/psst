@@ -9,7 +9,13 @@ declare module "vue-router" {
 }
 
 const routes: RouteRecordRaw[] = [
-  { path: "/", redirect: "/link" },
+  // Public front door. Signed-in visitors are sent on to /link by the guard.
+  {
+    path: "/",
+    name: "home",
+    component: () => import("@/pages/HomePage.vue"),
+    meta: { title: "Psst" }
+  },
 
   // Form (auth): a centred card, no app chrome.
   {
