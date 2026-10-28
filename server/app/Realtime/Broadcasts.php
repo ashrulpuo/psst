@@ -4,6 +4,7 @@ namespace App\Realtime;
 
 use App\Events\MessagePosted;
 use App\Events\MessagesRead;
+use App\Events\ReactionChanged;
 use App\Events\ThreadBlockChanged;
 use App\Models\Message;
 use App\Models\Thread;
@@ -64,6 +65,39 @@ class Broadcasts
                     ],
                 ],
             );
+        }
+    }
+
+    /**
+     * The same tally, but each participant's `mine` flag is their own.
+     * A guest has no channel to push to, so only the receiver hears about it.
+     */
+    public function reactionChanged(Thread $thread, Message $message): void
+    {
+        $summary = $message->reactions()->get()
+            ->groupBy('emoji')
+            ->map(fn ($group, $emoji) => [
+                'emoji' => $emoji,
+                'count' => $group->count(),
+                'user_ids' => $group->pluck('user_id')->all(),
+            ]);
+
+        foreach ([true, false] as $toReceiver) {
+            $viewerId = $toReceiver ? $thread->receiver_id : $thread->sender_id;
+
+            if ($viewerId === null) {
+                continue;
+            }
+
+            ReactionChanged::dispatch($viewerId, [
+                'thread_id' => $thread->id,
+                'message_id' => $message->id,
+                'reactions' => $summary->map(fn ($row) => [
+                    'emoji' => $row['emoji'],
+                    'count' => $row['count'],
+                    'mine' => in_array($viewerId, $row['user_ids'], true),
+                ])->values()->all(),
+            ]);
         }
     }
 

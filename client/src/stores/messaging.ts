@@ -3,6 +3,7 @@ import { computed, reactive, ref } from "vue";
 import { threadApi } from "@/api/endpoints";
 import type {
   BlockChangedPayload,
+  ReactionChangedPayload,
   InboxThread,
   Message,
   MessagePostedPayload,
@@ -331,6 +332,18 @@ export const useMessagingStore = defineStore("messaging", () => {
       asSender.can_reply = payload.can_reply;
   }
 
+  /** Realtime: the other side reacted (or took one back). The tally is already viewer-specific. */
+  function applyReactionChanged({
+    thread_id,
+    message_id,
+    reactions
+  }: ReactionChangedPayload) {
+    const list = messages[thread_id];
+    if (!list) return;
+    const target = list.find(m => m.id === message_id);
+    if (target) target.reactions = reactions;
+  }
+
   function applyMessagesRead({ thread_id, read_at }: MessagesReadPayload) {
     const list = messages[thread_id];
     if (!list) return;
@@ -377,6 +390,7 @@ export const useMessagingStore = defineStore("messaging", () => {
     applyMessagePosted,
     applyBlockChanged,
     applyMessagesRead,
+    applyReactionChanged,
     resync,
     setBlocked,
     hideThread,

@@ -4,7 +4,8 @@ import { isNativeApp } from "@/native/platform";
 import type {
   BlockChangedPayload,
   MessagePostedPayload,
-  MessagesReadPayload
+  MessagesReadPayload,
+  ReactionChangedPayload
 } from "@/api/types";
 import { config } from "@/utils/config";
 
@@ -12,6 +13,7 @@ export interface RealtimeHandlers {
   messagePosted(payload: MessagePostedPayload): void;
   blockChanged(payload: BlockChangedPayload): void;
   messagesRead(payload: MessagesReadPayload): void;
+  reactionChanged(payload: ReactionChangedPayload): void;
   /** Connection state changed. `reconnected` is true when we came back after a drop. */
   state(connected: boolean, reconnected: boolean): void;
 }
@@ -116,6 +118,9 @@ export async function openConnection(
     )
     .listen(".messages.read", (payload: MessagesReadPayload) =>
       handlers.messagesRead(payload)
+    )
+    .listen(".thread.reaction-changed", (payload: ReactionChangedPayload) =>
+      handlers.reactionChanged(payload)
     );
 }
 

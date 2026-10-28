@@ -16,6 +16,7 @@ export const useRealtimeStore = defineStore("realtime", () => {
         messagePosted: messaging.applyMessagePosted,
         blockChanged: messaging.applyBlockChanged,
         messagesRead: messaging.applyMessagesRead,
+        reactionChanged: messaging.applyReactionChanged,
         state: (isConnected, reconnected) => {
           connected.value = isConnected;
           // Events missed while offline are gone: catch up from the API.

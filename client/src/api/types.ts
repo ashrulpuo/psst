@@ -86,6 +86,12 @@ export interface BlockChangedPayload {
   can_chat?: boolean;
 }
 
+export interface ReactionChangedPayload {
+  thread_id: string;
+  message_id: string;
+  reactions: Reaction[];
+}
+
 export interface MessagesReadPayload {
   thread_id: string;
   read_at: string;
