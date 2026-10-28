@@ -117,6 +117,15 @@ await step("Bob reacts, and it reaches Alice live", async () => {
   await shot(alice, "9-alice-sees-reaction");
 });
 
+await step("Bob writes back, and Alice sees it live", async () => {
+  await guest.getByLabel("Reply").fill("anytime. glad i said it");
+  await guest.getByLabel("Reply").press("Enter");
+  await alice.waitForSelector('.bubble:has-text("anytime. glad i said it")', {
+    timeout: 10000
+  });
+  await shot(alice, "10-alice-sees-bob-reply");
+});
+
 console.log(`\npage errors: ${errors.length ? errors.join(" | ") : "none"}`);
 console.log(failed === 0 ? "ALL TWO-PERSON CHECKS PASSED" : `${failed} FAILED`);
 await browser.close();
