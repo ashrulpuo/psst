@@ -114,3 +114,15 @@ Sign-in bodies: `{ "id_token": "...", "nonce": "<16+ chars>", "name"?: "...", "d
 Set `GOOGLE_CLIENT_IDS` and `APPLE_CLIENT_IDS` (comma-separated OAuth client IDs for web, iOS, Android). The client
 obtains an ID token with a random nonce embedded in the request and posts both to the API. Until the IDs are set,
 every sign-in is rejected (fails closed).
+
+**Open item: no client IDs are configured in this repo yet.** Nothing breaks — `LoginPage.vue` hides the provider slot
+when both IDs are empty and shows the local demo accounts instead — but there is no real sign-in path until they exist.
+To close it:
+
+1. Google Cloud Console → *APIs & Services → Credentials → Create OAuth client ID → Web application*, with
+   `http://localhost:9000` (and the production origin) as an authorised JavaScript origin.
+2. Put the ID in **both** places: `GOOGLE_CLIENT_IDS=…apps.googleusercontent.com` in `server/.env` (verification) and
+   `QCLI_GOOGLE_CLIENT_ID=…apps.googleusercontent.com` in `client/.env` (rendering).
+3. Restart `pnpm dev` — `QCLI_*` values are inlined at build time, so a hot reload will not pick them up.
+
+Apple additionally needs a Services ID and an https return URL, so it cannot be tested on plain `localhost`.
