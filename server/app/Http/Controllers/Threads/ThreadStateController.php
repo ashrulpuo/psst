@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Threads;
 
 use App\Actions\Messaging\BlockSender;
+use App\Actions\Messaging\HideThread;
 use App\Actions\Messaging\MarkThreadRead;
 use App\Http\Controllers\Controller;
 use App\Models\Thread;
@@ -31,6 +32,20 @@ class ThreadStateController extends Controller
     {
         Gate::authorize('manageBlock', $thread);
         $blocks->unblock($thread);
+
+        return response()->noContent();
+    }
+
+    public function hide(Request $request, Thread $thread, HideThread $hides): Response
+    {
+        $hides->hide($thread, $request->user());
+
+        return response()->noContent();
+    }
+
+    public function unhide(Request $request, Thread $thread, HideThread $hides): Response
+    {
+        $hides->show($thread, $request->user());
 
         return response()->noContent();
     }

@@ -33,6 +33,9 @@ Route::get('push/config', [PushController::class, 'config'])->middleware('thrott
 Route::post('profiles/{username}/messages', [ProfileController::class, 'send'])
     ->where('username', '[a-z0-9_.]{3,24}')
     ->middleware('throttle:messages');
+Route::post('guest/link', [GuestController::class, 'link'])->middleware('throttle:auth');
+Route::post('guest/link/resume', [GuestController::class, 'resume'])->middleware('throttle:auth');
+
 Route::get('profiles/{username}', [ProfileController::class, 'show'])
     ->where('username', '[a-z0-9_.]{3,24}')
     ->middleware('throttle:profile');
@@ -65,6 +68,8 @@ Route::middleware(['auth:sanctum', 'not-banned'])->group(function () {
         Route::post('read', [ThreadStateController::class, 'read']);
         Route::put('block', [ThreadStateController::class, 'block']);
         Route::delete('block', [ThreadStateController::class, 'unblock']);
+        Route::put('hide', [ThreadStateController::class, 'hide']);
+        Route::delete('hide', [ThreadStateController::class, 'unhide']);
     });
 
     Route::post('messages/{message}/report', [ReportController::class, 'store'])

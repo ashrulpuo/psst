@@ -20,6 +20,7 @@ class ThreadListController extends Controller
     {
         $threads = Thread::query()
             ->where('receiver_id', $request->user()->id)
+            ->whereDoesntHave('hides', fn ($query) => $query->where('user_id', $request->user()->id))
             ->with('latestMessage')
             ->orderByDesc('last_message_at')
             ->orderByDesc('id')
@@ -35,6 +36,7 @@ class ThreadListController extends Controller
     {
         $threads = Thread::query()
             ->where('sender_id', $request->user()->id)
+            ->whereDoesntHave('hides', fn ($query) => $query->where('user_id', $request->user()->id))
             ->with(['latestMessage', 'receiver:id,username,name,avatar_url'])
             ->orderByDesc('last_message_at')
             ->orderByDesc('id')

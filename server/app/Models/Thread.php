@@ -67,6 +67,12 @@ class Thread extends Model
         return $this->hasMany(Message::class);
     }
 
+    /** @return HasMany<ThreadHide, $this> */
+    public function hides(): HasMany
+    {
+        return $this->hasMany(ThreadHide::class);
+    }
+
     /** @return BelongsTo<Message, $this> */
     public function latestMessage(): BelongsTo
     {

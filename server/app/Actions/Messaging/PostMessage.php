@@ -5,6 +5,7 @@ namespace App\Actions\Messaging;
 use App\Messaging\CannotMessage;
 use App\Models\Message;
 use App\Models\Thread;
+use App\Models\ThreadHide;
 use App\Models\User;
 use App\Push\PushNotifier;
 use App\Realtime\Broadcasts;
@@ -27,12 +28,16 @@ class PostMessage
         // A null author is a guest sender.
         $fromReceiver = $author !== null && $thread->receiver_id === $author->id;
 
-        return DB::transaction(function () use ($thread, $fromReceiver, $body) {
+        return DB::transaction(function () use ($thread, $author, $fromReceiver, $body) {
             // Re-read under lock so block state and the unanswered count cannot change mid-check.
             $thread = Thread::query()->lockForUpdate()->findOrFail($thread->id);
 
             if ($thread->isBlocked()) {
                 throw CannotMessage::blocked();
+            }
+
+            if ($fromReceiver && $author->link_only) {
+                throw CannotMessage::signInToReply();
             }
 
             if ($fromReceiver && $thread->isGuest()) {
@@ -54,6 +59,9 @@ class PostMessage
                 'last_message_at' => $message->created_at,
                 'last_message_id' => $message->id,
             ]);
+
+            // A new note pulls the thread back into both lists, even if someone hid it.
+            ThreadHide::query()->where('thread_id', $thread->id)->delete();
 
             // Queued and sent only after this transaction commits (events set $afterCommit).
             $this->broadcasts->messagePosted($thread, $message);
