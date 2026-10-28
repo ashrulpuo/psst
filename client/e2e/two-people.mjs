@@ -37,9 +37,8 @@ const step = async (name, fn) => {
 const shot = (page, name) =>
   page.screenshot({ path: `${OUT}${name}.png`, animations: "disabled" });
 const errors = [];
-for (const [name, page] of [["alice", alice], ["guest", guest]]) {
-  page.on("pageerror", e => errors.push(`${name}: ${e.message}`));
-}
+alice.on("pageerror", e => errors.push(`alice: ${e.message}`));
+guest.on("pageerror", e => errors.push(`guest: ${e.message}`));
 
 // ---------- 1. Alice is signed in ----------
 await step("Alice signs in and lands on her link", async () => {

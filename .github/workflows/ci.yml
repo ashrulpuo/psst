@@ -82,3 +82,28 @@ jobs:
       - run: pnpm audit --prod --audit-level high
       - run: pnpm typecheck
       - run: pnpm build
+
+  client:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: client
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: client/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm audit --prod --audit-level high
+      - run: pnpm typecheck
+      - run: pnpm lint:check
+      - run: pnpm build
+      # The native and desktop targets are code paths too: prove they still bundle.
+      # Packaging is skipped — that needs an Android SDK / Electron binary and signing keys.
+      - run: pnpm build:android --skip-pkg
+      - run: pnpm build:desktop --skip-pkg

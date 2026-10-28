@@ -83,7 +83,7 @@ await demo(alice, "Alice");
 await alice.waitForURL("**/link");
 await alice.goto(`${BASE}/inbox`);
 // A couple more senders so the inbox looks lived-in.
-for (const [who, text] of [
+for (const [, text] of [
   ["Carol", "Coffee sometime? Your talk gave me ideas."],
   ["Carol", "Also: thank you for the book recommendation!"]
 ]) {
