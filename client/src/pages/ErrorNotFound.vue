@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Compass } from "@lucide/vue";
 import EmptyState from "@/components/EmptyState.vue";
+import AppButton from "@/components/AppButton.vue";
 </script>
 
 <template>
@@ -10,13 +11,7 @@ import EmptyState from "@/components/EmptyState.vue";
       :title="$t('errors.notFound')"
       :body="$t('errors.notFoundBody')"
     >
-      <q-btn
-        color="primary"
-        unelevated
-        no-caps
-        :label="$t('profile.goHome')"
-        to="/"
-      />
+      <AppButton to="/">{{ $t("profile.goHome") }}</AppButton>
     </EmptyState>
   </div>
 </template>
