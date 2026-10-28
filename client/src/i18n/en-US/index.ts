@@ -11,6 +11,8 @@ export default {
   },
 
   link: {
+    title: "your link",
+    live: "live",
     prompt: "ask me anything",
     hint: "Share this. New messages land in your inbox.",
     step1: "Step 1: Copy your link",
