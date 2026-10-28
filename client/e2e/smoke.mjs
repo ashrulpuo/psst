@@ -143,7 +143,8 @@ ok(
 );
 
 // ---------- report + block ----------
-await B.page.goBack();
+// One pane at every width: make sure the sender is on the list, not inside a thread.
+await B.page.goto(`${BASE}/sent`);
 const A2 = A.page;
 await A2.getByRole("button", { name: "Conversation options" }).click();
 await A2.getByText("Block sender").click();
