@@ -11,25 +11,46 @@
   --font-sans:
     "Inter Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI",
     Roboto, sans-serif;
+  /* Sticker words. Round, heavy, a little loud. */
+  --font-display:
+    "Bricolage Grotesque Variable", "Nunito Variable", "Avenir Next",
+    var(--font-sans);
 
-  --canvas: #f6f6f9;
+  --ink: #1b1024;
+  --edge: #1b1024; /* hard offset shadow */
+  --paper: #fff6ee;
+  --cream: #ffe9d6;
+
+  --canvas: var(--paper);
   --surface: #ffffff;
-  --surface-hover: #f1f1f6;
-  --text: #17171c;
-  --text-2: #4f4f5e;
-  --text-3: #6a6a7a;
-  --border: rgba(23, 23, 28, 0.09);
-  --border-strong: rgba(23, 23, 28, 0.18);
+  --surface-hover: #ffeedd;
+  --text: #1b1024;
+  --text-2: #4a3552;
+  --text-3: #7a6782;
+  --border: rgba(27, 16, 36, 0.1);
+  --border-strong: rgba(27, 16, 36, 0.22);
   --shadow-soft: 0 1px 3px rgba(23, 23, 28, 0.06);
 
-  --accent: #5b4bf0; // fills (buttons, own bubbles)
-  --accent-hover: #4a3bd9;
+  --accent: #ff2d6f; /* decoration + large type only */
+  --accent-strong: #d6004f; /* fills under white text */
+  --accent-hover: #e8175c;
   --on-accent: #ffffff;
-  --accent-text: #4a3bd9; // links, active nav
-  --accent-soft: rgba(91, 75, 240, 0.1);
+  --accent-text: #c2004a;
+  --accent-soft: rgba(255, 45, 111, 0.1);
   --danger: #c62828;
+  --lime: #c9ff4f;
+  --violet: #7c3aed;
+  --blue: #2c6bff;
+  --tangerine: #ff8a3d;
 
-  --bubble-theirs: #eceef3;
+  --bubble-theirs: #ffffff;
+
+  --grad-pink: linear-gradient(150deg, #d6004f 0%, #7c3aed 100%);
+  --grad-ocean: linear-gradient(150deg, #1d4ed8 0%, #0f766e 100%);
+  --grad-sunset: linear-gradient(150deg, #c2410c 0%, #9d174d 100%);
+
+  --edge-shadow: 0 6px 0 var(--edge);
+  --edge-shadow-sm: 0 4px 0 var(--edge);
 
   --s-1: 0.25rem;
   --s-2: 0.5rem;
@@ -39,8 +60,9 @@
   --s-6: 2rem;
   --s-7: 3rem;
 
-  --r-control: 12px;
-  --r-card: 20px;
+  --r-control: 15px;
+  --r-card: 24px;
+  --r-sticker: 20px;
 
   --text-meta: 0.75rem;
   --text-secondary: 0.875rem;
@@ -54,30 +76,38 @@
   --vp-wide: 1280px;
 
   --ease: cubic-bezier(0.2, 0, 0, 1);
+  --ease-pop: cubic-bezier(0.2, 1.3, 0.3, 1);
   --dur: 160ms;
 
-  --nav-height: 64px;
+  --nav-height: 84px;
   --rail-width: 88px;
 }
 
 .body--dark {
-  --canvas: #0e0e12;
-  --surface: #16161c;
-  --surface-hover: #1e1e26;
-  --text: #ececf2;
-  --text-2: #b3b3c3;
-  --text-3: #9494a8;
-  --border: rgba(255, 255, 255, 0.09);
-  --border-strong: rgba(255, 255, 255, 0.2);
+  --ink: #f6f1ff;
+  --edge: #000000;
+  --paper: #14101c;
+  --cream: #1e1729;
+
+  --canvas: #14101c;
+  --surface: #1d1728;
+  --surface-hover: #261e35;
+  --text: #f6f1ff;
+  --text-2: #cfc3e6;
+  --text-3: #a294c2;
+  --border: rgba(255, 255, 255, 0.12);
+  --border-strong: rgba(255, 255, 255, 0.26);
   --shadow-soft: inset 0 1px 0 rgba(255, 255, 255, 0.05);
 
-  --accent: #6355e8;
-  --accent-hover: #7569f0;
-  --accent-text: #a79dff;
-  --accent-soft: rgba(167, 157, 255, 0.14);
-  --danger: #ff7b7b;
+  --accent: #ff5c91;
+  --accent-strong: #d6004f;
+  --accent-hover: #ff75a3;
+  --on-accent: #ffffff;
+  --accent-text: #ff9cc0;
+  --accent-soft: rgba(255, 92, 145, 0.16);
+  --danger: #ff8a8a;
 
-  --bubble-theirs: #23232d;
+  --bubble-theirs: #241d33;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -109,12 +139,13 @@ h1,
 h2,
 h3 {
   margin: 0;
-  font-weight: 600;
+  font-weight: 800;
+  letter-spacing: -0.03em;
   line-height: 1.2;
 }
 h1 {
   font-size: var(--text-h1);
-  letter-spacing: -0.01em;
+  letter-spacing: -0.03em;
 }
 h2 {
   font-size: var(--text-h2);
@@ -207,4 +238,124 @@ html.native-app body {
   padding-top: var(--safe-top);
   // Never let the rubber band / pull-to-refresh of the WebView show through.
   overscroll-behavior: none;
+}
+
+/* A wide browser is the desk. The 430px column is the phone. */
+@media (min-width: 480px) {
+  body {
+    background: #efe3d8;
+  }
+  body.body--dark {
+    background: #07060c;
+  }
+}
+
+/* The sticker. Color comes from the card. This only adds the raised edge. */
+.story {
+  position: relative;
+  overflow: hidden;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.38),
+    0 16px 32px rgba(48, 16, 72, 0.24);
+}
+.story:active {
+  transform: scale(0.985);
+}
+@media (prefers-reduced-motion: reduce) {
+  .story:active {
+    transform: none;
+  }
+}
+
+/* The card is placed, then the steps follow. One motion, not a loop. */
+@keyframes psst-place {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes psst-rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes psst-sheet {
+  from {
+    opacity: 0;
+    transform: translateX(28px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .arrive {
+    animation: psst-place 520ms var(--ease) both;
+  }
+  .arrive-late {
+    animation: psst-rise 440ms var(--ease) 140ms both;
+  }
+  .arrive-later {
+    animation: psst-rise 440ms var(--ease) 240ms both;
+  }
+}
+
+/* The press: every chunky control sits on a hard edge and drops onto the page. */
+.press {
+  border: 2.5px solid var(--edge);
+  border-radius: var(--r-sticker);
+  box-shadow: var(--edge-shadow-sm);
+  transition:
+    transform 120ms var(--ease),
+    box-shadow 120ms var(--ease),
+    background-color var(--dur) var(--ease);
+}
+.press:active {
+  transform: translateY(4px);
+  box-shadow: 0 0 0 var(--edge);
+}
+
+/* Celebration particles are created imperatively by utils/celebrate.ts. */
+.celebrate-host {
+  position: relative;
+}
+.celebrate-bit {
+  position: absolute;
+  z-index: 8;
+  font-size: 20px;
+  line-height: 1;
+  pointer-events: none;
+  animation: psst-confetti 900ms cubic-bezier(0.2, 0.7, 0.3, 1) forwards;
+}
+
+@keyframes psst-confetti {
+  from {
+    opacity: 1;
+    transform: translate(0, 0) rotate(0deg) scale(0.4);
+  }
+  to {
+    opacity: 0;
+    transform: translate(var(--dx), var(--dy)) rotate(var(--rot)) scale(1);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .press {
+    transition: none;
+  }
+  .press:active {
+    transform: none;
+  }
+  .celebrate-bit {
+    display: none;
+  }
 }
