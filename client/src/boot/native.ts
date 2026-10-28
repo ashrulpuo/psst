@@ -49,9 +49,14 @@ export default defineBoot(async ({ router }) => {
   // Android hardware back: step back through the app, and leave it only from the root.
   shell.onBackButton(() => {
     const route = router.currentRoute.value;
-    const atRoot = ["/inbox", "/sent", "/settings", "/login", "/"].includes(
-      route.path
-    );
+    const atRoot = [
+      "/link",
+      "/inbox",
+      "/sent",
+      "/settings",
+      "/login",
+      "/"
+    ].includes(route.path);
     if (atRoot) void shell.exitApp();
     else router.back();
   });

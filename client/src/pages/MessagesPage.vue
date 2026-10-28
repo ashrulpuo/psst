@@ -1,13 +1,10 @@
 <script setup lang="ts">
-// Pattern: Split Pane — thread list on the left, the open conversation on the right.
-// Narrow screens show one or the other; wide screens show both.
+// One screen at a time, at every width. The list, or the open conversation.
 import { computed } from "vue";
 import { useRoute } from "vue-router";
-import { useQuasar, useMeta } from "quasar";
-import { Inbox, Link2, Send } from "@lucide/vue";
-import { useAuthStore } from "@/stores/auth";
+import { useMeta } from "quasar";
+import { Inbox, Send } from "@lucide/vue";
 import { useMessagingStore } from "@/stores/messaging";
-import { copyText } from "@/utils/clipboard";
 import EmptyState from "@/components/EmptyState.vue";
 import ThreadListItem from "@/components/ThreadListItem.vue";
 import ConversationPane from "@/features/messaging/ConversationPane.vue";
@@ -16,8 +13,6 @@ import PushPrompt from "@/features/push/PushPrompt.vue";
 const props = defineProps<{ box: "inbox" | "sent" }>();
 
 const route = useRoute();
-const $q = useQuasar();
-const auth = useAuthStore();
 const store = useMessagingStore();
 
 useMeta(() => ({
@@ -29,15 +24,6 @@ const threadId = computed(
 );
 const list = computed(() => (props.box === "inbox" ? store.inbox : store.sent));
 const items = computed(() => list.value.items);
-
-async function copyLink() {
-  const ok = await copyText(auth.profileLink);
-  $q.notify({
-    type: ok ? "positive" : "warning",
-    message: ok ? "Link copied" : auth.profileLink,
-    position: "top"
-  });
-}
 </script>
 
 <template>
@@ -46,33 +32,15 @@ async function copyLink() {
       class="list-pane"
       :aria-label="box === 'inbox' ? $t('nav.inbox') : $t('nav.sent')"
     >
-      <header class="list-head">
-        <h1>{{ box === "inbox" ? $t("nav.inbox") : $t("nav.sent") }}</h1>
-        <q-btn
-          v-if="box === 'inbox'"
-          flat
-          round
-          dense
-          class="hit"
-          :aria-label="$t('settings.copy')"
-          @click="copyLink"
-        >
-          <Link2 :size="20" />
-          <q-tooltip>{{ $t("settings.copy") }}</q-tooltip>
-        </q-btn>
-      </header>
-
       <PushPrompt />
 
-      <div class="frame surface">
+      <div class="frame">
         <div
           v-if="list.loading && !list.loaded"
           class="skeleton-list"
           aria-hidden="true"
         >
-          <div v-for="n in 5" :key="n" class="sk-row"
-            ><span class="sk-av" /><span class="sk-lines"><i /><i /></span
-          ></div>
+          <div v-for="n in 3" :key="n" class="sk-card" />
         </div>
 
         <div v-else-if="list.error && !items.length" class="state" role="alert">
@@ -96,8 +64,8 @@ async function copyLink() {
             color="primary"
             unelevated
             no-caps
+            to="/link"
             :label="$t('inbox.emptyAction')"
-            @click="copyLink"
           />
         </EmptyState>
 
@@ -108,7 +76,7 @@ async function copyLink() {
           :body="$t('sent.emptyBody')"
         />
 
-        <ul v-else class="threads">
+        <ul v-else class="threads" :key="box">
           <li v-for="thread in items" :key="thread.id">
             <ThreadListItem
               :thread="thread"
@@ -117,6 +85,13 @@ async function copyLink() {
             />
           </li>
         </ul>
+
+        <router-link
+          v-if="box === 'inbox' && !threadId && items.length"
+          class="get"
+          to="/link"
+          >{{ $t("inbox.getMessages") }}</router-link
+        >
 
         <div v-if="list.cursor" class="more">
           <q-btn
@@ -161,7 +136,6 @@ async function copyLink() {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   width: 100%;
-  max-width: var(--vp-wide);
   height: var(--pane-height);
   margin-inline: auto;
 }
@@ -173,7 +147,7 @@ async function copyLink() {
 .list-pane {
   display: flex;
   flex-direction: column;
-  padding: var(--s-4);
+  padding: 4px 16px 88px;
   overflow-y: auto;
 }
 .thread-pane {
@@ -186,14 +160,18 @@ async function copyLink() {
 .has-thread .thread-pane {
   display: block;
 }
-.list-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: var(--s-3);
-}
-.list-head h1 {
-  font-size: var(--text-h2);
+@media (prefers-reduced-motion: no-preference) {
+  .threads li {
+    animation: psst-rise 420ms var(--ease) both;
+  }
+  @for $i from 1 through 12 {
+    .threads li:nth-child(#{$i}) {
+      animation-delay: #{30 + ($i - 1) * 45}ms;
+    }
+  }
+  .has-thread .thread-pane {
+    animation: psst-sheet 280ms var(--ease) both;
+  }
 }
 .frame {
   flex: 1;
@@ -201,12 +179,34 @@ async function copyLink() {
   overflow: hidden auto;
 }
 .threads {
+  display: grid;
   margin: 0;
   padding: 0;
   list-style: none;
 }
-.threads li + li {
-  border-top: 1px solid var(--border);
+.get {
+  position: fixed;
+  z-index: 11;
+  left: 50%;
+  bottom: calc(18px + env(safe-area-inset-bottom));
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 0 26px;
+  border-radius: 999px;
+  background: var(--text);
+  color: var(--canvas);
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 800;
+  text-decoration: none;
+  transform: translateX(-50%);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18);
+}
+.get:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 3px;
 }
 .more {
   display: flex;
@@ -227,51 +227,17 @@ async function copyLink() {
   place-items: center;
 }
 
-// Wide: both panes side by side.
-@media (min-width: 900px) {
-  .split {
-    --pane-height: calc(100dvh - var(--safe-top));
-    grid-template-columns: 380px minmax(0, 1fr);
-  }
-  .has-thread .list-pane,
-  .list-pane {
-    display: flex;
-  }
-  .thread-pane {
-    display: block;
-    border-left: 1px solid var(--border);
-  }
-}
-
 .skeleton-list {
   display: grid;
-}
-.sk-row {
-  display: flex;
-  align-items: center;
   gap: var(--s-3);
-  min-height: 72px;
-  padding: var(--s-3) var(--s-4);
+}
+.sk-card {
+  height: 64px;
   border-bottom: 1px solid var(--border);
-}
-.sk-av {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  background: var(--surface-hover);
-}
-.sk-lines {
-  display: grid;
-  flex: 1;
-  gap: var(--s-2);
-}
-.sk-lines i {
-  display: block;
-  height: 10px;
-  border-radius: 5px;
-  background: var(--surface-hover);
-}
-.sk-lines i:last-child {
-  width: 60%;
+  background: linear-gradient(
+    90deg,
+    transparent 56px,
+    var(--surface-hover) 56px
+  );
 }
 </style>

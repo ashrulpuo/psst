@@ -25,44 +25,46 @@ watch(
     :model-value="modelValue"
     @update:model-value="emit('update:modelValue', $event)"
   >
-    <form
-      class="surface dialog"
-      @submit.prevent="valid && emit('submit', reason.trim())"
-    >
-      <h3>{{ $t("thread.reportTitle") }}</h3>
-      <div class="field">
-        <label for="report-reason">{{ $t("thread.reportReason") }}</label>
-        <textarea
-          id="report-reason"
-          v-model="reason"
-          class="input"
-          rows="3"
-          maxlength="500"
-        />
-        <p v-if="error" class="error" role="alert">{{ error }}</p>
-      </div>
-      <div class="actions">
-        <q-btn flat no-caps label="Cancel" v-close-popup />
-        <q-btn
-          type="submit"
-          unelevated
-          no-caps
-          color="primary"
-          :label="$t('thread.reportSubmit')"
-          :loading="busy"
-          :disable="!valid"
-        />
-      </div>
-    </form>
+    <!-- Quasar only re-enables pointer events on a direct <div> child. -->
+    <div class="surface dialog" role="dialog" aria-labelledby="report-title">
+      <form @submit.prevent="valid && emit('submit', reason.trim())">
+        <h3 id="report-title">{{ $t("thread.reportTitle") }}</h3>
+        <div class="field">
+          <label for="report-reason">{{ $t("thread.reportReason") }}</label>
+          <textarea
+            id="report-reason"
+            v-model="reason"
+            class="input"
+            rows="3"
+            maxlength="500"
+          />
+          <p v-if="error" class="error" role="alert">{{ error }}</p>
+        </div>
+        <div class="actions">
+          <q-btn flat no-caps label="Cancel" v-close-popup />
+          <q-btn
+            type="submit"
+            unelevated
+            no-caps
+            color="primary"
+            :label="$t('thread.reportSubmit')"
+            :loading="busy"
+            :disable="!valid"
+          />
+        </div>
+      </form>
+    </div>
   </q-dialog>
 </template>
 
 <style scoped lang="scss">
 .dialog {
-  display: grid;
-  gap: var(--s-4);
   width: min(92vw, 420px);
   padding: var(--s-5);
+}
+form {
+  display: grid;
+  gap: var(--s-4);
 }
 .field {
   display: grid;

@@ -1,16 +1,16 @@
 <script setup lang="ts">
-// App shell: left rail on wide screens, bottom tab bar on narrow. Never width-capped itself.
-import { onMounted } from "vue";
-import { Inbox, MessageCircle, Send, Settings } from "@lucide/vue";
-import { useAuthStore } from "@/stores/auth";
+// Phone shell at every width. A wide window shows the same column, not a website.
+import { computed, onMounted } from "vue";
+import { useRoute } from "vue-router";
+import { Settings } from "@lucide/vue";
 import { useMessagingStore } from "@/stores/messaging";
 import { useRealtimeStore } from "@/stores/realtime";
 import { usePolling } from "@/composables/usePolling";
-import AppAvatar from "@/components/AppAvatar.vue";
 
-const auth = useAuthStore();
 const messaging = useMessagingStore();
 const realtime = useRealtimeStore();
+const route = useRoute();
+const inThread = computed(() => Boolean(route.params.threadId));
 
 onMounted(() => {
   void messaging.loadInbox();
@@ -24,60 +24,35 @@ usePolling(
   },
   () => (realtime.connected ? 60000 : 15000)
 );
-
-const items = [
-  {
-    to: "/inbox",
-    key: "nav.inbox",
-    icon: Inbox,
-    badge: () => messaging.inboxUnread
-  },
-  {
-    to: "/sent",
-    key: "nav.sent",
-    icon: Send,
-    badge: () => messaging.sentUnread
-  },
-  { to: "/settings", key: "nav.settings", icon: Settings, badge: () => 0 }
-];
 </script>
 
 <template>
-  <q-layout view="hHh lpR fFf" class="shell">
-    <nav class="nav" :aria-label="$t('nav.main')">
-      <router-link to="/inbox" class="nav-brand hit" aria-label="Psst">
-        <span class="brand-mark" aria-hidden="true"
-          ><MessageCircle :size="20"
-        /></span>
-      </router-link>
-
-      <ul class="nav-list">
-        <li v-for="item in items" :key="item.to">
-          <router-link :to="item.to" class="nav-link" active-class="is-active">
-            <span class="nav-icon">
-              <component :is="item.icon" :size="22" aria-hidden="true" />
-              <span v-if="item.badge() > 0" class="badge" aria-hidden="true">{{
-                item.badge() > 9 ? "9+" : item.badge()
-              }}</span>
-            </span>
-            <span class="nav-label">{{ $t(item.key) }}</span>
-            <span v-if="item.badge() > 0" class="sr-only"
-              >{{ item.badge() }} unread</span
-            >
-          </router-link>
-        </li>
-      </ul>
-
+  <q-layout view="hHh lpR fFf" class="shell" :class="{ 'in-thread': inThread }">
+    <nav v-show="!inThread" class="nav" :aria-label="$t('nav.main')">
+      <router-link to="/link" class="mark">Psst</router-link>
+      <div class="tabs">
+        <router-link to="/inbox" class="tab" active-class="is-active">
+          {{ $t("nav.inbox") }}
+          <span
+            v-if="messaging.inboxUnread > 0"
+            class="dot"
+            aria-hidden="true"
+          />
+          <span v-if="messaging.inboxUnread > 0" class="sr-only"
+            >{{ messaging.inboxUnread }} unread</span
+          >
+        </router-link>
+        <router-link to="/sent" class="tab" active-class="is-active">{{
+          $t("nav.sent")
+        }}</router-link>
+      </div>
       <router-link
         to="/settings"
-        class="nav-me hit"
-        :aria-label="auth.user?.name"
+        class="gear"
+        active-class="is-active"
+        :aria-label="$t('nav.settings')"
       >
-        <AppAvatar
-          :name="auth.user?.name ?? ''"
-          :src="auth.user?.avatar_url"
-          :size="36"
-        />
+        <Settings :size="22" aria-hidden="true" />
       </router-link>
     </nav>
 
@@ -89,131 +64,94 @@ const items = [
 
 <style scoped lang="scss">
 .shell {
-  min-height: calc(100dvh - var(--safe-top));
+  --nav-height: 56px;
+  width: min(100%, 430px);
+  min-height: 100dvh;
+  margin-inline: auto;
+  background: var(--canvas);
+}
+.shell.in-thread {
+  --nav-height: 0px;
 }
 
-// ---- narrow: bottom tab bar ----
 .nav {
   position: fixed;
-  inset: auto 0 0 0;
   z-index: 10;
-  display: flex;
-  align-items: stretch;
-  height: calc(var(--nav-height) + env(safe-area-inset-bottom));
-  padding-bottom: env(safe-area-inset-bottom);
-  background: var(--surface);
-  border-top: 1px solid var(--border);
+  top: 0;
+  left: 50%;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  width: min(100%, 430px);
+  height: calc(var(--nav-height) + var(--safe-top));
+  padding: var(--safe-top) 8px 0;
+  background: var(--canvas);
+  transform: translateX(-50%);
 }
-.nav-brand,
-.nav-me {
-  display: none;
+.mark {
+  justify-self: start;
+  padding-left: 8px;
+  color: var(--text);
+  font-family: var(--font-display);
+  font-size: 1.45rem;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1;
   text-decoration: none;
 }
-.nav-list {
+.tabs {
   display: flex;
-  flex: 1;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-.nav-list li {
-  flex: 1;
-}
-.nav-link {
-  display: flex;
-  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 2px;
-  height: 100%;
+  gap: 22px;
+}
+.tab {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
   min-height: 44px;
   color: var(--text-3);
-  text-decoration: none;
-  font-size: var(--text-meta);
-  font-weight: 500;
-  transition: color var(--dur) var(--ease);
-}
-.nav-link:hover {
-  color: var(--text);
-}
-.nav-link.is-active {
-  color: var(--accent-text);
-}
-.nav-icon {
-  position: relative;
-  display: grid;
-}
-.badge {
-  position: absolute;
-  top: -6px;
-  right: -10px;
-  min-width: 18px;
-  height: 18px;
-  padding: 0 5px;
-  border-radius: 9px;
-  background: var(--accent);
-  color: var(--on-accent);
-  font-size: var(--text-meta);
+  font-size: 1.15rem;
   font-weight: 600;
-  line-height: 18px;
-  text-align: center;
+  text-decoration: none;
 }
-.content {
-  padding-bottom: calc(var(--nav-height) + env(safe-area-inset-bottom));
+.tab.is-active {
+  color: var(--text);
+  font-weight: 800;
 }
-
-// ---- medium and up: left rail ----
-@media (min-width: 768px) {
-  .nav {
-    inset: 0 auto 0 0;
-    flex-direction: column;
-    align-items: center;
-    width: var(--rail-width);
-    height: calc(100dvh - var(--safe-top));
-    padding: var(--s-4) 0;
-    border-top: 0;
-    border-right: 1px solid var(--border);
-  }
-  .nav-brand,
-  .nav-me {
-    display: inline-flex;
-  }
-  .nav-brand {
-    margin-bottom: var(--s-4);
-  }
-  .nav-list {
-    flex: 1;
-    flex-direction: column;
-    gap: var(--s-1);
-    width: 100%;
-    padding: 0 var(--s-2);
-  }
-  .nav-list li {
-    flex: none;
-  }
-  .nav-link {
-    height: auto;
-    padding: var(--s-2) 0;
-    border-radius: var(--r-control);
-  }
-  .nav-link:hover {
-    background: var(--surface-hover);
-  }
-  .nav-link.is-active {
-    background: var(--accent-soft);
-  }
-  .content {
-    padding: 0 0 0 var(--rail-width);
-  }
+.tab:focus-visible,
+.mark:focus-visible,
+.gear:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 8px;
 }
-
-.brand-mark {
+.dot {
+  position: absolute;
+  top: 10px;
+  right: -9px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ff3b5c;
+}
+.gear {
+  justify-self: end;
   display: grid;
   place-items: center;
-  width: 36px;
-  height: 36px;
-  border-radius: 11px;
-  background: var(--accent);
-  color: var(--on-accent);
+  width: 44px;
+  height: 44px;
+  color: var(--text);
+  text-decoration: none;
+}
+.content {
+  padding-top: calc(var(--nav-height) + var(--safe-top));
+}
+
+// The window is the desk. The column is the phone.
+@media (min-width: 480px) {
+  .shell {
+    min-height: 100dvh;
+    box-shadow: 0 0 0 1px var(--border);
+  }
 }
 </style>
