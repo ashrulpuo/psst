@@ -97,6 +97,9 @@ return [
             'prefix_indexes' => true,
             'search_path' => 'public',
             'sslmode' => env('DB_SSLMODE', 'prefer'),
+            // Match the app clock. A naive UTC timestamp written into timestamptz
+            // is otherwise read in the server's TimeZone (this machine is +08).
+            'timezone' => 'UTC',
         ],
 
         'sqlsrv' => [

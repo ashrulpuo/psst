@@ -16,8 +16,11 @@
 	}
 
 	# Realtime: browsers connect to /app on 443; Reverb itself stays on the Docker network.
+	# Inside handle: a bare reverse_proxy sorts after handle, so the SPA catch-all below would swallow it.
 	@ws path /app/*
-	reverse_proxy @ws reverb:8080
+	handle @ws {
+		reverse_proxy reverb:8080
+	}
 
 	# API, CSRF cookie and health check go to Laravel.
 	@laravel path /api/* /sanctum/* /up
@@ -29,7 +32,8 @@
 	}
 
 	# App-link verification for the native apps. Must be served as-is (no redirects) with a JSON content type.
-	handle /.well-known/assetlinks.json /.well-known/apple-app-site-association {
+	@appLinks path /.well-known/assetlinks.json /.well-known/apple-app-site-association
+	handle @appLinks {
 		root * /srv/wellknown
 		header Content-Type "application/json"
 		header Cache-Control "public, max-age=3600"

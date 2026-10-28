@@ -49,14 +49,22 @@ services:
   reverb:
     <<: *app
     command: php artisan reverb:start --host=0.0.0.0 --port=8080
+    # The image's healthcheck probes php-fpm on 9000; Reverb listens on 8080 instead.
+    healthcheck:
+      test: ["CMD", "php", "-r", "exit(@fsockopen('127.0.0.1', 8080) ? 0 : 1);"]
 
   queue:
     <<: *app
     command: php artisan queue:work redis --sleep=1 --tries=3 --max-time=3600
+    # Workers listen on no port, so the image's php-fpm probe would always fail.
+    healthcheck:
+      disable: true
 
   scheduler:
     <<: *app
     command: php artisan schedule:work
+    healthcheck:
+      disable: true
 
   postgres:
     image: postgres:16-alpine

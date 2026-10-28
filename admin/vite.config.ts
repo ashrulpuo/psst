@@ -11,7 +11,11 @@ export default defineConfig(({ command }) => ({
   server: {
     port: 9100,
     // Same origin in dev as in production: no CORS, cookie auth just works.
-    proxy: { "/api": "http://127.0.0.1:8000", "/sanctum": "http://127.0.0.1:8000" },
+    // PSST_API_PORT overrides the default when 8000 is already taken on this machine.
+    proxy: {
+      "/api": `http://127.0.0.1:${process.env.PSST_API_PORT || "8000"}`,
+      "/sanctum": `http://127.0.0.1:${process.env.PSST_API_PORT || "8000"}`,
+    },
   },
   build: { target: "baseline-widely-available", sourcemap: false },
 }));

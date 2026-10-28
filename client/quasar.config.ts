@@ -108,9 +108,10 @@ export default defineConfig(ctx => {
       port: 9000,
       open: false,
       // Same origin in dev as in production (Caddy proxies /api), so cookie auth needs no CORS.
+      // PSST_API_PORT overrides the default when 8000 is already taken on this machine.
       proxy: {
-        "/api": "http://127.0.0.1:8000",
-        "/sanctum": "http://127.0.0.1:8000",
+        "/api": `http://127.0.0.1:${process.env.PSST_API_PORT || "8000"}`,
+        "/sanctum": `http://127.0.0.1:${process.env.PSST_API_PORT || "8000"}`,
         // Reverb WebSocket. Anchored so usernames such as /apple are never mistaken for it.
         "^/app/.*": { target: "http://127.0.0.1:8080", ws: true }
       }
