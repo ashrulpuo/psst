@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Psst — Home mockup (Theme A · Sticker Shop)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --ink:#1b1024; --paper:#fff6ee; --cream:#ffe9d6; --surface:#fff;
+    --pink:#ff2d6f; --pink-deep:#d6004f; --lime:#c9ff4f; --violet:#7c3aed; --tangerine:#ff8a3d;
+    --grad-pink:linear-gradient(150deg,#d6004f 0%,#7c3aed 100%);
+    --grad-sunset:linear-gradient(150deg,#c2410c 0%,#d6004f 52%,#7c3aed 100%);
+    --grad-ocean:linear-gradient(150deg,#1d4ed8 0%,#0f766e 100%);
+    --display:"Bricolage Grotesque","Avenir Next",system-ui,sans-serif;
+    --body:"Nunito",ui-rounded,system-ui,sans-serif;
+    --edge:0 5px 0 var(--ink);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    background:var(--paper);background-image:radial-gradient(rgba(27,16,36,.09) 1px,transparent 1px);background-size:18px 18px;
+    color:var(--ink);font-family:var(--body);-webkit-font-smoothing:antialiased;
+  }
+  .doc{max-width:1180px;margin:0 auto;padding:48px 24px 12px}
+  .kicker{display:inline-flex;gap:8px;align-items:center;padding:8px 14px;border:2px solid var(--ink);border-radius:999px;background:var(--lime);
+    font:800 12px/1 var(--display);letter-spacing:.12em;text-transform:uppercase;box-shadow:0 3px 0 var(--ink)}
+  h1{font:800 clamp(34px,5vw,60px)/0.95 var(--display);letter-spacing:-.035em;margin:18px 0 10px}
+  h1 em{font-style:normal;color:var(--pink);text-shadow:3px 3px 0 var(--ink)}
+  .lede{max-width:66ch;font-size:17px;line-height:1.55;color:#4a3552;margin:0 0 24px}
+  .legend{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin-bottom:30px}
+  .chip-card{border:2px solid var(--ink);border-radius:18px;background:#fff;padding:13px 15px;box-shadow:0 4px 0 rgba(27,16,36,.85)}
+  .chip-card h3{margin:0 0 6px;font:800 10.5px/1 var(--display);letter-spacing:.14em;text-transform:uppercase;color:#7a6782}
+  .chip-card p{margin:0;font-size:13px;line-height:1.55;color:#4a3552}
+
+  .rail{display:flex;gap:56px;overflow-x:auto;padding:6px 4px 40px}
+  .item{flex:0 0 auto;width:430px}
+  .phone{position:relative;width:430px;height:884px;padding:20px;border-radius:62px;background:linear-gradient(160deg,#2b1e35,#120a18 60%);
+    box-shadow:0 30px 60px rgba(60,24,70,.28),inset 0 0 0 2px rgba(255,255,255,.08)}
+  .screen{position:relative;width:390px;height:844px;border-radius:44px;overflow:hidden;display:flex;flex-direction:column;
+    background:linear-gradient(180deg,#fff7ef 0%,#ffeede 100%);isolation:isolate}
+  .sbar{display:flex;justify-content:space-between;align-items:center;padding:14px 26px 0;font:800 13px/1 var(--display);z-index:4}
+  .sbar .dots{display:flex;gap:4px;align-items:center}
+  .sbar .dots i{width:5px;height:5px;border-radius:99px;background:rgba(27,16,36,.55)}
+  .sbar .batt{width:22px;height:11px;border:2px solid rgba(27,16,36,.55);border-radius:3px;position:relative}
+  .sbar .batt::after{content:"";position:absolute;inset:2px;right:6px;background:rgba(27,16,36,.55);border-radius:1px}
+  .homebar{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:128px;height:5px;border-radius:99px;background:rgba(27,16,36,.22);z-index:9}
+  .cap{width:430px;margin-top:16px}
+  .cap h2{font:800 21px/1.15 var(--display);letter-spacing:-.02em;margin:0 0 4px;display:flex;align-items:center;gap:10px}
+  .cap .num{display:grid;place-items:center;width:26px;height:26px;border-radius:9px;background:var(--ink);color:#fff;font:800 12px/1 var(--display)}
+  .cap p{margin:0 0 6px;font-size:13.5px;line-height:1.55;color:#4a3552}
+  .cap .tag{display:inline-block;margin:2px 6px 0 0;padding:4px 9px;border-radius:99px;background:var(--cream);border:1.5px solid rgba(27,16,36,.16);font:700 11px/1 var(--display)}
+
+  /* shared */
+  .wordmark{font:800 26px/1 var(--display);letter-spacing:-.04em;position:relative}
+  .wordmark sup{position:absolute;top:-7px;right:-15px;font-size:13px;transform:rotate(12deg)}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:56px;padding:0 20px;border-radius:20px;border:2.5px solid var(--ink);
+    background:var(--pink-deep);color:#fff;box-shadow:var(--edge);font:800 17px/1 var(--display);letter-spacing:-.01em;cursor:pointer;
+    transition:transform .12s cubic-bezier(.2,0,0,1),box-shadow .12s cubic-bezier(.2,0,0,1),background-color .15s;text-decoration:none}
+  .btn:hover{background:#e8175c}
+  .btn:active{transform:translateY(4px);box-shadow:0 0 0 var(--ink)}
+  .btn.ghost{background:#fff;color:var(--ink);box-shadow:0 4px 0 var(--ink)}
+  .btn.ghost:hover{background:var(--cream)}
+  .btn.block{width:100%}
+  .btn.sm{min-height:46px;font-size:15px;border-radius:16px;box-shadow:0 4px 0 var(--ink)}
+  .pill{display:inline-flex;align-items:center;gap:6px;padding:6px 11px;border-radius:99px;border:2px solid var(--ink);background:#fff;
+    font:800 11px/1 var(--display);box-shadow:0 3px 0 rgba(27,16,36,.85)}
+  .sticker{border:2.5px solid var(--ink);border-radius:24px;box-shadow:0 6px 0 var(--ink);color:#fff;overflow:hidden}
+  @keyframes bob{0%,100%{transform:translateY(0) rotate(var(--r,-3deg))}50%{transform:translateY(-5px) rotate(var(--r,-3deg))}}
+  @keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+  .rise{animation:rise .5s cubic-bezier(.2,1.1,.3,1) both}
+
+  /* ======== VARIANT A · sticker wall ======== */
+  .a-top{display:flex;align-items:center;justify-content:space-between;padding:14px 22px 0}
+  .a-body{flex:1;display:flex;flex-direction:column;justify-content:center;gap:16px;padding:4px 22px 26px;position:relative}
+  .a-head{text-align:center;margin-top:6px}
+  .a-head h1{margin:0;font:800 33px/1.02 var(--display);letter-spacing:-.045em;color:var(--ink)}
+  .a-head h1 em{font-style:normal;color:var(--pink);text-shadow:2px 2px 0 var(--ink)}
+  .a-head p{margin:8px auto 0;max-width:27ch;font-size:13.5px;line-height:1.5;color:#4a3552}
+  .wall{position:relative;height:344px;margin:2px -8px 0}
+  .wall .sticker{position:absolute;padding:13px 14px 11px}
+  .wall .s1{left:6px;top:0;width:218px;background:var(--grad-pink);transform:rotate(-4deg);--r:-4deg;animation:bob 5s ease-in-out infinite}
+  .wall .s2{right:-2px;top:70px;width:192px;background:var(--grad-ocean);transform:rotate(3deg);--r:3deg;animation:bob 6.2s ease-in-out infinite .4s}
+  .wall .s3{left:22px;top:196px;width:204px;background:var(--grad-sunset);transform:rotate(1.5deg);--r:1.5deg;animation:bob 5.6s ease-in-out infinite .8s}
+  .wall p{margin:0 0 8px;font:700 14px/1.35 var(--body)}
+  .wall .from{display:flex;justify-content:space-between;align-items:center;font:800 10px/1 var(--display);color:rgba(255,255,255,.88)}
+  .wall .from .dot{width:7px;height:7px;border-radius:99px;background:var(--lime);border:1.5px solid #fff;display:inline-block;margin-right:5px}
+  .a-cta{display:grid;gap:9px}
+  .a-note{display:flex;align-items:center;justify-content:center;gap:6px;margin:0;font-size:11.5px;color:#7a6782}
+  .a-note b{color:var(--ink)}
+
+  /* ======== VARIANT B · one big note ======== */
+  .b-top{display:flex;align-items:center;justify-content:space-between;padding:14px 22px 0}
+  .b-body{flex:1;display:flex;flex-direction:column;justify-content:center;gap:18px;padding:6px 22px 26px}
+  .b-note{position:relative;margin-top:0;padding:22px 20px 18px;border-radius:30px;background:var(--grad-sunset);
+    border:3px solid var(--ink);box-shadow:0 10px 0 var(--ink);color:#fff;transform:rotate(-1.2deg)}
+  .b-note .tape{position:absolute;top:-13px;left:50%;margin-left:-46px;width:92px;height:24px;background:rgba(255,226,190,.92);
+    border:1px solid rgba(180,140,100,.35);transform:rotate(-2deg);box-shadow:0 1px 3px rgba(27,16,36,.18)}
+  .b-note .from{font:800 10px/1 var(--display);letter-spacing:.16em;text-transform:uppercase;opacity:.9}
+  .b-note blockquote{margin:10px 0 14px;font:800 25px/1.15 var(--display);letter-spacing:-.03em}
+  .b-note blockquote span{display:inline-block;background:rgba(255,255,255,.22);border-radius:8px;padding:0 6px}
+  .b-note .who{display:flex;align-items:center;gap:8px;font:800 11px/1 var(--display)}
+  .b-note .who i{width:24px;height:24px;border-radius:50%;background:rgba(255,255,255,.25);display:grid;place-items:center;font-style:normal;border:2px solid rgba(255,255,255,.5)}
+  .b-title{text-align:center}
+  .b-title h1{margin:0;font:800 30px/1.02 var(--display);letter-spacing:-.04em}
+  .b-title p{margin:8px auto 0;max-width:30ch;font-size:13.5px;line-height:1.5;color:#4a3552}
+  .b-cta{display:grid;gap:9px}
+  .b-values{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+  .b-values div{padding:9px 6px;border:2px dashed rgba(27,16,36,.28);border-radius:14px;text-align:center;font:800 9.5px/1.25 var(--display);
+    letter-spacing:.06em;text-transform:uppercase;color:#4a3552;background:rgba(255,255,255,.5)}
+  .b-values b{display:block;font-size:15px;margin-bottom:3px}
+  .b-steps{display:grid;gap:7px;margin:0;padding:0;list-style:none;counter-reset:none}
+  .b-steps li{display:flex;align-items:center;gap:9px;padding:8px 11px;border:2px solid rgba(27,16,36,.16);border-radius:14px;
+    background:#fff;font:700 12px/1.2 var(--body);color:#4a3552}
+  .b-steps b{display:grid;place-items:center;width:20px;height:20px;flex:none;border-radius:7px;background:var(--ink);color:var(--cream);
+    font:800 10px/1 var(--display)}
+
+  /* notes */
+  .notes{max-width:1180px;margin:0 auto;padding:8px 24px 70px}
+  .notes h2{font:800 28px/1.1 var(--display);letter-spacing:-.03em;margin:30px 0 12px}
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:12px}
+  .card{border:2px solid var(--ink);border-radius:20px;background:#fff;padding:16px 17px;box-shadow:0 4px 0 rgba(27,16,36,.85)}
+  .card h3{font:800 14.5px/1.3 var(--display);margin:0 0 7px;display:flex;gap:8px;align-items:center}
+  .card p,.card li{font-size:13px;line-height:1.6;color:#4a3552}
+  .card p{margin:0}
+  .card ul{margin:0;padding-left:17px}
+  .card li::marker{color:var(--pink)}
+  .footer{margin-top:22px;font-size:12px;color:#7a6782}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<header class="doc">
+  <span class="kicker">Homepage · Theme A · Sticker Shop</span>
+  <h1>Two ways to land at <em>Psst</em></h1>
+  <p class="lede">Today <code>/</code> just redirects: signed in → your link page, stranger → the sign-in card. That makes the front door a gate. These two homepages open with the <em>product</em> instead — a note someone already sent — and let a visitor choose a door without reading a paragraph first.</p>
+  <div class="legend">
+    <div class="chip-card"><h3>Who lands here</h3><p>A stranger from a story link who has never heard of Psst, on a phone, in a hurry. They should understand “send an anonymous note” in one glance and be able to act in one tap.</p></div>
+    <div class="chip-card"><h3>Two doors, one primary</h3><p><b>Get my link</b> (no account) is the main action. <b>Sign in</b> is there for returning people and stays visually secondary — never a wall.</p></div>
+    <div class="chip-card"><h3>Same tokens as the app</h3><p>Paper, ink, hot pink, lime, Bricolage 800, 2.5px borders, hard shadows, press-down buttons. Nothing new to build: it reuses <code>AppButton</code>, the sticker card and the coin-flip pop.</p></div>
+  </div>
+</header>
+
+<section class="rail">
+
+  <!-- ============ A ============ -->
+  <figure class="item" style="margin:0">
+    <div class="phone">
+      <div class="screen">
+        <div class="sbar"><span>9:41</span><span class="dots"><i></i><i></i><i></i><span class="batt"></span></span></div>
+        <div class="a-top">
+          <span class="wordmark">psst<sup>🤫</sup></span>
+          <span class="pill">🔒 anonymous</span>
+        </div>
+
+        <div class="a-body">
+          <div class="a-head rise">
+            <h1>say the thing.<br /><em>no name attached.</em></h1>
+            <p>Send a note to anyone with a Psst link — or get your own and see what people are too shy to say.</p>
+          </div>
+
+          <div class="wall rise" style="animation-delay:.1s" aria-hidden="true">
+            <div class="sticker s1">
+              <p>you were the best part of that meeting. just so you know 🤍</p>
+              <div class="from"><span><span class="dot"></span>Anonymous #7</span><span>2m</span></div>
+            </div>
+            <div class="sticker s2">
+              <p>coffee sometime? your talk gave me ideas.</p>
+              <div class="from"><span><span class="dot"></span>Anonymous #2</span><span>18m</span></div>
+            </div>
+            <div class="sticker s3">
+              <p>i’ve been trying to say this in person for weeks…</p>
+              <div class="from"><span>Anonymous #11</span><span>1h</span></div>
+            </div>
+          </div>
+
+          <div class="a-cta rise" style="animation-delay:.2s">
+            <a class="btn block" href="#">get my link 🚀 <span style="font-weight:600;opacity:.85;font-size:13px">· free</span></a>
+            <a class="btn ghost sm block" href="#">I have an account — sign in</a>
+          </div>
+          <p class="a-note">🔒 <span>They see a nickname. <b>Not your name.</b></span></p>
+        </div>
+        <div class="homebar"></div>
+      </div>
+    </div>
+    <figcaption class="cap">
+      <h2><span class="num">A</span> The sticker wall</h2>
+      <p>Headline does the explaining; a fanned stack of real-looking notes does the convincing. The wall keeps drifting 5px so the page feels alive while you read.</p>
+      <p><span class="tag">3 tilted stickers</span><span class="tag">bob 5–6s</span><span class="tag">one primary CTA</span></p>
+    </figcaption>
+  </figure>
+
+  <!-- ============ B ============ -->
+  <figure class="item" style="margin:0">
+    <div class="phone">
+      <div class="screen">
+        <div class="sbar"><span>9:41</span><span class="dots"><i></i><i></i><i></i><span class="batt"></span></span></div>
+        <div class="b-top">
+          <span class="wordmark">psst<sup>🤫</sup></span>
+          <span class="pill" style="background:var(--lime)">no account needed</span>
+        </div>
+
+        <div class="b-body">
+          <div class="b-note rise">
+            <span class="tape"></span>
+            <div class="from">a note someone sent today</div>
+            <blockquote>“you were the best part of <span>that meeting</span> 🤍”</blockquote>
+            <div class="who"><i>?</i><span>Anonymous #7 · received 2m ago</span></div>
+          </div>
+
+          <div class="b-title rise" style="animation-delay:.1s">
+            <h1>now it’s your turn</h1>
+            <p>Get a link, share it, and read what people won’t say to your face.</p>
+          </div>
+
+          <div class="b-values rise" style="animation-delay:.16s">
+            <div><b>🙈</b>no name</div>
+            <div><b>👻</b>no account</div>
+            <div><b>🔒</b>no trace</div>
+          </div>
+
+          <ol class="b-steps rise" style="animation-delay:.2s">
+            <li><b>1</b> pick a username</li>
+            <li><b>2</b> drop the link in your story</li>
+            <li><b>3</b> read what lands</li>
+          </ol>
+
+          <div class="b-cta rise" style="animation-delay:.24s">
+            <a class="btn block" href="#">pick my username →</a>
+            <a class="btn ghost sm block" href="#">I have an account — sign in</a>
+          </div>
+          <p class="a-note">🔒 <span>They see a nickname. <b>Not your name.</b></span></p>
+        </div>
+        <div class="homebar"></div>
+      </div>
+    </div>
+    <figcaption class="cap">
+      <h2><span class="num">B</span> The one big note</h2>
+      <p>No stack, no scroll: a single tape-stuck note as the hero, then the ask. Reads like a story card, so it survives being screenshotted and shared — which is how Psst actually spreads.</p>
+      <p><span class="tag">taped hero note</span><span class="tag">3 value pills</span><span class="tag">CTA inside the fold</span></p>
+    </figcaption>
+  </figure>
+
+</section>
+
+<section class="notes">
+  <h2>What changes on the real <code>/</code></h2>
+  <div class="cards">
+    <div class="card">
+      <h3>Routing</h3>
+      <ul>
+        <li><code>/</code> renders this homepage instead of redirecting.</li>
+        <li>Signed-in users skip it: the guard sends them to <code>/link</code> so the app still opens on their link.</li>
+        <li><b>Get my link</b> → <code>/get-link</code> (already exists, no account).</li>
+        <li><b>Sign in</b> → <code>/login</code> (already exists).</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Copy, kept short</h3>
+      <p>“say the thing. no name attached.” / “get my link · free” / “I have an account — sign in”. The privacy line stays one sentence and names exactly who can see what.</p>
+    </div>
+    <div class="card">
+      <h3>Build cost</h3>
+      <p>One new page file, one route, reuse of <code>AppButton</code>, the sticker gradient helper and the existing tokens. No server change: <code>/get-link</code> and <code>/login</code> already do the work.</p>
+    </div>
+    <div class="card">
+      <h3>Motion &amp; a11y</h3>
+      <p>Staggered rise on load only; the drifting notes stop under <code>prefers-reduced-motion</code>. Both CTAs are real links in DOM order, 56px tall, ink focus rings, and the sample notes are <code>aria-hidden</code> so a screen reader hears the pitch, not the demo.</p>
+    </div>
+  </div>
+  <p class="footer">static mockup · open in a browser · the press/hover states are live</p>
+</section>
+
+</body>
+</html>
