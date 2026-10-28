@@ -1,7 +1,8 @@
 <script setup lang="ts">
 // Pattern: Form — public link page. The sender's first impression, so it stays small and fast.
-import { computed, onMounted, ref, watch } from "vue";
+import { computed, nextTick, onMounted, ref, watch } from "vue";
 import { useRouter } from "vue-router";
+import { useI18n } from "vue-i18n";
 import { useMeta } from "quasar";
 import { Link2, UserX } from "@lucide/vue";
 import { ApiError } from "@/api/http";
@@ -9,12 +10,15 @@ import { profileApi } from "@/api/endpoints";
 import { config } from "@/utils/config";
 import { guestToken, setGuestToken } from "@/utils/guest";
 import TurnstileBox from "@/components/TurnstileBox.vue";
+import ClaimLinkForm from "@/components/ClaimLinkForm.vue";
 import type { PublicProfile } from "@/api/types";
 import { useAuthStore } from "@/stores/auth";
 import { useMessagingStore } from "@/stores/messaging";
 import { copyText } from "@/utils/clipboard";
 import AppAvatar from "@/components/AppAvatar.vue";
 import EmptyState from "@/components/EmptyState.vue";
+import AppButton from "@/components/AppButton.vue";
+import PromptChips from "@/components/PromptChips.vue";
 
 const MAX = 1000;
 const props = defineProps<{ username: string }>();
@@ -53,6 +57,19 @@ const canSend = computed(
     (auth.isAuthenticated || !challengeNeeded || challenge.value !== null)
 );
 
+const { tm, rt } = useI18n();
+const prompts = computed(() => (tm("profile.prompts") as string[]).map(rt));
+const EMOJI = ["🥰", "😂", "😭", "🤍", "🔥"];
+
+function usePrompt(text: string) {
+  if (!body.value.trim()) body.value = `${text} `;
+  void nextTick(() => document.getElementById("message")?.focus());
+}
+function addEmoji(emoji: string) {
+  body.value += emoji;
+  void nextTick(() => document.getElementById("message")?.focus());
+}
+
 // Keep a half-written message across the sign-in round trip (and accidental refreshes).
 function readDraft() {
   try {
@@ -86,6 +103,9 @@ async function load() {
 }
 onMounted(load);
 watch(() => props.username, load);
+watch([status, isOwn], () => {
+  if (status.value === "ready" && isOwn.value) void router.replace("/link");
+});
 
 async function submit() {
   if (!canSend.value) return;
@@ -196,6 +216,7 @@ async function copyOwn() {
     <p v-if="sentAsGuest" class="chat-offer text-secondary-copy">
       {{ $t("profile.chatOffer") }}
     </p>
+    <ClaimLinkForm v-if="sentAsGuest && !auth.isAuthenticated" />
     <div class="row">
       <q-btn
         v-if="sentAsGuest"
@@ -225,18 +246,23 @@ async function copyOwn() {
 
   <form
     v-else-if="profile"
-    class="surface card"
+    class="send-page"
     novalidate
     @submit.prevent="submit"
   >
-    <header class="head">
-      <AppAvatar :name="profile.name" :src="profile.avatar_url" :size="64" />
-      <h1>{{ $t("profile.title", { name: profile.name }) }}</h1>
-      <p class="text-secondary-copy">{{ $t("profile.subtitle") }}</p>
+    <header class="hero arrive">
+      <span class="sticker-avatar">
+        <AppAvatar :name="profile.name" :src="profile.avatar_url" :size="88" />
+        <span class="tape">{{ $t("profile.prompt") }}</span>
+      </span>
+      <h1>{{ profile.name }}</h1>
+      <p class="prompt-line">{{ $t("profile.subtitle") }}</p>
     </header>
 
-    <div class="field">
-      <label for="message">{{ $t("profile.label") }}</label>
+    <PromptChips :prompts="prompts" @pick="usePrompt" />
+
+    <div class="paper">
+      <label class="sr-only" for="message">{{ $t("profile.label") }}</label>
       <textarea
         id="message"
         v-model="body"
@@ -247,14 +273,31 @@ async function copyOwn() {
         @keydown.ctrl.enter.prevent="submit"
         @keydown.meta.enter.prevent="submit"
       />
-      <p
-        id="message-help"
-        class="text-meta help"
-        :class="{ over: remaining < 0 }"
-      >
-        <span v-if="error" class="error" role="alert">{{ error }}</span>
-        <span class="count" aria-live="polite">{{ remaining }}</span>
-      </p>
+      <div class="paper-foot">
+        <div
+          class="emoji-row"
+          role="group"
+          :aria-label="$t('profile.emojiLabel')"
+        >
+          <button
+            v-for="emoji in EMOJI"
+            :key="emoji"
+            type="button"
+            class="emoji"
+            @click="addEmoji(emoji)"
+          >
+            {{ emoji }}
+          </button>
+        </div>
+        <p
+          id="message-help"
+          class="text-meta help"
+          :class="{ over: remaining < 0 }"
+        >
+          <span v-if="error" class="error" role="alert">{{ error }}</span>
+          <span class="count" aria-live="polite">{{ remaining }}</span>
+        </p>
+      </div>
     </div>
 
     <!-- Honeypot: hidden from people and assistive tech, irresistible to form-filling bots. -->
@@ -274,20 +317,16 @@ async function copyOwn() {
       @token="challenge = $event"
     />
 
-    <q-btn
-      type="submit"
-      color="primary"
-      unelevated
-      no-caps
-      size="lg"
-      :loading="sending"
-      :disable="!canSend"
-      :label="$t('profile.send')"
-    />
+    <AppButton type="submit" size="md" block :disabled="!canSend">
+      {{ sending ? $t("thread.sending") : $t("profile.send") }}
+    </AppButton>
 
-    <router-link v-if="!auth.isAuthenticated" to="/login" class="own-link">{{
-      $t("profile.getYourOwn")
-    }}</router-link>
+    <div class="send-foot">
+      <p class="tiny">🔒 {{ $t("profile.privacyShort") }}</p>
+      <router-link v-if="!auth.isAuthenticated" to="/get-link" class="own-link">
+        {{ $t("profile.getYourOwn") }}
+      </router-link>
+    </div>
   </form>
 </template>
 
@@ -315,45 +354,132 @@ async function copyOwn() {
 .card {
   display: grid;
   gap: var(--s-5);
-  padding: var(--s-6) var(--s-5);
+  padding: var(--s-7) var(--s-5) var(--s-5);
+  border-radius: 32px;
 }
-.head {
+.send-page {
+  display: flex;
+  flex-direction: column;
+  width: min(100%, 340px);
+  margin-inline: auto;
+  gap: 14px;
+  padding-bottom: 12px;
+}
+.hero {
   display: grid;
   justify-items: center;
-  gap: var(--s-2);
+  gap: 8px;
+  padding: 6px 0 0;
   text-align: center;
 }
-.head h1 {
-  font-size: var(--text-h2);
-}
-.field {
+.sticker-avatar {
+  position: relative;
   display: grid;
-  gap: var(--s-2);
+  place-items: center;
+  padding: 4px;
+  border: 4px solid var(--surface);
+  border-radius: 50%;
+  background: var(--grad-pink);
+  box-shadow:
+    0 8px 0 var(--edge),
+    0 16px 26px rgba(214, 0, 79, 0.18);
+  transform: rotate(-5deg);
 }
-label {
-  font-size: var(--text-secondary);
-  font-weight: 500;
+.tape {
+  position: absolute;
+  right: -34px;
+  bottom: 4px;
+  padding: 4px 9px;
+  border: 2.5px solid var(--edge);
+  border-radius: 7px;
+  background: var(--lime);
+  box-shadow: 0 3px 0 var(--edge);
+  color: var(--ink);
+  font: 800 0.62rem / 1 var(--font-display);
+  white-space: nowrap;
+  transform: rotate(7deg);
 }
-.input {
-  padding: var(--s-3) var(--s-4);
-  resize: vertical;
-  min-height: 140px;
-  border: 1px solid var(--border-strong);
-  border-radius: var(--r-control);
-  background: var(--canvas);
+.hero h1 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.9rem;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1.05;
+}
+.prompt-line {
+  max-width: 28ch;
+  color: var(--text-2);
+  font-size: 0.9rem;
+}
+.paper {
+  position: relative;
+  padding: 16px 14px 10px;
+  border: 2.5px solid var(--edge);
+  border-radius: var(--r-card);
+  background: var(--surface);
+  box-shadow: var(--edge-shadow-sm);
+}
+.paper .input {
+  width: 100%;
+  min-height: 108px;
+  padding: 0;
+  border: 0;
+  background: transparent;
   color: var(--text);
   font: inherit;
-  transition: border-color var(--dur) var(--ease);
+  resize: none;
+  outline: 0;
 }
-.input:focus-visible {
+.paper .input::placeholder {
+  color: var(--text-3);
+}
+.paper-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 2px dashed var(--border);
+}
+.emoji-row {
+  display: flex;
+  gap: 2px;
+}
+.emoji {
+  padding: 4px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  font-size: 1.15rem;
+  line-height: 1;
+  cursor: pointer;
+}
+.emoji:hover {
+  transform: translateY(-2px);
+}
+.tiny {
+  color: var(--text-3);
+  font-size: 0.75rem;
+  text-align: center;
+}
+.send-foot {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  margin-top: auto;
+  padding-bottom: 8px;
+}
+.paper .input:focus-visible {
   outline: 2px solid var(--accent-text);
   outline-offset: 1px;
-  border-color: var(--accent-text);
 }
 .help {
   display: flex;
-  justify-content: space-between;
-  gap: var(--s-3);
+  align-items: center;
+  gap: 8px;
+  margin: 0;
 }
 .help .count {
   margin-left: auto;

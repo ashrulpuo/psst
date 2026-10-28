@@ -3,10 +3,20 @@ export default {
   app: { name: "Psst" },
 
   nav: {
+    link: "Link",
     inbox: "Inbox",
     sent: "Sent",
     settings: "Settings",
     main: "Main navigation"
+  },
+
+  link: {
+    prompt: "ask me anything",
+    hint: "Share this. New messages land in your inbox.",
+    step1: "Step 1: Copy your link",
+    step2: "Step 2: Share link on your story",
+    copy: "copy link",
+    share: "Share!"
   },
 
   login: {
@@ -34,9 +44,19 @@ export default {
 
   profile: {
     title: "Send {name} an anonymous message",
+    prompt: "ask me anything",
     subtitle: "They won't see who you are. Be kind.",
+    promptsLabel: "Prompt ideas",
+    prompts: [
+      "say something nice 💌",
+      "confess 🤫",
+      "roast me 🔥",
+      "a secret 🫣"
+    ],
+    privacyShort: "They see a nickname. Not your name.",
+    emojiLabel: "Add an emoji",
     label: "Your message",
-    send: "Send message",
+    send: "Send anonymously",
     chatOffer:
       "Want to hear back? Sign in and they can reply to you, still anonymously. You don't need to sign in to send more.",
     signInToChat: "Sign in to chat",
@@ -56,7 +76,8 @@ export default {
   inbox: {
     emptyTitle: "No messages yet",
     emptyBody: "Share your link and your first message will show up here.",
-    emptyAction: "Copy my link",
+    emptyAction: "Share your link",
+    getMessages: "Get messages",
     pick: "Select a conversation",
     pickBody: "Choose a message on the left to read and reply."
   },
@@ -81,6 +102,7 @@ export default {
     cannotReply: "This person isn't accepting replies from you.",
     guestSender:
       "They haven't signed in, so you can't reply yet. If they sign in, you'll be able to chat.",
+    signInToReply: "Sign in to chat before you reply.",
     report: "Report message",
     reportTitle: "Report this message",
     reportReason: "What's wrong with it?",
