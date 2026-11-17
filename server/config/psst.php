@@ -43,6 +43,13 @@ return [
         'secret' => env('TURNSTILE_SECRET', ''),
     ],
 
+    'backup' => [
+        'disk' => 'backups',
+        // Encrypts the nightly dump. Empty = the backup command refuses to run.
+        'passphrase' => env('BACKUP_PASSPHRASE', ''),
+        'keep_days' => 14,
+    ],
+
     'auth' => [
         'token_ttl_days' => 30,
     ],

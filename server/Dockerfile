@@ -12,7 +12,7 @@ RUN composer dump-autoload --no-dev --classmap-authoritative --no-interaction --
 # ---- Runtime ----
 FROM php:8.3-fpm-alpine AS app
 
-RUN apk add --no-cache icu-libs libpq gmp \
+RUN apk add --no-cache icu-libs libpq gmp bash openssl postgresql16-client \
     && apk add --no-cache --virtual .build-deps $PHPIZE_DEPS icu-dev postgresql-dev gmp-dev \
     && docker-php-ext-install -j"$(nproc)" intl pdo_pgsql pcntl opcache gmp \
     && pecl install redis \
