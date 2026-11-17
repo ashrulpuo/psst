@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 import { computed, ref } from "vue";
 import { authApi, guestApi, type TokenLogin } from "@/api/endpoints";
-import { setAuthToken } from "@/api/http";
+import { ApiError, getAuthToken, setAuthToken } from "@/api/http";
 import type { Me, Provider } from "@/api/types";
 import { nativeAdapters } from "@/native/adapters";
 import { isNativeApp, nativePlatform } from "@/native/platform";
@@ -10,6 +10,21 @@ import { clearGuestToken, guestToken, setGuestToken } from "@/utils/guest";
 import { randomNonce } from "@/utils/format";
 
 const LINK_PAUSE = "psst.link-paused";
+/**
+ * The web session cookie is HttpOnly, so the page cannot see it. This flag records that this browser
+ * signed in, so a first-time visitor is not sent to /me just to be told 401 (which the console prints).
+ */
+const SESSION_HINT = "psst.session";
+
+function sessionHint(on?: boolean): boolean {
+  try {
+    if (on === true) localStorage.setItem(SESSION_HINT, "1");
+    else if (on === false) localStorage.removeItem(SESSION_HINT);
+    return localStorage.getItem(SESSION_HINT) === "1";
+  } catch {
+    return true; // storage blocked: cannot tell, so ask the server
+  }
+}
 
 export const useAuthStore = defineStore("auth", () => {
   const user = ref<Me | null>(null);
@@ -56,12 +71,22 @@ export const useAuthStore = defineStore("auth", () => {
 
   function init(): Promise<void> {
     initializing ??= restoreNativeSession()
-      .then(() => authApi.me())
+      .then(() => {
+        // Nothing to ask the server about: no device token, or a browser that never signed in.
+        const mayBeSignedIn = isNativeApp ? !!getAuthToken() : sessionHint();
+        return mayBeSignedIn
+          ? authApi.me()
+          : Promise.reject(new Error("guest"));
+      })
       .then(async me => {
+        sessionHint(true);
         user.value = me;
         await claimGuestThreads();
       })
-      .catch(async () => {
+      .catch(async error => {
+        // Only a definite "not signed in" retires the hint; an outage must not sign anyone out.
+        if (error instanceof ApiError && error.status === 401)
+          sessionHint(false);
         const token = guestToken();
         const paused =
           typeof sessionStorage !== "undefined" &&
@@ -105,6 +130,7 @@ export const useAuthStore = defineStore("auth", () => {
       name,
       guestToken()
     );
+    sessionHint(true);
     await claimGuestThreads();
   }
 
@@ -127,7 +153,10 @@ export const useAuthStore = defineStore("auth", () => {
   async function devLogin(email: string) {
     const result = await authApi.devLogin(email, guestToken());
     if ("token" in result) await adoptToken(result);
-    else user.value = result.data;
+    else {
+      sessionHint(true);
+      user.value = result.data;
+    }
     await claimGuestThreads();
   }
 
@@ -153,6 +182,7 @@ export const useAuthStore = defineStore("auth", () => {
   /** Forget the session locally (sign-out, or the server saying 401). */
   function clear() {
     user.value = null;
+    sessionHint(false);
     if (isNativeApp) {
       setAuthToken(null);
       void nativeAdapters().then(n => n.tokens.clear());
