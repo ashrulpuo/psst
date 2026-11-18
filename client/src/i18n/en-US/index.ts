@@ -262,7 +262,7 @@ export default {
         },
         safety: {
           heading: "Blocking and reporting",
-          body: "You can block a sender. A signed-in sender will see that they can no longer message you; a blocked guest's messages are quietly dropped. You can report any message you receive. Admins can open conversations to investigate abuse and review reports, and each time they do it is logged."
+          body: "You can block a sender. A signed-in sender will see that they can no longer message you; a blocked guest's messages are quietly dropped. You can report any message you receive. Admins can open conversations to investigate abuse, review reports and check messages our automatic word check sets aside, and each time they do it is logged."
         },
         bans: {
           heading: "Bans",
@@ -298,15 +298,15 @@ export default {
         },
         encryption: {
           heading: "Messages are stored encrypted",
-          body: "Message text is encrypted at rest. Admins can open conversations to investigate abuse and review reports, and each access is logged."
+          body: "Message text is encrypted at rest. Admins can open conversations to investigate abuse and review reports, and each access is logged. When a message is sent, it is checked automatically against a short list of words that suggest threats or self-harm. A match is set aside for an admin to read; the message is still delivered."
         },
         usage: {
           heading: "Anonymous usage counts",
-          body: "We collect aggregate counts of accounts and messages, such as how many accounts exist and how many messages are sent per day. These counts are not linked to a person."
+          body: "We collect aggregate counts of accounts and messages, such as how many accounts exist, how many messages are sent per day and how often links and notes are shared. These counts store no account, device or network address and are kept by day only."
         },
         sharing: {
           heading: "Who we share it with",
-          body: "We don't sell your data. We use service providers to run Psst, for example for hosting, sign-in and notifications, and they only get what they need to do that. We may also have to share information if the law requires it."
+          body: "We don't sell your data. We use service providers to run Psst, for example for hosting, sign-in, notifications and error monitoring, and they only get what they need to do that. Error reports have message text and personal details removed. We may also have to share information if the law requires it."
         },
         shared: {
           heading: "What gets shared is out of our hands",
