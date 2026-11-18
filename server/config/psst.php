@@ -10,6 +10,8 @@ return [
         'settings', 'support', 'help', 'about', 'terms', 'privacy', 'security', 'root', 'system',
         'moderator', 'mod', 'staff', 'team', 'official', 'psst', 'null', 'undefined', 'me', 'www',
         'mail', 'static', 'assets', 'cdn', 'status', 'inbox', 'link', 'get-link', 'messages', 'thread', 'threads',
+        // Top-level SPA routes (client/src/router/routes.ts) that fit the username shape and would shadow a profile.
+        'welcome', 'sent',
     ],
 
     'messages' => [

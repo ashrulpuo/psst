@@ -278,6 +278,8 @@ Expected:
 - The crawler request: the `og:title` and `noindex, nofollow` robots tags. The same URL with a normal browser
   user agent returns the app shell instead.
 
+If the database was seeded or imported before launch, check that no user already holds a reserved name (they would have a dead profile): `docker compose exec app php artisan tinker --execute='dump(App\Models\User::whereIn("username", config("psst.reserved_usernames"))->pluck("username"));'` must print an empty collection.
+
 Drop `-k` once the certificate is issued to make curl enforce TLS. Then open `https://<domain>/` in a browser, sign in
 with Google, send yourself a message and confirm it arrives live (realtime goes through `/app` on port 443).
 

@@ -89,7 +89,8 @@
 		# Profile pages (/{username}) must not be indexed; home, /terms and /privacy stay indexable.
 		@profile {
 			path_regexp ^/[a-z0-9_.]{3,24}$
-			not path /login /terms /privacy /welcome /link /inbox /sent /settings /og.png /sw.js /manifest.json /index.html /favicon.ico /robots.txt /sitemap.xml
+			# Same exclusions as @preview above (keep both lists in step with psst.reserved_usernames and the SPA routes).
+			not path /login /terms /privacy /welcome /link /inbox /sent /settings /admin /api /app /sanctum /og.png /sw.js /manifest.json /index.html /favicon.ico /robots.txt /sitemap.xml
 		}
 		header @profile X-Robots-Tag "noindex, nofollow"
 		try_files {path} /index.html
