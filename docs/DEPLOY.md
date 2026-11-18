@@ -335,3 +335,24 @@ if the bug is in the UI.
 Migrations are written to be backward compatible, so the previous image can run against the already-migrated
 database. Do not run `migrate:rollback` in production; if a schema change has to be undone, ship a new forward
 migration. If data is damaged, restore from backup (section 9).
+
+## 11. Error tracking and uptime
+
+**Error tracking (Sentry, free tier).**
+
+1. Create a free account at sentry.io, then a project with the platform set to Laravel. Copy its DSN.
+2. Set `SENTRY_LARAVEL_DSN=<dsn>` in `deploy/.env` and run `docker compose up -d` so `app`, `queue` and `scheduler`
+   pick it up. Leave it empty and nothing is sent.
+3. Verify from the host: `docker compose exec app php artisan sentry:test`. Expected: the command prints that a test
+   event was sent and it appears in the project's Issues list within a minute.
+
+psst is anonymous, so every event goes through `App\Observability\ScrubEvent` before it leaves the server. Request
+payloads, cookies, query strings, all headers except content type, the user and IP, `extra`, breadcrumb messages and
+data, stack-frame variables and source lines are dropped. Database error messages are cut before the SQL and the
+Postgres `DETAIL` line, where a bound message body would appear. `send_default_pii` is off and SQL bindings are not
+recorded. Exception type, message, stack trace, route and release still arrive. Do not turn on Sentry session replay,
+client SDKs or performance traces without extending the scrubber first.
+
+**Uptime check.** Add an external monitor on any free uptime service (UptimeRobot, Better Stack, Uptime Kuma on
+another host); the owner picks. Point an HTTPS check at `https://<domain>/up` every 1 to 5 minutes and send alerts to
+the owner's email. Expected: `/up` returns 200 while the app is healthy; stop `app` briefly to confirm the alert fires.
