@@ -91,6 +91,20 @@ export function fitFontSize(
   return Math.max(min, Math.floor((start * maxWidth) / w));
 }
 
+let segmenter: Intl.Segmenter | null | undefined;
+
+/** User-perceived characters, so emoji sequences (ZWJ, flags, skin tones) are never cut in half. */
+export function graphemes(text: string): string[] {
+  if (segmenter === undefined) {
+    segmenter =
+      typeof Intl !== "undefined" && "Segmenter" in Intl
+        ? new Intl.Segmenter(undefined, { granularity: "grapheme" })
+        : null;
+  }
+  if (!segmenter) return Array.from(text);
+  return Array.from(segmenter.segment(text), part => part.segment);
+}
+
 /** Shorten `text` with an ellipsis until it fits at the given size. Pure. */
 export function ellipsize(
   measure: Measure,
@@ -99,7 +113,7 @@ export function ellipsize(
   px: number
 ): string {
   if (measure(text, px) <= maxWidth) return text;
-  const chars = Array.from(text);
+  const chars = graphemes(text);
   let lo = 0;
   let hi = chars.length;
   while (lo < hi) {
@@ -110,7 +124,7 @@ export function ellipsize(
   return chars.slice(0, lo).join("") + "…";
 }
 
-/** Greedy word wrap; words wider than maxWidth are hard-split. Pure (for Task 13). */
+/** Greedy word wrap; words wider than maxWidth are hard-split. Pure . */
 export function wrapText(
   measure: Measure,
   text: string,
@@ -128,8 +142,8 @@ export function wrapText(
     if (line) lines.push(line);
     line = "";
     let rest = word;
-    while (measure(rest, px) > maxWidth && Array.from(rest).length > 1) {
-      const chars = Array.from(rest);
+    while (measure(rest, px) > maxWidth && graphemes(rest).length > 1) {
+      const chars = graphemes(rest);
       let n = chars.length - 1;
       while (n > 1 && measure(chars.slice(0, n).join(""), px) > maxWidth) n--;
       lines.push(chars.slice(0, n).join(""));
@@ -278,6 +292,202 @@ export async function renderStoryCard(
   const chipW = Math.min(maxW, sans(urlText, urlPx) + chipPad * 2);
   const chipH = 120;
   const chipY = 1400;
+  ctx.fillStyle = p.chip;
+  roundRect(ctx, cx - chipW / 2, chipY, chipW, chipH, chipH / 2);
+  ctx.fill();
+  ctx.fillStyle = p.chipText;
+  ctx.font = `800 ${urlPx}px ${SANS}`;
+  ctx.textBaseline = "middle";
+  ctx.fillText(urlText, cx, chipY + chipH / 2 + 2);
+
+  try {
+    return await canvasToBlob(canvas);
+  } finally {
+    releaseCanvas();
+  }
+}
+
+/** Longest note shown on a card, in user-perceived characters. */
+export const NOTE_MAX_CHARS = 280;
+
+/**
+ * Make received text safe and predictable to draw: unify newlines, drop control and bidi
+ * override characters (they can reorder or hide text), collapse blank-line runs, trim.
+ */
+export function cleanNote(raw: string): string {
+  return raw
+    .replace(/\r\n?|\u2028|\u2029/g, "\n")
+    .replace(
+      // eslint-disable-next-line no-control-regex
+      /[\u0000-\u0008\u000b-\u001f\u007f-\u009f\u200e\u200f\u202a-\u202e\u2066-\u2069\ufeff]/g,
+      ""
+    )
+    .replace(/[^\S\n]+/g, " ")
+    .replace(/ ?\n ?/g, "\n")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+}
+
+/** True when the first strongly-directional letter is right-to-left (Hebrew, Arabic, ...). */
+export function isRtlText(text: string): boolean {
+  const m = /[\p{L}]/u.exec(text);
+  return m ? /[\u0590-\u08ff\ufb1d-\ufdff\ufe70-\ufeff]/.test(m[0]) : false;
+}
+
+/** The note as it will be drawn: cleaned and capped. Empty means there is nothing to share. */
+export function prepareNote(raw: string): string {
+  const text = cleanNote(raw);
+  const chars = graphemes(text);
+  if (chars.length <= NOTE_MAX_CHARS) return text;
+  return chars.slice(0, NOTE_MAX_CHARS).join("").trimEnd() + "…";
+}
+
+/**
+ * Render a received note as a speech-bubble story card (1080x1920 PNG). The note is drawn as
+ * plain canvas text, on this device only. The card carries the text, the receiver's handle and
+ * link, and nothing about the sender or when it arrived. Right-to-left notes are drawn with
+ * RTL direction centred; mixed-direction lines rely on the browser's bidi handling.
+ */
+export async function renderNoteCard(
+  template: StoryTemplate,
+  note: string,
+  username: string,
+  url: string
+): Promise<Blob> {
+  const text = prepareNote(note);
+  if (!text) throw new Error("Nothing to share");
+  await ensureFonts();
+  const canvas = getCanvas();
+  const ctx = canvas.getContext("2d");
+  if (!ctx) throw new Error("Canvas is not available");
+  const p = PALETTES[template];
+  const margin = 96;
+  const maxW = CARD_WIDTH - margin * 2;
+  const display = measureIn(ctx, DISPLAY);
+  const sans = measureIn(ctx, SANS);
+  const cx = CARD_WIDTH / 2;
+
+  paintBackground(ctx, template);
+  ctx.textAlign = "center";
+  ctx.textBaseline = "alphabetic";
+  ctx.direction = "ltr";
+
+  // Instagram covers roughly the top 250px and bottom 340px with its own UI.
+  ctx.fillStyle = p.accent;
+  ctx.font = `800 56px ${DISPLAY}`;
+  ctx.fillText("psst", cx, 330);
+
+  const handle = "@" + username;
+  const labelPx = 40;
+  ctx.fillStyle = p.text;
+  ctx.font = `800 ${labelPx}px ${DISPLAY}`;
+  ctx.fillText(
+    ellipsize(display, `anonymous message for ${handle}`, maxW, labelPx),
+    cx,
+    400
+  );
+
+  // Bubble: fit the note by shrinking the font, then truncating if it still overflows.
+  const pad = 64;
+  const textW = maxW - pad * 2;
+  const regionTop = 450;
+  const regionBottom = 1130;
+  const maxTextH = regionBottom - regionTop - pad * 2;
+  const layout = (px: number): string[][] =>
+    text
+      .split("\n")
+      .map(par => (par.trim() ? wrapText(display, par, textW, px) : []));
+  const heightOf = (paras: string[][], px: number): number => {
+    const lh = px * 1.25;
+    const gap = px * 0.5;
+    return paras.reduce(
+      (h, lines, i) => h + (lines.length || 0.6) * lh + (i ? gap : 0),
+      0
+    );
+  };
+  let px = 84;
+  let paras = layout(px);
+  while (heightOf(paras, px) > maxTextH && px > 34) {
+    px -= 2;
+    paras = layout(px);
+  }
+  const lh = px * 1.25;
+  const gap = px * 0.5;
+  // Flatten to drawable rows; at the minimum size, drop rows that do not fit.
+  const rows: (string | null)[] = [];
+  paras.forEach((lines, i) => {
+    if (i) rows.push(null);
+    if (lines.length) rows.push(...lines);
+    else rows.push(null);
+  });
+  let rowsH = heightOf(paras, px);
+  if (rowsH > maxTextH) {
+    const kept: (string | null)[] = [];
+    let used = 0;
+    for (const row of rows) {
+      const next = used + (row === null ? gap : lh);
+      if (next > maxTextH) break;
+      kept.push(row);
+      used = next;
+    }
+    while (kept.length && kept[kept.length - 1] === null) kept.pop();
+    const lastIdx = kept.length - 1;
+    const last = kept[lastIdx];
+    if (last) kept[lastIdx] = ellipsize(display, last + "…", textW, px);
+    rows.length = 0;
+    rows.push(...kept);
+    rowsH = used;
+  } else {
+    rowsH = rows.reduce<number>((h, r) => h + (r === null ? gap : lh), 0);
+  }
+
+  const bubbleH = Math.max(240, rowsH + pad * 2);
+  const bubbleTop = regionTop + (regionBottom - regionTop - bubbleH) / 2;
+  const bubbleX = margin;
+  ctx.fillStyle = p.chip;
+  roundRect(ctx, bubbleX, bubbleTop, maxW, bubbleH, 56);
+  ctx.fill();
+  // Tail at the bottom left, like a chat bubble.
+  ctx.beginPath();
+  ctx.moveTo(bubbleX + 90, bubbleTop + bubbleH - 2);
+  ctx.lineTo(bubbleX + 60, bubbleTop + bubbleH + 52);
+  ctx.lineTo(bubbleX + 170, bubbleTop + bubbleH - 2);
+  ctx.closePath();
+  ctx.fill();
+
+  ctx.fillStyle = p.chipText;
+  ctx.font = `800 ${px}px ${DISPLAY}`;
+  ctx.direction = isRtlText(text) ? "rtl" : "ltr";
+  let y = bubbleTop + pad;
+  for (const row of rows) {
+    if (row === null) {
+      y += gap;
+      continue;
+    }
+    ctx.fillText(row, cx, y + px * 0.95);
+    y += lh;
+  }
+  ctx.direction = "ltr";
+
+  ctx.fillStyle = p.text;
+  const ctaPx = fitFontSize(
+    display,
+    "send me anonymous messages",
+    maxW,
+    64,
+    34
+  );
+  ctx.font = `800 ${ctaPx}px ${DISPLAY}`;
+  ctx.fillText("send me anonymous messages", cx, 1260);
+
+  const chipPad = 48;
+  const inner = maxW - chipPad * 2;
+  const shown = url.replace(/^https?:\/\//, "");
+  const urlPx = fitFontSize(sans, shown, inner, 54, 26);
+  const urlText = ellipsize(sans, shown, inner, urlPx);
+  const chipW = Math.min(maxW, sans(urlText, urlPx) + chipPad * 2);
+  const chipH = 120;
+  const chipY = 1330;
   ctx.fillStyle = p.chip;
   roundRect(ctx, cx - chipW / 2, chipY, chipW, chipH, chipH / 2);
   ctx.fill();

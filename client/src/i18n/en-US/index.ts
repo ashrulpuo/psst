@@ -155,6 +155,14 @@ export default {
     guestSender:
       "They haven't signed in, so you can't reply yet. If they sign in, you'll be able to chat.",
     signInToReply: "Sign in to chat before you reply.",
+    shareStory: "Share this note to your story",
+    shareNoticeTitle: "Share to story",
+    shareNotice:
+      "Sharing shows this note to your followers. The sender stays anonymous.",
+    shareContinue: "Share",
+    shareCancel: "Cancel",
+    shareSaved: "Story card saved. Post it to your story.",
+    shareFailed: "Couldn't make the story card. Try again.",
     report: "Report message",
     reportTitle: "Report this message",
     reportReason: "What's wrong with it?",

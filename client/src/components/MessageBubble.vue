@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Flag, RotateCw, Trash2 } from "@lucide/vue";
+import { Flag, RotateCw, Share2, Trash2 } from "@lucide/vue";
 import type { Message } from "@/api/types";
 import { clockTime } from "@/utils/format";
 import ReactionBar from "@/components/ReactionBar.vue";
@@ -9,8 +9,10 @@ withDefaults(
     message: Message;
     canReport: boolean;
     reactionsDisabled?: boolean;
+    canShare?: boolean;
+    sharing?: boolean;
   }>(),
-  { reactionsDisabled: false }
+  { reactionsDisabled: false, canShare: false, sharing: false }
 );
 
 defineEmits<{
@@ -18,6 +20,7 @@ defineEmits<{
   retry: [message: Message];
   remove: [message: Message];
   react: [message: Message, emoji: string];
+  share: [message: Message];
 }>();
 </script>
 
@@ -73,7 +76,19 @@ defineEmits<{
       </q-btn>
     </template>
     <q-btn
-      v-else-if="canReport && !message.mine"
+      v-if="canShare && !message.mine && !message.pending && !message.failed"
+      flat
+      round
+      dense
+      class="hit share"
+      :disable="sharing"
+      :aria-label="$t('thread.shareStory')"
+      @click="$emit('share', message)"
+    >
+      <Share2 :size="18" />
+    </q-btn>
+    <q-btn
+      v-if="canReport && !message.mine && !message.failed"
       flat
       round
       dense
@@ -153,6 +168,13 @@ defineEmits<{
   color: var(--text-3);
   opacity: 0.7;
   transition: opacity var(--dur) var(--ease);
+}
+.share {
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  min-height: 44px;
+  color: var(--text-2);
 }
 .report:hover,
 .report:focus-visible {
