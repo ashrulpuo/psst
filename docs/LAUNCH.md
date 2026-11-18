@@ -58,6 +58,14 @@ not announced.
 - [ ] **Delete account.** With a spare test account: Settings, "Delete account", type the name to confirm. Pass: the
       account is gone and its link no longer resolves.
 
+### Guest network identity
+
+- [ ] **Per-network `ip_hash` is distinct.** Send guest messages from two different networks, including a phone on
+      mobile data (not the same Wi-Fi). Then run on the database:
+      `select count(distinct ip_hash) from threads where sender_id is null and created_at > now() - interval '1 hour';`
+      Pass: 2 or more. Fail: 1 means client IPs are collapsing (IPv6 behind the Docker proxy, or Cloudflare proxying
+      the domain); see `docs/DEPLOY.md` section 1 step 2.
+
 ### Browser suites against the live origin
 
 - [ ] `BASE_URL=https://<domain> pnpm e2e` in `client/`, plus the other client suites you want (`e2e:realtime`,

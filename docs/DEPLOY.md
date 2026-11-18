@@ -17,7 +17,13 @@ checklist into a fill-in table.
 1. A Linux VPS with a public IPv4 address, at least 2 GB RAM, Docker Engine and the Docker Compose plugin, `git`,
    Node.js 22.12 or newer (24 also works; `client/package.json` requires `>= 26 || ^24 || ^22.12`) with `pnpm`. The app image is built from `php:8.3-fpm-alpine` and the project is pinned to PHP 8.3, so
    there is nothing to install for PHP on the host.
-2. An `A` record (and `AAAA` if you have IPv6) for `<domain>` pointing at the VPS. Wait for it to resolve.
+2. An `A` record for `<domain>` pointing at the VPS. Wait for it to resolve. **Do not publish an `AAAA` record**
+   unless Docker IPv6 is enabled (`"ipv6": true` and `"ip6tables": true` in `/etc/docker/daemon.json`, plus
+   `enable_ipv6: true` on the compose public network). Without that, Docker's userland proxy rewrites every IPv6
+   client to the same internal address, so all IPv6 visitors share one per-IP rate limit and one `ip_hash`, and guest
+   blocks and limits collapse onto a single bucket. Keep the record DNS-only: do not proxy the domain through
+   Cloudflare (orange cloud). Behind the proxy the app sees Cloudflare edge IPs, so per-IP limits and `ip_hash` would
+   key on the edge, not the visitor.
 3. Open inbound ports 80 and 443 (TCP) and 443 (UDP, HTTP/3). Caddy needs port 80 reachable to obtain the
    certificate. Nothing else should be public: Postgres and Redis are only on the internal Docker network.
 4. Clone the repository on the server and work from the checkout.
