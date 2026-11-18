@@ -1,6 +1,6 @@
-// Story cards: a 1080x1920 PNG the owner posts to a story. Task 13 adds the
-// received-note card on top of the helpers below (one shared canvas, text
-// fitting, font loading and shareImage).
+// Story cards: 1080x1920 PNGs the owner posts to a story. renderStoryCard
+// (the link card) and renderNoteCard (a received note) share one canvas, text
+// fitting, font loading and shareImage.
 
 export const STORY_TEMPLATES = [
   "sunset",
@@ -124,7 +124,7 @@ export function ellipsize(
   return chars.slice(0, lo).join("") + "…";
 }
 
-/** Greedy word wrap; words wider than maxWidth are hard-split. Pure . */
+/** Greedy word wrap; words wider than maxWidth are hard-split. Pure. */
 export function wrapText(
   measure: Measure,
   text: string,

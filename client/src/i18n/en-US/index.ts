@@ -158,7 +158,7 @@ export default {
     shareStory: "Share this note to your story",
     shareNoticeTitle: "Share to story",
     shareNotice:
-      "Sharing shows this note to your followers. The sender stays anonymous.",
+      "Anyone who sees your story will be able to read this note. The card doesn't show who sent it, but the note's wording might.",
     shareContinue: "Share",
     shareCancel: "Cancel",
     shareSaved: "Story card saved. Post it to your story.",

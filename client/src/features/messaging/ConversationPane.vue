@@ -261,15 +261,15 @@ function confirmNotice() {
   } catch {
     /* private mode: the notice shows again next time */
   }
-  if (message) void shareNote(message);
+  if (message) void shareNote(message, true);
 }
 
-async function shareNote(message: Message) {
+async function shareNote(message: Message, skipNotice = false) {
   const username = auth.user?.username;
   const url = auth.profileLink;
   if (sharingId.value || !username || !url || message.mine) return;
   if (!prepareNote(message.body)) return;
-  if (!noticeSeen()) {
+  if (!skipNotice && !noticeSeen()) {
     noticeFor.value = message;
     return;
   }
@@ -418,7 +418,12 @@ async function submitReport(reason: string) {
             :message="message"
             :can-report="true"
             :reactions-disabled="Boolean(blocked || awaitingSignIn)"
-            :can-share="isInbox && !blocked && !!auth.profileLink"
+            :can-share="
+              isInbox &&
+              !blocked &&
+              !!auth.profileLink &&
+              !!prepareNote(message.body)
+            "
             :sharing="sharingId !== null"
             @share="shareNote"
             @report="reportTarget = $event"
