@@ -17,6 +17,16 @@ return [
         'max_unanswered' => 5,
     ],
 
+    'moderation' => [
+        // Inbound messages containing any of these (case-insensitive, whole words) are flagged for review but still delivered.
+        'keywords' => [
+            'kill you', 'kill yourself', 'kys', 'i will find you', 'going to hurt you', 'i will hurt you',
+            'bomb threat', 'shoot up', 'rape you', 'want to die', 'end my life', 'suicide', 'kill myself',
+        ],
+        // Where flag alerts go. Empty = no email.
+        'alert_email' => env('ADMIN_ALERT_EMAIL'),
+    ],
+
     /*
     | Local-development shortcut: POST /api/dev/login {email} returns a bearer token without Google/Apple.
     | Refuses to register in production no matter what the env says.

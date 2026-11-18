@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Messaging\GuestKey;
 use App\Models\Message;
 use App\Models\Thread;
+use App\Moderation\KeywordFlagger;
 use App\Push\FcmSender;
 use App\Push\FirebaseFcmSender;
 use App\Push\MinishlinkWebPushSender;
@@ -25,6 +26,7 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->app->bind(WebPushSender::class, MinishlinkWebPushSender::class);
         $this->app->bind(FcmSender::class, FirebaseFcmSender::class);
+        $this->app->bind(KeywordFlagger::class, fn () => new KeywordFlagger((array) config('psst.moderation.keywords')));
     }
 
     /**
