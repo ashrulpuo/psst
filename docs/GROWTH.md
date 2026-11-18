@@ -135,7 +135,7 @@ change. Treat it as a future item. Until then, carry seasonal and community prom
 
 ## 7. What to measure and when to change course
 
-Admin dashboard, "Growth" section, rolling last 7 days. The data is cached for about 60 seconds.
+Admin dashboard, "Growth" section, the last 7 UTC days (today plus the 6 before it; events are stored by UTC day only and rows older than 30 days are pruned nightly). The data is cached for about 60 seconds.
 
 | Tile | Meaning |
 |---|---|

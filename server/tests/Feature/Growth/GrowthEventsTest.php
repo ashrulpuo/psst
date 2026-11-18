@@ -7,7 +7,9 @@ use App\Admin\AdminStats;
 use App\Growth\GrowthEvents;
 use App\Models\Thread;
 use App\Models\User;
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -121,6 +123,47 @@ class GrowthEventsTest extends TestCase
         $this->assertSame(1, $growth['note_shares_7d']);
         $this->assertSame(1, $growth['own_links_after_guest_7d']);
         $this->assertSame(0.25, $growth['conversion_rate']);
+    }
+
+    public function test_events_are_stored_at_midnight_utc(): void
+    {
+        $this->travelTo(now()->utc()->setTime(15, 42, 7));
+
+        GrowthEvents::record('link_shared');
+
+        $this->assertSame(
+            now()->utc()->startOfDay()->toDateTimeString(),
+            Carbon::parse(DB::table('growth_events')->value('created_at'))->utc()->toDateTimeString(),
+        );
+    }
+
+    public function test_stats_window_is_seven_utc_days(): void
+    {
+        $this->travelTo(now()->utc()->setTime(15, 0));
+        $day = fn (int $ago) => now()->utc()->startOfDay()->subDays($ago);
+        DB::table('growth_events')->insert([
+            ['name' => 'guest_sent', 'created_at' => $day(6)],
+            ['name' => 'guest_sent', 'created_at' => $day(7)],
+            ['name' => 'guest_sent', 'created_at' => $day(8)],
+        ]);
+        Cache::forget('admin.overview');
+
+        $this->assertSame(1, app(AdminStats::class)->overview()['growth']['guest_sends_7d']);
+    }
+
+    public function test_prune_deletes_rows_older_than_thirty_days_only(): void
+    {
+        DB::table('growth_events')->insert([
+            ['name' => 'guest_sent', 'created_at' => now()->subDays(31)],
+            ['name' => 'guest_sent', 'created_at' => now()->subDays(29)],
+        ]);
+
+        $event = collect(app(Schedule::class)->events())
+            ->first(fn ($e) => $e->description === 'growth-prune');
+        $this->assertNotNull($event);
+        $event->run(app());
+
+        $this->assertSame(1, DB::table('growth_events')->count());
     }
 
     public function test_record_ignores_unknown_names(): void

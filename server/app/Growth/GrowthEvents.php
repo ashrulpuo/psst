@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\DB;
 use Throwable;
 
 /**
- * Aggregate growth counters. Stores the event name and a timestamp only; never who did it.
+ * Aggregate growth counters. Stores the event name and the UTC day (midnight) only; never who did it, and no time of day.
  */
 class GrowthEvents
 {
@@ -23,7 +23,7 @@ class GrowthEvents
         }
 
         try {
-            DB::table('growth_events')->insert(['name' => $name, 'created_at' => now()]);
+            DB::table('growth_events')->insert(['name' => $name, 'created_at' => now()->utc()->startOfDay()]);
         } catch (Throwable $e) {
             report($e);
         }

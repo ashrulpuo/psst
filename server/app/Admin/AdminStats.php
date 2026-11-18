@@ -56,7 +56,7 @@ class AdminStats
     }
 
     /**
-     * Aggregate growth counters for the last 7 days. The conversion rate is own links created after a guest
+     * Aggregate growth counters for the last 7 UTC days (today plus the 6 before it). The conversion rate is own links created after a guest
      * send, per guest send; null when nobody has sent as a guest yet.
      *
      * @return array<string, int|float|null>
@@ -64,7 +64,7 @@ class AdminStats
     private function growth(Carbon $now): array
     {
         $counts = DB::table('growth_events')
-            ->where('created_at', '>=', $now->copy()->subDays(7))
+            ->where('created_at', '>=', $now->copy()->utc()->startOfDay()->subDays(6))
             ->selectRaw('name, count(*) as total')
             ->groupBy('name')
             ->pluck('total', 'name');

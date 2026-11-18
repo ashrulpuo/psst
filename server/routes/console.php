@@ -2,6 +2,7 @@
 
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schedule;
 
 Artisan::command('inspire', function () {
@@ -9,3 +10,5 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote');
 
 Schedule::command('psst:backup')->dailyAt('03:00')->onOneServer();
+Schedule::call(fn () => DB::table('growth_events')->where('created_at', '<', now()->subDays(30))->delete())
+    ->daily()->name('growth-prune')->onOneServer();
