@@ -10,14 +10,22 @@ made), `docs/DEPLOY.md` (setup, referenced here by section number), `docs/GROWTH
 Things the build could not test, because they need your real domain, accounts or a real phone, are collected in
 "Known unverified items from the build" after M3. Work through them during M2 and M3.
 
-Values you must supply (fill in before starting):
+Secrets: put real values only in `deploy/.env` and a password manager. Never write them in this file, a commit or a
+chat. A command that takes a secret inline, such as `BACKUP_PASSPHRASE='...' scripts/restore-backup.sh` in
+`docs/DEPLOY.md` section 9, leaves it in your shell history; clear it afterwards or export it from a prompt instead.
+
+Values you must supply (fill in before starting; for secrets, tick only that they are stored, never write the value):
 
 - Domain: `[FILL IN: <domain>]`
-- SMTP provider and account for the owner alert: `[FILL IN]`
-- Turnstile site and secret keys: `[FILL IN]`
-- Backup destination (S3-compatible bucket) and a passphrase copy kept off the server: `[FILL IN]`
+- SMTP provider and account name for the owner alert: `[FILL IN]`; SMTP password stored in password manager: yes / no
+- Turnstile site key and secret key stored in password manager: yes / no
+- Backup destination (S3-compatible bucket name, not its keys): `[FILL IN]`; bucket keys and `BACKUP_PASSPHRASE` (a copy
+  kept off the server) stored in password manager: yes / no
 - Play account type (personal or organisation; only matters for M5): `[FILL IN]`
 - Announcement community and time: `[FILL IN]` (same field as `docs/GROWTH.md` section 2)
+
+`docker compose` commands run from the `deploy/` directory (`docs/DEPLOY.md` intro), and `php artisan` commands run
+inside the `app` container.
 
 Use two browsers (or one normal and one private window) for the guest steps, and a real phone for the story cards.
 
@@ -56,7 +64,7 @@ not announced.
       `e2e:account`, `e2e:guest`, `e2e:two-people`; see the `scripts` block of `client/package.json`) and `pnpm e2e` in
       `admin/`. Pass: every suite you run passes. Some suites may sign in with the dev login, which is off in
       production: read each script's header first and skip or adapt those. Do not turn the dev login on in production
-      to make them pass.
+      to make them pass. Run the guest suites before Turnstile is on (M3); with it on they may fail for lack of a token.
 
 ### Push
 
@@ -77,8 +85,9 @@ not announced.
 - [ ] **Backup.** `docker compose exec app php artisan psst:backup`. Pass: prints `Uploaded psst-...sql.gz.enc` and the
       file is in the bucket (`docs/DEPLOY.md` section 9).
 - [ ] **Restore into a scratch database** with `scripts/restore-backup.sh` as in `docs/DEPLOY.md` section 9. Pass:
-      `restored ... into psst_restore_test` and a plausible `select count(*) from users;`. Then `dropdb`. Never point the
-      script at the live database.
+      `restored ... into psst_restore_test` and a plausible `select count(*) from users;`. Then `dropdb`. The restore
+      runs on a host that has `psql`, `openssl` and `gunzip`, not inside the app image. Never point the script at the
+      live database.
 
 ### Story cards on a real phone
 
@@ -99,19 +108,27 @@ with no open bug rated blocking.
       no token) prints `422` and the body says "We could not verify you are human", and a real guest send through the
       browser widget still works. A `201` means the secret is empty (the challenge is off), and that run creates a
       real message.
+- [ ] **Dev login is off in production.** In `deploy/.env`: `grep -x 'PSST_DEV_LOGIN=false' deploy/.env` prints the
+      line. In `client/.env` (the example defaults it to `true`): `grep -x 'QCLI_DEV_LOGIN=false' client/.env` prints the
+      line, and the client was rebuilt after that value was set (`docs/DEPLOY.md` section 4). On the live site:
+      `curl -sk -o /dev/null -w '%{http_code}\n' -X POST https://<domain>/api/dev/login -H 'Content-Type: application/json' -H 'Accept: application/json' -d '{"email":"x@example.test"}'`
+      prints `404` (the route is not registered in production), and the login page at `https://<domain>/login` shows
+      only the real sign-in buttons, no dev sign-in block.
 - [ ] **Terms and Privacy reachable.** `https://<domain>/terms` and `https://<domain>/privacy` load while signed out,
       are linked from sign-in and Settings, and the contact line is a real address (see carry-forward below).
 - [ ] **Abuse drill (design doc section 5, M3 exit).** Do all of these in one sitting:
   - [ ] Owner alert configured: `ADMIN_ALERT_EMAIL` and the `MAIL_*` values in `deploy/.env` (`docs/DEPLOY.md`
-        section 2), containers recreated.
+        section 2), containers recreated. `APP_URL` is `https://<domain>` exactly, because the email's link is built from
+        it. The alert is a queued job, so the `queue` container must be running or no email is sent.
   - [ ] As a guest, send a message containing a default flag keyword (list: `moderation.keywords` in
         `server/config/psst.php`). Pass: the receiver still gets the message normally (flagged messages are delivered).
   - [ ] Open `https://<domain>/admin/flags` as the admin. Pass: the message is in the open tab; marking it reviewed
         moves it to the reviewed tab.
   - [ ] Pass: the owner email arrives (at most one per 10 minutes), contains no message text, and its link goes to
-        `https://<domain>/admin/flags`.
-  - [ ] Ban a signed-in test sender from the admin Users page. Pass: that account is refused on its next request;
-        unbanning restores it.
+        `https://<domain>/admin/flags`. A second flagged message within 10 minutes does not send a second email; to
+        retest, wait 10 minutes or clear the cache.
+  - [ ] Ban a signed-in test sender from the admin Users page. Pass: that account's next request is refused with HTTP
+        403 and the message "This account has been suspended."; unbanning restores it.
   - [ ] As a receiver, block a guest, then send again as that guest. Pass: the guest sees a normal success, nothing
         reaches that receiver, and a different receiver still receives that guest's messages (blocks are per receiver).
 
@@ -122,7 +139,7 @@ with no open bug rated blocking.
       and has no request body, cookies, query string, user or IP.
 - [ ] **Uptime check green.** A monitor on `https://<domain>/up` every 1 to 5 minutes, alerting your email
       (`docs/DEPLOY.md` section 11). Pass: green, and briefly stopping `app` (`docker compose stop app`, then
-      `docker compose start app`) fires the alert.
+      `docker compose start app`) fires the alert. This takes the site down: do it only before announcing.
 
 ### Sign-in and previews
 
