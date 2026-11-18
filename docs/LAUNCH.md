@@ -273,8 +273,8 @@ What to do:
 1. Bad deploy: roll back as in `docs/DEPLOY.md` section 10 (previous `APP_TAG`, `docker compose up -d --no-build`;
    rebuild the front-ends from the previous commit if the bug is in the UI). Do not run `migrate:rollback`. Damaged
    data: restore from backup (`docs/DEPLOY.md` section 9).
-2. Abuse: use the levers that exist, in `docs/GROWTH.md` section 8: turn Turnstile on if it is off, ban abusers, resolve
-   reports, tell receivers they can block, and tighten the `messages` limiter in
-   `server/app/Providers/AppServiceProvider.php` (a code change plus a redeploy).
-3. There is no pause switch for guest sends. If you need one it has to be built first; until then, stopping the
-   announcement is the only brake on new traffic.
+2. Abuse: use the levers in `docs/GROWTH.md` section 8: turn Turnstile on if it is off, ban abusers, resolve
+   reports, tell receivers they can block, and tighten the `PSST_GUEST_*` limits in `deploy/.env`.
+3. Pause guest sends: set `PSST_GUEST_SENDS=false` in `deploy/.env` and run
+   `docker compose up -d --force-recreate app` (plus `php artisan config:cache` if config is cached). Guests get a 503
+   with a friendly message; signed-in senders keep working. Set it back to `true` and recreate to resume.

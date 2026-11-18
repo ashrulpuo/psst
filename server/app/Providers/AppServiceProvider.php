@@ -44,8 +44,8 @@ class AppServiceProvider extends ServiceProvider
 
             if ($user) {
                 return [
-                    Limit::perMinute(20)->by($user->id),
-                    Limit::perDay(300)->by($user->id),
+                    Limit::perMinute((int) config('psst.rate_limits.user_per_minute'))->by($user->id),
+                    Limit::perDay((int) config('psst.rate_limits.user_per_day'))->by($user->id),
                 ];
             }
 
@@ -53,10 +53,10 @@ class AppServiceProvider extends ServiceProvider
             $token = GuestKey::presented($request);
 
             return array_filter([
-                Limit::perMinute(4)->by('g-ip:'.$request->ip()),
-                Limit::perHour(30)->by('g-ip-h:'.$request->ip()),
-                $token ? Limit::perMinute(3)->by('g-tok:'.GuestKey::hashToken($token)) : null,
-                Limit::perHour(200)->by('g-to:'.$request->route('username')),
+                Limit::perMinute((int) config('psst.rate_limits.guest_per_ip_minute'))->by('g-ip:'.$request->ip()),
+                Limit::perHour((int) config('psst.rate_limits.guest_per_ip_hour'))->by('g-ip-h:'.$request->ip()),
+                $token ? Limit::perMinute((int) config('psst.rate_limits.guest_per_token_minute'))->by('g-tok:'.GuestKey::hashToken($token)) : null,
+                Limit::perHour((int) config('psst.rate_limits.guest_per_target_hour'))->by('g-to:'.$request->route('username')),
             ]);
         });
         // Second-factor attempts are the brute-force target: a 6-digit code must not be guessable.

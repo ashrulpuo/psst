@@ -14,6 +14,21 @@ return [
         'welcome', 'sent',
     ],
 
+    /*
+    | Send limits behind the `messages` limiter. Env overrides; changing them needs the app container recreated.
+    */
+    'rate_limits' => [
+        'guest_per_ip_minute' => (int) env('PSST_GUEST_PER_IP_MINUTE', 4),
+        'guest_per_ip_hour' => (int) env('PSST_GUEST_PER_IP_HOUR', 30),
+        'guest_per_token_minute' => (int) env('PSST_GUEST_PER_TOKEN_MINUTE', 3),
+        'guest_per_target_hour' => (int) env('PSST_GUEST_PER_TARGET_HOUR', 200),
+        'user_per_minute' => (int) env('PSST_USER_PER_MINUTE', 20),
+        'user_per_day' => (int) env('PSST_USER_PER_DAY', 300),
+    ],
+
+    // Pause switch: false makes anonymous (guest) sends return 503; signed-in senders are unaffected.
+    'guest_sends_enabled' => (bool) env('PSST_GUEST_SENDS', true),
+
     'messages' => [
         // A sender may not send more than this many messages in a row without a reply.
         'max_unanswered' => 5,

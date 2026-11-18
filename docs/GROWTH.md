@@ -179,12 +179,15 @@ What exists:
   per hour per IP, 3 per minute per browser token, 200 per hour per target username. Signed-in users: 20 per minute and
   300 per day.
 
-Gaps: there is no "pause guest sends" switch. The rate limits have no config or env knob; they are hard-coded in
-`AppServiceProvider.php`.
+Levers (env in `deploy/.env`, read by `server/config/psst.php`): `PSST_GUEST_SENDS=false` pauses anonymous sending
+(guests get a 503 "Anonymous sending is paused for a moment."; signed-in senders are unaffected), and the limits above
+are `PSST_GUEST_PER_IP_MINUTE`, `PSST_GUEST_PER_IP_HOUR`, `PSST_GUEST_PER_TOKEN_MINUTE`, `PSST_GUEST_PER_TARGET_HOUR`,
+`PSST_USER_PER_MINUTE` and `PSST_USER_PER_DAY`. After editing `.env` run
+`docker compose up -d --force-recreate app` (a plain restart does not re-read it), and `php artisan config:cache` if
+config is cached.
 
 If abuse jumps:
 1. Turn Turnstile on if it is off (set both keys, rebuild the client, redeploy).
 2. Ban abusers, resolve reports, and tell receivers they can block.
-3. Tighten the guest limits by editing the `messages` limiter in `AppServiceProvider.php` and redeploying. This is a
-   code change, not a runtime lever.
-4. Stop posting your link until it calms down. If a pause switch is needed, it has to be built first.
+3. Tighten the guest limits with the `PSST_GUEST_*` env values and recreate the `app` container.
+4. Set `PSST_GUEST_SENDS=false` to pause anonymous sending outright, and stop posting your link until it calms down.

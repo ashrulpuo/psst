@@ -109,6 +109,13 @@ copy outside this server.**
 | `BACKUP_S3_SECRET` | secret access key | yes (empty) |
 | `BACKUP_S3_REGION` | `auto`; change only if your provider needs a real region | yes |
 
+### Send limits and the guest pause
+
+`PSST_GUEST_SENDS` (default `true`) pauses anonymous sending when `false`; the limits are `PSST_GUEST_PER_IP_MINUTE`
+(4), `PSST_GUEST_PER_IP_HOUR` (30), `PSST_GUEST_PER_TOKEN_MINUTE` (3), `PSST_GUEST_PER_TARGET_HOUR` (200),
+`PSST_USER_PER_MINUTE` (20) and `PSST_USER_PER_DAY` (300). All are in `deploy/.env.example`. Changes need
+`docker compose up -d --force-recreate app` (and `php artisan config:cache` if config is cached).
+
 ### Needed from the later task
 
 The code at the commit this runbook was written against does not read these yet. They are listed so the table stays
