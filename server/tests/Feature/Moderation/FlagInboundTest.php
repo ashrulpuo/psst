@@ -9,6 +9,7 @@ use App\Models\Thread;
 use App\Models\User;
 use App\Moderation\FlagInbound;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Schema;
 use Tests\TestCase;
 
 class FlagInboundTest extends TestCase
@@ -72,5 +73,17 @@ class FlagInboundTest extends TestCase
         $message = app(PostMessage::class)->handle($this->thread, null, 'kill you');
 
         $this->assertNotNull($message->fresh());
+    }
+
+    public function test_a_real_sql_failure_in_the_savepoint_does_not_poison_the_send(): void
+    {
+        // Postgres DDL is transactional, so this is undone with the test's own transaction.
+        Schema::drop('message_flags');
+
+        $message = app(PostMessage::class)->handle($this->thread, null, 'I will kill you');
+
+        $this->assertSame('I will kill you', $message->fresh()->body);
+        $this->assertSame(1, $this->thread->fresh()->receiver_unread_count);
+        $this->assertSame($message->id, $this->thread->fresh()->last_message_id);
     }
 }

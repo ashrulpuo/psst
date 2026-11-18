@@ -12,6 +12,11 @@ class KeywordFlaggerTest extends TestCase
         $this->assertSame(['kill you'], (new KeywordFlagger(['kill you']))->matches('I will KILL you!'));
     }
 
+    public function test_extra_whitespace_between_words_still_flags(): void
+    {
+        $this->assertSame(['kill you'], (new KeywordFlagger(['kill you']))->matches('kill    you'));
+    }
+
     public function test_matches_whole_words_only(): void
     {
         $this->assertSame([], (new KeywordFlagger(['ass']))->matches('first class'));
