@@ -211,7 +211,7 @@ export default {
     // vue-i18n reads a bare "@" as a link and "<d" as HTML, so both are quoted literals.
     // Once the real address is known, replace the whole value with it, e.g. "hello{'@'}example.com".
     contact: "hello{'@'}{'<'}domain>",
-    updated: "Plain-language summary. Last updated November 2026.",
+    updated: "Plain-language summary. Last updated {date}.",
     back: "Back",
     contactLabel: "Questions or reports? Write to",
     footerLabel: "Legal",
@@ -229,7 +229,7 @@ export default {
         },
         anonymity: {
           heading: "Who can see who you are",
-          body: "The person you message never sees who you are. If you send as a guest, Psst admins cannot identify you either. If you send while signed in, Psst admins can see which account the message came from, so we can deal with abuse. Anonymous to the receiver does not mean untraceable in every situation, so don't send anything you would not be willing to stand behind."
+          body: "The person you message never sees who you are. If you send as a guest, Psst admins cannot identify you either. If you send while signed in, Psst admins can see which account the message came from, so we can deal with abuse. If you send as a guest and later sign in on the same browser, your earlier guest messages are linked to that account, so admins could then identify you as their sender. Anonymous to the receiver does not mean untraceable in every situation, so don't send anything you would not be willing to stand behind."
         },
         yourPart: {
           heading: "What we ask of you",
@@ -241,7 +241,7 @@ export default {
         },
         safety: {
           heading: "Blocking and reporting",
-          body: "You can block a sender, and they are not told. You can report any message you receive, and we will look at it."
+          body: "You can block a sender. A signed-in sender will see that they can no longer message you; a blocked guest's messages are quietly dropped. You can report any message you receive. Admins can open conversations to investigate abuse and review reports, and each time they do it is logged."
         },
         bans: {
           heading: "Bans",
@@ -249,7 +249,7 @@ export default {
         },
         deleting: {
           heading: "Leaving",
-          body: "You can delete your account at any time: open Settings, choose Delete my account, and type your username to confirm. This erases your account, your link and your conversations, including the messages you sent. It can't be undone."
+          body: "You can delete your account at any time: open Settings, choose Delete my account, and type your username to confirm. This erases your account, your link and your conversations, including the messages you sent. It can't be undone. We keep one minimal record that an account was deleted, with an opaque id and no name or message text. Encrypted backups roll off within 14 days."
         },
         asIs: {
           heading: "No guarantees",
@@ -269,19 +269,19 @@ export default {
       sections: {
         anonymity: {
           heading: "Anonymity, exactly",
-          body: "The person you message never sees your name, email or account. Psst admins can identify a signed-in sender, because the message is tied to that account. Admins cannot identify a guest, because a guest has no account. We don't claim more than that."
+          body: "The person you message never sees your name, email or account. Psst admins can identify a signed-in sender, because the message is tied to that account. Admins cannot identify a guest, because a guest has no account. The exception: if a guest later signs in on the same browser, their earlier guest messages are linked to the account, and admins could then identify them. We don't claim more than that."
         },
         collect: {
           heading: "What we keep",
-          body: "If you sign in, we keep your sign-in email, your username, your messages and conversations, your blocks and reports, and the settings you choose, such as notifications. For guests we keep the message, a marker for the browser so a reply can reach it, and a scrambled (hashed) form of the network address so a receiver's block can hold."
+          body: "If you sign in, we keep what your sign-in provider gives us (your name, email address and profile picture from Google, plus the provider's account id), when you last signed in, your username, your messages and conversations, your blocks and reports, and the settings you choose, such as notifications. For guests we keep the message, a marker for the browser so a reply can reach it, and a scrambled (hashed) form of the network address so a receiver's block can hold."
         },
         encryption: {
           heading: "Messages are stored encrypted",
-          body: "Message text is encrypted when it is stored. It is decrypted so the people in the conversation can read it, and so our team can review a message that has been reported."
+          body: "Message text is encrypted at rest. Admins can open conversations to investigate abuse and review reports, and each access is logged."
         },
         usage: {
           heading: "Anonymous usage counts",
-          body: "We collect aggregate counts, such as how many messages are sent or how many people visit. These counts are not linked to a person."
+          body: "We collect aggregate counts of accounts and messages, such as how many accounts exist and how many messages are sent per day. These counts are not linked to a person."
         },
         sharing: {
           heading: "Who we share it with",
@@ -293,11 +293,11 @@ export default {
         },
         delete: {
           heading: "Deleting your data",
-          body: "Open Settings, choose Delete my account, and type your username. Your account, link and conversations, including the messages you sent, are erased. Copies that other people already made are outside our control."
+          body: "Open Settings, choose Delete my account, and type your username. Your account, link and conversations, including the messages you sent, are erased. We keep one minimal record that an account was deleted, with an opaque id and no name or message text. Encrypted backups roll off within 14 days. Copies that other people already made are outside our control."
         },
         safety: {
           heading: "Blocking, reporting and bans",
-          body: "Blocking is private; the sender isn't told. A reported message is seen by our team. Accounts that abuse Psst are banned."
+          body: "If you block a signed-in sender, they will see that they can no longer message you; a blocked guest's messages are quietly dropped. Reports are reviewed by our team. Accounts that abuse Psst are banned."
         }
       }
     }

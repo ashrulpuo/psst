@@ -6,6 +6,12 @@ import { useI18n } from "vue-i18n";
 const { t } = useI18n();
 useMeta({ title: `${t("legal.privacy.title")} · Psst` });
 
+// Bump when the text changes.
+const updated = new Date("2026-11-18").toLocaleDateString("en", {
+  month: "long",
+  year: "numeric"
+});
+
 const sections = [
   "anonymity",
   "collect",
@@ -23,7 +29,7 @@ const sections = [
     <header class="head">
       <h1>{{ $t("legal.privacy.title") }}</h1>
       <p class="text-secondary-copy">{{ $t("legal.privacy.intro") }}</p>
-      <p class="tiny">{{ $t("legal.updated") }}</p>
+      <p class="tiny">{{ $t("legal.updated", { date: updated }) }}</p>
     </header>
 
     <section v-for="key in sections" :key="key" class="block">
