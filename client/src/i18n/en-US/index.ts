@@ -30,6 +30,17 @@ export default {
     storyTitle: "story card",
     signInToChat: "Sign in to chat",
     storyBody: "9:16 · ready to post",
+    storyStyle: "Story card style",
+    storyShare: "Share story card",
+    storySaved: "Story card saved. Post it to your story.",
+    storyFailed: "Couldn't make the story card. Try again.",
+    template: {
+      sunset: "Sunset",
+      mint: "Mint",
+      ink: "Ink",
+      candy: "Candy",
+      paper: "Paper"
+    },
     prompt: "ask me anything",
     hint: "Share this. New messages land in your inbox.",
     step1: "Step 1: Copy your link",
