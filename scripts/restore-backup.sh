@@ -38,6 +38,6 @@ fi
 
 openssl enc -d -aes-256-cbc -pbkdf2 -pass env:BACKUP_PASSPHRASE -in "$file" \
   | gunzip \
-  | psql -X -q -v ON_ERROR_STOP=1
+  | psql -X -q --single-transaction -v ON_ERROR_STOP=1
 
 echo "restored $file into $DB_DATABASE"

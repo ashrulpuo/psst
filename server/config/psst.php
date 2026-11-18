@@ -61,7 +61,8 @@ return [
         'disk' => 'backups',
         // Encrypts the nightly dump. Empty = the backup command refuses to run.
         'passphrase' => env('BACKUP_PASSPHRASE', ''),
-        'keep_days' => 14,
+        // Prune runs only after a successful backup, so 13 keeps the "within 14 days" promise in the privacy copy true.
+        'keep_days' => 13,
     ],
 
     'auth' => [

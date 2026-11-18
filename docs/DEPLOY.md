@@ -95,7 +95,8 @@ Keep the defaults already in the example: `DB_*`, `REDIS_HOST=redis`, `LOG_CHANN
 ### Backups
 
 Nightly at 03:00 the `scheduler` service runs `php artisan psst:backup`: a `pg_dump`, gzip, AES-256 encryption and an
-upload to an S3-compatible bucket on the `backups` disk. Backups older than 14 days are pruned. With
+upload to an S3-compatible bucket on the `backups` disk. Backups older than 13 days are pruned (`psst.backup.keep_days`; pruning runs only after a successful backup, so
+encrypted copies are gone within the 14 days the privacy page promises). With
 `BACKUP_PASSPHRASE` empty the command refuses to run. **Losing the passphrase makes every backup unreadable: keep a
 copy outside this server.**
 

@@ -6,6 +6,7 @@ use Illuminate\Console\Command;
 use Illuminate\Contracts\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Process;
 use Illuminate\Support\Facades\Storage;
+use RuntimeException;
 use Throwable;
 
 class BackupDatabase extends Command
@@ -19,6 +20,7 @@ class BackupDatabase extends Command
         $passphrase = (string) config('psst.backup.passphrase');
         if ($passphrase === '') {
             $this->error('BACKUP_PASSPHRASE is not set; refusing to write an unencrypted backup.');
+            $this->reportFailure();
 
             return self::FAILURE;
         }
@@ -44,6 +46,7 @@ class BackupDatabase extends Command
 
             if ($result->failed()) {
                 $this->error('Backup failed: '.trim($result->errorOutput()));
+                $this->reportFailure();
 
                 return self::FAILURE;
             }
@@ -64,11 +67,18 @@ class BackupDatabase extends Command
             return self::SUCCESS;
         } catch (Throwable $e) {
             $this->error('Backup failed: '.$e->getMessage());
+            $this->reportFailure();
 
             return self::FAILURE;
         } finally {
             @unlink($tmp);
         }
+    }
+
+    /** Reaches the error tracker. Generic on purpose: the process error output can contain hostnames. */
+    private function reportFailure(): void
+    {
+        report(new RuntimeException('psst:backup failed'));
     }
 
     private function prune(Filesystem $disk): void

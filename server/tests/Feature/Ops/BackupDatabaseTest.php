@@ -3,8 +3,10 @@
 namespace Tests\Feature\Ops;
 
 use Illuminate\Process\PendingProcess;
+use Illuminate\Support\Facades\Exceptions;
 use Illuminate\Support\Facades\Process;
 use Illuminate\Support\Facades\Storage;
+use RuntimeException;
 use Tests\TestCase;
 
 class BackupDatabaseTest extends TestCase
@@ -13,7 +15,7 @@ class BackupDatabaseTest extends TestCase
     {
         parent::setUp();
 
-        config(['psst.backup.disk' => 'backups', 'psst.backup.passphrase' => 'correct horse battery staple', 'psst.backup.keep_days' => 14]);
+        config(['psst.backup.disk' => 'backups', 'psst.backup.passphrase' => 'correct horse battery staple', 'psst.backup.keep_days' => 13]);
         Storage::fake('backups');
     }
 
@@ -53,9 +55,12 @@ class BackupDatabaseTest extends TestCase
     {
         Process::fake(fn () => Process::result(errorOutput: 'pg_dump: boom', exitCode: 1));
 
+        Exceptions::fake();
+
         $this->artisan('psst:backup')->assertExitCode(1);
 
         $this->assertSame([], Storage::disk('backups')->files());
+        Exceptions::assertReported(fn (RuntimeException $e) => $e->getMessage() === 'psst:backup failed');
     }
 
     public function test_it_refuses_to_run_without_a_passphrase(): void
