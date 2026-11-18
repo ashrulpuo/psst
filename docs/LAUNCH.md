@@ -66,6 +66,12 @@ not announced.
       Pass: 2 or more. Fail: 1 means client IPs are collapsing (IPv6 behind the Docker proxy, or Cloudflare proxying
       the domain); see `docs/DEPLOY.md` section 1 step 2.
 
+### WhatsApp in-app browser
+
+- [ ] **No reload loop.** On an Android phone, send yourself your link in WhatsApp and open it inside WhatsApp's in-app
+      browser. Pass: the app loads and stays (not a preview page, not a reload loop). The Caddy preview matcher only
+      treats the crawler (User-Agent starting `WhatsApp/`) as a bot.
+
 ### Browser suites against the live origin
 
 - [ ] `BASE_URL=https://<domain> pnpm e2e` in `client/`, plus the other client suites you want (`e2e:realtime`,

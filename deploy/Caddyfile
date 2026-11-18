@@ -33,7 +33,7 @@
 	# same as SetUsernameRequest and the API routes. Reserved names (terms, admin, ...) that are not excluded here
 	# are rewritten but 404 in PHP via psst.reserved_usernames, so they never produce a preview.
 	@preview {
-		header_regexp ua User-Agent (?i)(facebookexternalhit|meta-externalagent|Twitterbot|Slackbot|WhatsApp|TelegramBot|LinkedInBot|Discordbot|Googlebot|bingbot)
+		header_regexp ua User-Agent (?i)(facebookexternalhit|meta-externalagent|Twitterbot|Slackbot|^WhatsApp/|TelegramBot|LinkedInBot|Discordbot|Googlebot|bingbot)
 		path_regexp user ^/([a-z0-9_.]{3,24})$
 		not path /login /terms /privacy /welcome /link /inbox /sent /settings /admin /api /app /sanctum /og.png /sw.js /manifest.json /index.html /favicon.ico /robots.txt /sitemap.xml
 	}
