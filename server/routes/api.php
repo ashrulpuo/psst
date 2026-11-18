@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AuditController;
+use App\Http\Controllers\Admin\FlagController as AdminFlagController;
 use App\Http\Controllers\Admin\OverviewController;
 use App\Http\Controllers\Admin\ReportController as AdminReportController;
 use App\Http\Controllers\Admin\ThreadController as AdminThreadController;
@@ -107,6 +108,9 @@ Route::prefix('admin')->middleware(['auth:sanctum', 'not-banned', 'admin'])->gro
         Route::get('reports', [AdminReportController::class, 'index']);
         Route::get('reports/{report}', [AdminReportController::class, 'show'])->whereUuid('report');
         Route::post('reports/{report}/resolve', [AdminReportController::class, 'resolve'])->whereUuid('report');
+
+        Route::get('flags', [AdminFlagController::class, 'index']);
+        Route::post('flags/{flag}/review', [AdminFlagController::class, 'review'])->whereUuid('flag');
 
         Route::get('audit', [AuditController::class, 'index']);
     });

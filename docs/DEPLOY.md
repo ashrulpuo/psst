@@ -83,6 +83,7 @@ Keep the defaults already in the example: `DB_*`, `REDIS_HOST=redis`, `LOG_CHANN
 | `PSST_DEV_LOGIN` | `false`. The route refuses to register in production anyway; keep it explicit. | yes |
 | `PUSH_EXTRA_ALLOWED_HOSTS` | leave unset in production | no (leave out) |
 | `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT` | from `psst:vapid` (section 7); subject `mailto:<email>` | yes (empty) |
+| `ADMIN_ALERT_EMAIL`, `MAIL_HOST`, `MAIL_PORT`, `MAIL_USERNAME`, `MAIL_PASSWORD`, `MAIL_FROM_ADDRESS` | where flagged-message alerts go (no message text in the mail) and the SMTP account that sends them; empty address = no email | yes (empty) |
 | `TURNSTILE_SECRET` | Cloudflare Turnstile secret (section 6), or empty to run without a challenge | yes (empty) |
 
 ### Backups

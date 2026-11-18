@@ -2,6 +2,7 @@
 
 namespace App\Moderation;
 
+use App\Jobs\NotifyAdminOfFlag;
 use App\Models\Message;
 use App\Models\MessageFlag;
 
@@ -18,6 +19,11 @@ class FlagInbound
             return null;
         }
 
-        return MessageFlag::create(['message_id' => $message->id, 'terms' => $terms]);
+        $flag = MessageFlag::create(['message_id' => $message->id, 'terms' => $terms]);
+
+        // Queued after the surrounding transaction commits, so a mail problem can never roll back the flag.
+        NotifyAdminOfFlag::dispatch();
+
+        return $flag;
     }
 }
