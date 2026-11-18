@@ -67,6 +67,19 @@ export interface AdminReport {
   context?: AdminMessage[];
 }
 
+export type FlagStatus = "open" | "reviewed";
+
+export interface AdminFlag {
+  id: string;
+  message_id: string;
+  thread_id: string;
+  sender_kind: "guest" | "user";
+  terms: string[];
+  body: string;
+  created_at: string;
+  reviewed_at: string | null;
+}
+
 export interface AuditEntry {
   id: string;
   action: string;

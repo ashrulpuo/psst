@@ -13,6 +13,7 @@ import {
 import {
   Flag,
   History,
+  OctagonAlert,
   LayoutDashboard,
   LogOut,
   Menu,
@@ -45,6 +46,7 @@ const items = computed(() => [
   { to: "/users", name: "users", label: "Users", icon: Users, badge: 0 },
   { to: "/threads", name: "threads", label: "Conversations", icon: MessagesSquare, badge: 0 },
   { to: "/reports", name: "reports", label: "Reports", icon: Flag, badge: overview.openReports },
+  { to: "/flags", name: "flags", label: "Flags", icon: OctagonAlert, badge: 0 },
   { to: "/audit", name: "audit", label: "Audit log", icon: History, badge: 0 },
 ]);
 
