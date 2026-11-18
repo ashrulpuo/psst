@@ -75,7 +75,7 @@ onMounted(() => void overview.load());
           />
         </section>
 
-        <section aria-labelledby="growth-heading" class="grid gap-3">
+        <section v-if="overview.data.growth" aria-labelledby="growth-heading" class="grid gap-3">
           <div>
             <h2 id="growth-heading" class="text-base font-semibold text-fg">Growth</h2>
             <p class="text-xs text-fg-3">

@@ -89,7 +89,7 @@ export default {
     signInToChat: "Sign in to chat",
     getYourOwn: "Get your own Psst link",
     ownLinkTitle: "Want your own link?",
-    ownLinkBody: "Takes 10 seconds. People message you anonymously.",
+    ownLinkBody: "People message you anonymously.",
     ownLinkCta: "Get my link",
     sent: "Sent",
     sentBody: "{name} will see it as an anonymous message.",

@@ -108,7 +108,8 @@ export interface Overview {
     open_reports: number;
   };
   series: { signups: DayCount[]; messages: DayCount[] };
-  growth: {
+  /** Absent on responses from a server that predates the growth stats. */
+  growth?: {
     guest_sends_7d: number;
     link_shares_7d: number;
     note_shares_7d: number;
