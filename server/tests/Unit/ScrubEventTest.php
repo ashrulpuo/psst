@@ -163,7 +163,28 @@ class ScrubEventTest extends TestCase
         $value = ScrubEvent::handle($this->event($message))->getExceptions()[0]->getValue();
 
         $this->assertStringNotContainsString(self::GUEST_TOKEN, $value);
-        $this->assertStringContainsString('duplicate key value', $value);
+        $this->assertSame('SQLSTATE[23505]: Unique violation', $value);
+    }
+
+    public function test_embedded_quotes_leave_no_value_fragments(): void
+    {
+        $message = 'SQLSTATE[22P02]: Invalid text representation: 7 ERROR: invalid input syntax for type uuid: "he said "hi""';
+
+        $value = ScrubEvent::handle($this->event($message))->getExceptions()[0]->getValue();
+
+        $this->assertSame('SQLSTATE[22P02]: Invalid text representation', $value);
+        $this->assertStringNotContainsString('hi', $value);
+    }
+
+    public function test_transaction_tag_does_not_survive(): void
+    {
+        $event = $this->event();
+        $event->setTags(['transaction' => '/api/profiles/alice', 'runtime' => 'php']);
+
+        $tags = ScrubEvent::handle($event)->getTags();
+
+        $this->assertArrayNotHasKey('transaction', $tags);
+        $this->assertSame('php', $tags['runtime']);
     }
 
     public function test_handles_a_bare_event(): void

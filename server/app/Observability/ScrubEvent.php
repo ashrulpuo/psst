@@ -20,7 +20,7 @@ final class ScrubEvent
 
     private const CONTEXTS = ['os', 'runtime', 'device', 'app', 'trace', 'culture'];
 
-    private const TAGS = ['environment', 'level', 'release', 'server_name', 'runtime', 'runtime.name', 'transaction', 'mechanism', 'handled'];
+    private const TAGS = ['environment', 'level', 'release', 'server_name', 'runtime', 'runtime.name', 'mechanism', 'handled'];
 
     private const MAX_MESSAGE = 200;
 
@@ -148,8 +148,9 @@ final class ScrubEvent
         $message = preg_replace('/DETAIL:.*$/s', 'DETAIL: [redacted]', $message) ?? $message;
 
         if (str_starts_with($message, 'SQLSTATE[')) {
-            // Postgres quotes the offending value in the main text as well as in DETAIL.
-            $message = preg_replace('/"[^"]*"|\'[^\']*\'/', '[value]', $message) ?? $message;
+            // Keep only the code and error class; anything after the first colon, quote or bracket may hold the value.
+            preg_match('/^SQLSTATE\[[^\]]*\]:?\s*[^:"\'(]*/', $message, $m);
+            $message = rtrim($m[0] ?? 'SQLSTATE');
         }
 
         return mb_strlen($message) > self::MAX_MESSAGE ? mb_substr($message, 0, self::MAX_MESSAGE).'... [truncated]' : $message;

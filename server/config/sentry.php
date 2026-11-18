@@ -41,10 +41,11 @@ return [
     'strict_trace_continuation' => env('SENTRY_STRICT_TRACE_CONTINUATION', false),
 
     // @see: https://docs.sentry.io/platforms/php/guides/laravel/configuration/options/#enable_logs
-    'enable_logs' => env('SENTRY_ENABLE_LOGS', false),
+    // Hard-wired off: there is no log or metric scrubber, so neither may be sent.
+    'enable_logs' => false,
 
     // @see: https://docs.sentry.io/platforms/php/guides/laravel/configuration/options/#enable_metrics
-    'enable_metrics' => env('SENTRY_ENABLE_METRICS', true),
+    'enable_metrics' => false,
 
     // @see: https://docs.sentry.io/platforms/php/guides/laravel/configuration/options/#log_flush_threshold
     'log_flush_threshold' => env('SENTRY_LOG_FLUSH_THRESHOLD') === null ? null : (int) env('SENTRY_LOG_FLUSH_THRESHOLD'),

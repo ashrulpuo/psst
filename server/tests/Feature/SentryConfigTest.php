@@ -37,6 +37,12 @@ class SentryConfigTest extends TestCase
         }
     }
 
+    public function test_logs_and_metrics_are_off(): void
+    {
+        $this->assertFalse(config('sentry.enable_logs'));
+        $this->assertFalse(config('sentry.enable_metrics'));
+    }
+
     public function test_transactions_are_dropped(): void
     {
         $this->assertNull(ScrubEvent::dropTransaction(Event::createTransaction()));
