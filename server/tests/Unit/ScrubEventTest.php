@@ -100,12 +100,12 @@ class ScrubEventTest extends TestCase
         $this->assertClean(ScrubEvent::handle($this->event()));
     }
 
-    public function test_request_keeps_only_method_and_path_without_query(): void
+    public function test_request_keeps_only_method_and_masked_url(): void
     {
         $request = ScrubEvent::handle($this->event())->getRequest();
 
         $this->assertSame('POST', $request['method']);
-        $this->assertSame('https://psst.example/api/rooms/42/messages', $request['url']);
+        $this->assertSame('https://psst.example/[path]', $request['url']);
         $this->assertArrayNotHasKey('data', $request);
         $this->assertArrayNotHasKey('cookies', $request);
         $this->assertArrayNotHasKey('query_string', $request);
@@ -172,5 +172,45 @@ class ScrubEventTest extends TestCase
 
         $this->assertSame([], $result->getExceptions());
         $this->assertNull($result->getUser());
+    }
+
+    public function test_exception_values_are_truncated(): void
+    {
+        $value = ScrubEvent::handle($this->event(str_repeat('x', 500)))->getExceptions()[0]->getValue();
+
+        $this->assertLessThanOrEqual(220, strlen($value));
+        $this->assertStringEndsWith('[truncated]', $value);
+    }
+
+    public function test_raw_pdo_message_without_connection_suffix_is_redacted(): void
+    {
+        $message = 'SQLSTATE[22P02]: Invalid text representation: 7 ERROR: invalid input syntax for type json DETAIL: Token "'.self::BODY.'" is invalid. CONTEXT: JSON data, line 1: "'.self::BODY.'"';
+
+        $result = ScrubEvent::handle($this->event($message));
+
+        $this->assertStringNotContainsString(self::BODY, $result->getExceptions()[0]->getValue());
+        $this->assertStringContainsString('SQLSTATE[22P02]', $result->getExceptions()[0]->getValue());
+
+        $quoted = 'SQLSTATE[22P02]: Invalid text representation: 7 ERROR: invalid input syntax for type uuid: "'.self::BODY.'"';
+        $this->assertStringNotContainsString(self::BODY, ScrubEvent::handle($this->event($quoted))->getExceptions()[0]->getValue());
+    }
+
+    public function test_event_level_stacktrace_is_cleared(): void
+    {
+        $event = $this->event();
+        $frame = new Frame('f', '/app/F.php', 3);
+        $frame->setVars(['body' => self::BODY]);
+        $frame->setContextLine(self::BODY);
+        $frame->setPreContext([self::BODY]);
+        $frame->setPostContext([self::BODY]);
+        $event->setStacktrace(new Stacktrace([$frame]));
+
+        $out = ScrubEvent::handle($event)->getStacktrace()->getFrames()[0];
+
+        $this->assertSame([], $out->getVars());
+        $this->assertNull($out->getContextLine());
+        $this->assertSame([], $out->getPreContext());
+        $this->assertSame([], $out->getPostContext());
+        $this->assertSame('/app/F.php', $out->getFile());
     }
 }

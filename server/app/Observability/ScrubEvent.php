@@ -2,6 +2,7 @@
 
 namespace App\Observability;
 
+use Illuminate\Support\Facades\Facade;
 use Sentry\Breadcrumb;
 use Sentry\Event;
 use Sentry\ExceptionDataBag;
@@ -21,9 +22,19 @@ final class ScrubEvent
 
     private const TAGS = ['environment', 'level', 'release', 'server_name', 'runtime', 'runtime.name', 'transaction', 'mechanism', 'handled'];
 
+    private const MAX_MESSAGE = 200;
+
+    /** before_send_transaction: tracing is not used and a half-scrubbed transaction has no value, so drop it. */
+    public static function dropTransaction(Event $event): ?Event
+    {
+        return null;
+    }
+
     public static function handle(Event $event): Event
     {
-        $event->setRequest(self::request($event->getRequest()));
+        $route = self::routeTemplate();
+        $event->setRequest(self::request($event->getRequest(), $route));
+        $event->setTransaction(self::transaction($event->getTransaction(), $route));
         $event->setUser(null);
         $event->setExtra([]);
         self::keepContexts($event);
@@ -42,6 +53,8 @@ final class ScrubEvent
             self::exception($exception);
         }
 
+        self::frames($event->getStacktrace()?->getFrames() ?? []);
+
         return $event;
     }
 
@@ -59,7 +72,7 @@ final class ScrubEvent
      * @param  array<string, mixed>  $request
      * @return array<string, mixed>
      */
-    private static function request(array $request): array
+    private static function request(array $request, ?string $route): array
     {
         $clean = [];
 
@@ -68,7 +81,9 @@ final class ScrubEvent
         }
 
         if (isset($request['url']) && is_string($request['url'])) {
-            $clean['url'] = preg_replace('/[?#].*$/', '', $request['url']);
+            // Paths carry usernames (profiles/{username}); keep scheme and host plus the route template only.
+            $origin = parse_url($request['url'], PHP_URL_SCHEME).'://'.parse_url($request['url'], PHP_URL_HOST);
+            $clean['url'] = $origin.'/'.($route !== null ? ltrim($route, '/') : '[path]');
         }
 
         $headers = array_filter(
@@ -87,8 +102,13 @@ final class ScrubEvent
     {
         $exception->setValue(self::message($exception->getValue()));
 
-        foreach ($exception->getStacktrace()?->getFrames() ?? [] as $frame) {
-            /** @var Frame $frame */
+        self::frames($exception->getStacktrace()?->getFrames() ?? []);
+    }
+
+    /** @param  Frame[]  $frames */
+    private static function frames(array $frames): void
+    {
+        foreach ($frames as $frame) {
             $frame->setVars([]);
             $frame->setContextLine(null);
             $frame->setPreContext([]);
@@ -96,11 +116,42 @@ final class ScrubEvent
         }
     }
 
+    /** The matched route's URI template (e.g. api/profiles/{username}), when a request is being handled. */
+    private static function routeTemplate(): ?string
+    {
+        $app = Facade::getFacadeApplication();
+        if ($app === null || ! $app->bound('request')) {
+            return null;
+        }
+
+        return $app->make('request')->route()?->uri();
+    }
+
+    private static function transaction(?string $name, ?string $route): ?string
+    {
+        if ($name === null) {
+            return null;
+        }
+
+        if ($route !== null) {
+            return $route;
+        }
+
+        // Unmatched requests are named after the raw path; jobs and commands have no slash.
+        return str_contains($name, '/') && ! str_contains($name, '{') ? '[path]' : $name;
+    }
+
     /** Database errors embed the bound values (the message body) in the SQL text and in Postgres DETAIL lines. */
     private static function message(string $message): string
     {
         $message = preg_replace('/\s*\((?:Connection|SQL):.*$/s', ' [query redacted]', $message) ?? $message;
+        $message = preg_replace('/DETAIL:.*$/s', 'DETAIL: [redacted]', $message) ?? $message;
 
-        return preg_replace('/DETAIL:.*$/s', 'DETAIL: [redacted]', $message) ?? $message;
+        if (str_starts_with($message, 'SQLSTATE[')) {
+            // Postgres quotes the offending value in the main text as well as in DETAIL.
+            $message = preg_replace('/"[^"]*"|\'[^\']*\'/', '[value]', $message) ?? $message;
+        }
+
+        return mb_strlen($message) > self::MAX_MESSAGE ? mb_substr($message, 0, self::MAX_MESSAGE).'... [truncated]' : $message;
     }
 }
