@@ -15,7 +15,7 @@ checklist into a fill-in table.
 ## 1. DNS and VPS prerequisites
 
 1. A Linux VPS with a public IPv4 address, at least 2 GB RAM, Docker Engine and the Docker Compose plugin, `git`,
-   Node.js 20+ with `pnpm`. The app image is built from `php:8.3-fpm-alpine` and the project is pinned to PHP 8.3, so
+   Node.js 22.12 or newer (24 also works; `client/package.json` requires `>= 26 || ^24 || ^22.12`) with `pnpm`. The app image is built from `php:8.3-fpm-alpine` and the project is pinned to PHP 8.3, so
    there is nothing to install for PHP on the host.
 2. An `A` record (and `AAAA` if you have IPv6) for `<domain>` pointing at the VPS. Wait for it to resolve.
 3. Open inbound ports 80 and 443 (TCP) and 443 (UDP, HTTP/3). Caddy needs port 80 reachable to obtain the
@@ -39,8 +39,7 @@ cp .env.example .env
 chmod 600 .env
 ```
 
-`deploy/.env.example` is production-shaped but does not contain every variable below. Add the missing ones yourself
-(the "In example?" column says which). Generate each secret with a password manager or `openssl rand -hex 24`.
+`deploy/.env.example` contains every variable below (empty ones are the ones you fill in). Generate each secret with a password manager or `openssl rand -hex 24`.
 
 Generate `APP_KEY` (needs the image, so build it first):
 
@@ -69,10 +68,10 @@ rewrite a `.env` file inside the read-only container.
 | `BROADCAST_CONNECTION` | `reverb` | yes |
 | `REVERB_APP_ID`, `REVERB_APP_KEY`, `REVERB_APP_SECRET` | random values you generate (the secret stays private; the key is also the client build's `QCLI_REVERB_KEY`) | yes (empty) |
 | `REVERB_ALLOWED_ORIGINS` | `<domain>` | yes |
-| `GOOGLE_CLIENT_IDS` | OAuth client ID from section 3 | **no, add it** |
-| `APPLE_CLIENT_IDS` | Apple Services ID; empty means Apple sign-in is rejected | **no, add it** |
-| `CORS_ALLOWED_ORIGINS` | `capacitor://localhost,https://localhost,https://<domain>` (native builds need the first two) | **no, add it** |
-| `SANCTUM_STATEFUL_DOMAINS` | `<domain>` | **no, add it** |
+| `GOOGLE_CLIENT_IDS` | OAuth client ID from section 3 | yes (empty) |
+| `APPLE_CLIENT_IDS` | Apple Services ID; empty means Apple sign-in is rejected | yes (empty) |
+| `CORS_ALLOWED_ORIGINS` | `capacitor://localhost,https://localhost,https://<domain>` (native builds need the first two) | yes (edit the domain) |
+| `SANCTUM_STATEFUL_DOMAINS` | `<domain>` | yes (edit the domain) |
 
 Keep the defaults already in the example: `DB_*`, `REDIS_HOST=redis`, `LOG_CHANNEL=stderr`, `LOG_LEVEL=info`,
 `REVERB_HOST=reverb`, `REVERB_PORT=8080`, `REVERB_SCHEME=http`.
@@ -81,10 +80,10 @@ Keep the defaults already in the example: `DB_*`, `REDIS_HOST=redis`, `LOG_CHANN
 
 | Variable | Value | In example? |
 |---|---|---|
-| `PSST_DEV_LOGIN` | `false`. The route refuses to register in production anyway; keep it explicit. | **no, add it** |
+| `PSST_DEV_LOGIN` | `false`. The route refuses to register in production anyway; keep it explicit. | yes |
 | `PUSH_EXTRA_ALLOWED_HOSTS` | leave unset in production | no (leave out) |
-| `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT` | from `psst:vapid` (section 7); subject `mailto:<email>` | **no, add them** |
-| `TURNSTILE_SECRET` | Cloudflare Turnstile secret (section 6), or empty to run without a challenge | **no, add it** |
+| `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT` | from `psst:vapid` (section 7); subject `mailto:<email>` | yes (empty) |
+| `TURNSTILE_SECRET` | Cloudflare Turnstile secret (section 6), or empty to run without a challenge | yes (empty) |
 
 ### Backups
 
@@ -100,7 +99,7 @@ copy outside this server.**
 | `BACKUP_S3_BUCKET` | bucket name | yes (empty) |
 | `BACKUP_S3_KEY` | access key ID | yes (empty) |
 | `BACKUP_S3_SECRET` | secret access key | yes (empty) |
-| `BACKUP_S3_REGION` | defaults to `auto`; set only if your provider needs a real region | no (optional) |
+| `BACKUP_S3_REGION` | `auto`; change only if your provider needs a real region | yes |
 
 ### Needed from the later task
 
@@ -113,13 +112,18 @@ accurate once the production-launch tasks that use them are merged.
 | `ADMIN_ALERT_EMAIL` | where flagged-message alerts are sent | Task 6 |
 | `MAIL_MAILER`, `MAIL_HOST`, `MAIL_PORT`, `MAIL_USERNAME`, `MAIL_PASSWORD`, `MAIL_FROM_ADDRESS` | outbound mail for those alerts (your SMTP provider's values) | Task 6 |
 
-Check the file for leftovers:
+Check the required keys are all set, and that nothing unsafe remains:
 
 ```sh
-grep -nE 'change-me|^APP_KEY=$|^GOOGLE_CLIENT_IDS=$' .env || echo "no placeholders left"
+for k in APP_KEY DB_PASSWORD REDIS_PASSWORD GOOGLE_CLIENT_IDS REVERB_APP_ID REVERB_APP_KEY REVERB_APP_SECRET CORS_ALLOWED_ORIGINS SANCTUM_STATEFUL_DOMAINS; do
+  grep -qE "^$k=.+" .env || echo "MISSING or empty: $k"
+done
+grep -qx 'PSST_DEV_LOGIN=false' .env || echo "PSST_DEV_LOGIN must be false"
+grep -n 'change-me' .env && echo "replace the change-me values"
+grep -n 'example.com' .env && echo "replace the example.com placeholders"
 ```
 
-Expected: `no placeholders left`. Any line printed is a value you still have to fill in.
+Expected: no output at all. Every line printed is a value you still have to fix.
 
 ## 3. Google OAuth client
 
