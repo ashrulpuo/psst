@@ -17,11 +17,6 @@ class NotifyAdminOfFlag implements ShouldQueue
 {
     use Dispatchable, Queueable;
 
-    public function __construct()
-    {
-        $this->afterCommit();
-    }
-
     public function handle(): void
     {
         $email = (string) config('psst.moderation.alert_email');

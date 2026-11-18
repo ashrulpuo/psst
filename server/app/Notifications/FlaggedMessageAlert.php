@@ -21,7 +21,7 @@ class FlaggedMessageAlert extends Notification
     {
         return (new MailMessage)
             ->subject('A message was flagged')
-            ->line('A message was flagged for review.')
+            ->line('New messages were flagged for review.')
             ->action('Open the flagged messages', rtrim((string) config('app.url'), '/').'/admin/flags');
     }
 }

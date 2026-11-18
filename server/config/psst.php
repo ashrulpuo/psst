@@ -25,6 +25,8 @@ return [
         ],
         // Where flag alerts go. Empty = no email.
         'alert_email' => env('ADMIN_ALERT_EMAIL'),
+        // At most one alert email per this many minutes, however many messages are flagged.
+        'alert_window_minutes' => 10,
     ],
 
     /*
