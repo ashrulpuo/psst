@@ -206,6 +206,103 @@ export default {
     promptDismiss: "Not now"
   },
 
+  legal: {
+    // Placeholder: the owner replaces <domain> with the real contact address before launch.
+    // vue-i18n reads a bare "@" as a link and "<d" as HTML, so both are quoted literals.
+    // Once the real address is known, replace the whole value with it, e.g. "hello{'@'}example.com".
+    contact: "hello{'@'}{'<'}domain>",
+    updated: "Plain-language summary. Last updated November 2026.",
+    back: "Back",
+    contactLabel: "Questions or reports? Write to",
+    footerLabel: "Legal",
+    footerTerms: "Terms",
+    footerPrivacy: "Privacy",
+
+    terms: {
+      title: "Terms",
+      intro:
+        "Psst lets you receive messages from people who don't have to give their name. These are the ground rules for using it, in plain words.",
+      sections: {
+        what: {
+          heading: "What Psst is",
+          body: "Everyone who signs in gets a public link. Anyone can open that link and send a message without an account. The person who owns the link sees the message, never the sender's name."
+        },
+        anonymity: {
+          heading: "Who can see who you are",
+          body: "The person you message never sees who you are. If you send as a guest, Psst admins cannot identify you either. If you send while signed in, Psst admins can see which account the message came from, so we can deal with abuse. Anonymous to the receiver does not mean untraceable in every situation, so don't send anything you would not be willing to stand behind."
+        },
+        yourPart: {
+          heading: "What we ask of you",
+          body: "Don't send threats, harassment, hate, sexual content involving minors, or anything illegal. Don't use Psst to stalk, scam or impersonate someone. Don't try to break the service or get around its limits."
+        },
+        sharing: {
+          heading: "Sharing what you receive",
+          body: "A message sent to you is yours to read. If you choose to share one, for example in a screenshot or a post, it is no longer private to you. We can't control where it goes after that."
+        },
+        safety: {
+          heading: "Blocking and reporting",
+          body: "You can block a sender, and they are not told. You can report any message you receive, and we will look at it."
+        },
+        bans: {
+          heading: "Bans",
+          body: "If someone abuses Psst, we may ban their account, remove their messages, or refuse their messages. Signed-in accounts can be banned. Guests have no account, so for them we can only block on a receiver's behalf, and we do that on a best-effort basis."
+        },
+        deleting: {
+          heading: "Leaving",
+          body: "You can delete your account at any time: open Settings, choose Delete my account, and type your username to confirm. This erases your account, your link and your conversations, including the messages you sent. It can't be undone."
+        },
+        asIs: {
+          heading: "No guarantees",
+          body: "Psst is provided as it is. It may change, have bugs or go offline. We do our best, but we can't promise it will always be available."
+        },
+        changes: {
+          heading: "Changes",
+          body: "If these terms change in a way that matters, we will update this page and its date."
+        }
+      }
+    },
+
+    privacy: {
+      title: "Privacy",
+      intro:
+        "This page says what Psst keeps about you and what it doesn't, without the fine print.",
+      sections: {
+        anonymity: {
+          heading: "Anonymity, exactly",
+          body: "The person you message never sees your name, email or account. Psst admins can identify a signed-in sender, because the message is tied to that account. Admins cannot identify a guest, because a guest has no account. We don't claim more than that."
+        },
+        collect: {
+          heading: "What we keep",
+          body: "If you sign in, we keep your sign-in email, your username, your messages and conversations, your blocks and reports, and the settings you choose, such as notifications. For guests we keep the message, a marker for the browser so a reply can reach it, and a scrambled (hashed) form of the network address so a receiver's block can hold."
+        },
+        encryption: {
+          heading: "Messages are stored encrypted",
+          body: "Message text is encrypted when it is stored. It is decrypted so the people in the conversation can read it, and so our team can review a message that has been reported."
+        },
+        usage: {
+          heading: "Anonymous usage counts",
+          body: "We collect aggregate counts, such as how many messages are sent or how many people visit. These counts are not linked to a person."
+        },
+        sharing: {
+          heading: "Who we share it with",
+          body: "We don't sell your data. We use service providers to run Psst, for example for hosting, sign-in and notifications, and they only get what they need to do that. We may also have to share information if the law requires it."
+        },
+        shared: {
+          heading: "What gets shared is out of our hands",
+          body: "If a receiver shows a message to someone else, for example by posting a screenshot, it is no longer private to them or to the sender."
+        },
+        delete: {
+          heading: "Deleting your data",
+          body: "Open Settings, choose Delete my account, and type your username. Your account, link and conversations, including the messages you sent, are erased. Copies that other people already made are outside our control."
+        },
+        safety: {
+          heading: "Blocking, reporting and bans",
+          body: "Blocking is private; the sender isn't told. A reported message is seen by our team. Accounts that abuse Psst are banned."
+        }
+      }
+    }
+  },
+
   errors: {
     generic: "Something went wrong. Please try again.",
     notFound: "That page doesn't exist.",

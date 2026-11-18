@@ -89,6 +89,11 @@ async function done() {
     </ul>
 
     <p class="privacy">{{ $t("login.privacy") }}</p>
+    <p class="privacy legal-links">
+      <router-link to="/terms">{{ $t("legal.footerTerms") }}</router-link>
+      ·
+      <router-link to="/privacy">{{ $t("legal.footerPrivacy") }}</router-link>
+    </p>
   </div>
 </template>
 
@@ -325,5 +330,8 @@ blockquote {
   font-size: 0.68rem;
   line-height: 1.45;
   text-align: center;
+}
+.legal-links a {
+  color: var(--accent-text, var(--accent));
 }
 </style>

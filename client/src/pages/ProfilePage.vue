@@ -330,6 +330,11 @@ async function copyOwn() {
       <router-link v-if="!auth.isAuthenticated" to="/get-link" class="own-link">
         {{ $t("profile.getYourOwn") }}
       </router-link>
+      <p class="tiny legal-links">
+        <router-link to="/terms">{{ $t("legal.footerTerms") }}</router-link>
+        ·
+        <router-link to="/privacy">{{ $t("legal.footerPrivacy") }}</router-link>
+      </p>
     </div>
   </form>
 </template>
@@ -499,6 +504,12 @@ async function copyOwn() {
   color: var(--text-3);
   font-size: 0.75rem;
   text-align: center;
+}
+.legal-links {
+  margin: 0;
+}
+.legal-links a {
+  color: var(--accent-text, var(--accent));
 }
 .send-foot {
   display: grid;

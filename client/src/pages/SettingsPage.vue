@@ -300,6 +300,11 @@ async function deleteAccount(typed: string) {
         >
       </section>
 
+      <nav class="legal-links" :aria-label="$t('legal.footerLabel')">
+        <router-link to="/terms">{{ $t("legal.footerTerms") }}</router-link>
+        <router-link to="/privacy">{{ $t("legal.footerPrivacy") }}</router-link>
+      </nav>
+
       <DeleteAccountDialog
         v-model="deleteOpen"
         :expected="deleteExpected()"
@@ -331,6 +336,18 @@ async function deleteAccount(typed: string) {
 }
 .block h2 {
   font-size: var(--text-body);
+}
+.legal-links {
+  display: flex;
+  justify-content: center;
+  gap: var(--s-5);
+  font-size: var(--text-secondary);
+}
+.legal-links a {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  color: var(--accent-text, var(--accent));
 }
 .link {
   display: block;
