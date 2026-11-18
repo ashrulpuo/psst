@@ -9,6 +9,7 @@ import { ApiError } from "@/api/http";
 import { profileApi } from "@/api/endpoints";
 import { config } from "@/utils/config";
 import { guestToken, setGuestToken } from "@/utils/guest";
+import { markGuestSent } from "@/utils/growth";
 import TurnstileBox from "@/components/TurnstileBox.vue";
 import type { PublicProfile } from "@/api/types";
 import { useAuthStore } from "@/stores/auth";
@@ -131,6 +132,7 @@ async function submit() {
     );
     if ("guest_token" in result) {
       setGuestToken(result.guest_token);
+      markGuestSent();
       sentAsGuest.value = true;
       sentThreadId.value = "guest";
     } else {
@@ -231,17 +233,22 @@ async function copyOwn() {
       {{ $t("profile.viewConversation") }}
     </AppButton>
 
+    <section
+      v-if="sentAsGuest && !auth.isAuthenticated"
+      class="own-card"
+      aria-labelledby="own-link-title"
+    >
+      <h2 id="own-link-title">{{ $t("profile.ownLinkTitle") }}</h2>
+      <p class="text-secondary-copy">{{ $t("profile.ownLinkBody") }}</p>
+      <AppButton variant="ghost" block to="/get-link">
+        {{ $t("profile.ownLinkCta") }}
+      </AppButton>
+    </section>
+
     <div class="after">
       <button type="button" class="again" @click="sentThreadId = null">
         {{ $t("profile.sendAnother") }}
       </button>
-      <router-link
-        v-if="sentAsGuest && !auth.isAuthenticated"
-        to="/get-link"
-        class="own-link"
-      >
-        {{ $t("profile.getOwnLinkInstead") }}
-      </router-link>
     </div>
   </div>
 
@@ -340,6 +347,19 @@ async function copyOwn() {
 </template>
 
 <style scoped lang="scss">
+.own-card {
+  display: grid;
+  gap: var(--s-2);
+  padding: var(--s-4);
+  border: 2px solid var(--edge);
+  border-radius: var(--r-card);
+  background: var(--surface);
+  text-align: center;
+}
+.own-card h2 {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+}
 .own-link {
   justify-self: center;
   min-height: 44px;

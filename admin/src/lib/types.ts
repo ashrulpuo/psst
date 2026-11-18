@@ -108,6 +108,14 @@ export interface Overview {
     open_reports: number;
   };
   series: { signups: DayCount[]; messages: DayCount[] };
+  growth: {
+    guest_sends_7d: number;
+    link_shares_7d: number;
+    note_shares_7d: number;
+    own_links_after_guest_7d: number;
+    /** 0-1 fraction; null when there were no guest sends in the window. */
+    conversion_rate: number | null;
+  };
   generated_at: string;
 }
 

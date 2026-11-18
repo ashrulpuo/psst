@@ -5,6 +5,7 @@ import { useMeta, useQuasar } from "quasar";
 import { useRouter } from "vue-router";
 import { useI18n } from "vue-i18n";
 import qrcode from "qrcode-generator";
+import { trackEvent } from "@/api/endpoints";
 import { useAuthStore } from "@/stores/auth";
 import { copyText } from "@/utils/clipboard";
 import AppButton from "@/components/AppButton.vue";
@@ -30,6 +31,7 @@ const qr = computed(() => {
 
 async function copy() {
   const ok = await copyText(url.value);
+  if (ok) void trackEvent("link_shared");
   $q.notify({
     type: ok ? "positive" : "warning",
     message: ok ? t("settings.copied") : url.value,
@@ -48,6 +50,7 @@ async function share() {
       text: t("link.prompt"),
       url: url.value
     });
+    void trackEvent("link_shared");
   } catch {
     /* dismissed */
   }

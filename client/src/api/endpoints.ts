@@ -63,6 +63,29 @@ export const authApi = {
       .then(r => r.data)
 };
 
+export type GrowthEvent =
+  | "link_shared"
+  | "note_shared"
+  | "own_link_after_guest";
+
+/**
+ * Fire-and-forget usage counter. Carries only the event name. Signed out is a no-op (the endpoint is
+ * auth-only), and no failure is ever surfaced or thrown.
+ */
+export function trackEvent(name: GrowthEvent): Promise<void> {
+  try {
+    return request<void>("POST", "/events", {
+      body: { name },
+      silent401: true
+    }).then(
+      () => undefined,
+      () => undefined
+    );
+  } catch {
+    return Promise.resolve();
+  }
+}
+
 export const profileApi = {
   show: (username: string) =>
     http

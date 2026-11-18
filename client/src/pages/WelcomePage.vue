@@ -4,6 +4,7 @@ import { computed, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { useMeta } from "quasar";
 import { ApiError } from "@/api/http";
+import { reportOwnLinkAfterGuest } from "@/utils/growth";
 import { useAuthStore } from "@/stores/auth";
 import { safeNext } from "@/features/auth/redirect";
 import AppButton from "@/components/AppButton.vue";
@@ -39,6 +40,7 @@ async function submit() {
   serverError.value = "";
   try {
     await auth.setUsername(normalized.value);
+    reportOwnLinkAfterGuest();
     await router.replace(safeNext(route.query.next) ?? "/link");
   } catch (e) {
     serverError.value =

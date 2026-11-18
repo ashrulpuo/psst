@@ -2,6 +2,7 @@
 import { computed, ref } from "vue";
 import { useRouter } from "vue-router";
 import { ApiError } from "@/api/http";
+import { reportOwnLinkAfterGuest } from "@/utils/growth";
 import { useAuthStore } from "@/stores/auth";
 import AppButton from "@/components/AppButton.vue";
 
@@ -32,6 +33,7 @@ async function submit() {
   serverError.value = "";
   try {
     await auth.claimLink(normalized.value);
+    reportOwnLinkAfterGuest();
     await router.replace("/link");
   } catch (e) {
     if (auth.isAuthenticated && auth.user?.username) {

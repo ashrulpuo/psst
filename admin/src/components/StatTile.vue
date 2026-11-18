@@ -4,7 +4,7 @@ import { formatCompact } from "@/lib/format";
 
 defineProps<{
   label: string;
-  value: number;
+  value: number | string;
   hint?: string;
   hero?: boolean;
   tone?: "default" | "danger";
@@ -19,10 +19,10 @@ defineProps<{
       class="font-semibold leading-none"
       :class="[
         hero ? 'text-5xl' : 'text-3xl',
-        tone === 'danger' && value > 0 ? 'text-danger' : 'text-fg',
+        tone === 'danger' && typeof value === 'number' && value > 0 ? 'text-danger' : 'text-fg',
       ]"
     >
-      {{ formatCompact(value) }}
+      {{ typeof value === "number" ? formatCompact(value) : value }}
     </p>
     <p v-if="hint" class="text-xs text-fg-3">{{ hint }}</p>
   </div>
