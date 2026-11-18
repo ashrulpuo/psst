@@ -11,6 +11,7 @@ use App\Http\Controllers\Auth\DevLoginController;
 use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\Auth\SessionLoginController;
 use App\Http\Controllers\Auth\TokenLoginController;
+use App\Http\Controllers\EventController;
 use App\Http\Controllers\GuestController;
 use App\Http\Controllers\MeController;
 use App\Http\Controllers\ProfileController;
@@ -58,6 +59,8 @@ Route::middleware(['auth:sanctum', 'not-banned'])->group(function () {
     Route::delete('push/subscriptions', [PushController::class, 'destroy']);
     Route::post('push/devices', [PushController::class, 'storeDevice'])->middleware('throttle:reports');
     Route::delete('push/devices', [PushController::class, 'destroyDevice']);
+
+    Route::post('events', [EventController::class, 'store'])->middleware('throttle:profile');
 
     Route::post('guest/claim', [GuestController::class, 'claim'])->middleware('throttle:reports');
 

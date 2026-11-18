@@ -50,7 +50,34 @@ class AdminStats
                 'signups' => $this->daily(User::query(), 'created_at'),
                 'messages' => $this->daily(Message::query(), 'created_at'),
             ],
+            'growth' => $this->growth($now),
             'generated_at' => $now->toIso8601String(),
+        ];
+    }
+
+    /**
+     * Aggregate growth counters for the last 7 days. The conversion rate is own links created after a guest
+     * send, per guest send; null when nobody has sent as a guest yet.
+     *
+     * @return array<string, int|float|null>
+     */
+    private function growth(Carbon $now): array
+    {
+        $counts = DB::table('growth_events')
+            ->where('created_at', '>=', $now->copy()->subDays(7))
+            ->selectRaw('name, count(*) as total')
+            ->groupBy('name')
+            ->pluck('total', 'name');
+
+        $sends = (int) ($counts['guest_sent'] ?? 0);
+        $own = (int) ($counts['own_link_after_guest'] ?? 0);
+
+        return [
+            'guest_sends_7d' => $sends,
+            'link_shares_7d' => (int) ($counts['link_shared'] ?? 0),
+            'note_shares_7d' => (int) ($counts['note_shared'] ?? 0),
+            'own_links_after_guest_7d' => $own,
+            'conversion_rate' => $sends > 0 ? $own / $sends : null,
         ];
     }
 
