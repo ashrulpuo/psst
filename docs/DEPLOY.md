@@ -264,6 +264,7 @@ curl -sk https://<domain>/api/push/config
 curl -sk https://<domain>/.well-known/assetlinks.json
 curl -skI https://<domain>/ | head -n 1
 curl -skI https://<domain>/admin/ | head -n 1
+curl -sk -A "facebookexternalhit/1.1" https://<domain>/<an-existing-username> | grep -E "og:title|robots"
 ```
 
 Expected:
@@ -274,6 +275,8 @@ Expected:
 - `/.well-known/assetlinks.json`: the JSON file served as `application/json`. Until you replace the fingerprint (see
   `deploy/wellknown/README.md`), app links simply open in the browser.
 - `/` and `/admin/`: `HTTP/2 200`.
+- The crawler request: the `og:title` and `noindex, nofollow` robots tags. The same URL with a normal browser
+  user agent returns the app shell instead.
 
 Drop `-k` once the certificate is issued to make curl enforce TLS. Then open `https://<domain>/` in a browser, sign in
 with Google, send yourself a message and confirm it arrives live (realtime goes through `/app` on port 443).

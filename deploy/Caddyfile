@@ -22,6 +22,31 @@
 		reverse_proxy reverb:8080
 	}
 
+	# Link previews: social crawlers asking for /{username} get a small HTML page (username only, noindex) from Laravel.
+	# Real people never see it: the matcher needs a crawler User-Agent, and a browser that requests /preview/* directly
+	# falls through to the SPA catch-all below (the app's own not-found page), because only crawler requests for
+	# /{username} are rewritten.
+	# Instagram and Threads are deliberately not in the list: their in-app browsers send "Instagram" in the User-Agent,
+	# so real people opening a shared link there would get the preview instead of the app. Meta fetches those previews
+	# as facebookexternalhit / meta-externalagent, which are listed.
+	# The exclusions are real static files and SPA routes that also look like usernames; the username rule is the
+	# same as SetUsernameRequest and the API routes. Reserved names (terms, admin, ...) that are not excluded here
+	# are rewritten but 404 in PHP via psst.reserved_usernames, so they never produce a preview.
+	@preview {
+		header_regexp ua User-Agent (?i)(facebookexternalhit|meta-externalagent|Twitterbot|Slackbot|WhatsApp|TelegramBot|LinkedInBot|Discordbot|Googlebot|bingbot)
+		path_regexp user ^/([a-z0-9_.]{3,24})$
+		not path /login /terms /privacy /welcome /link /inbox /sent /settings /admin /api /app /sanctum /og.png /sw.js /manifest.json /index.html /favicon.ico /robots.txt /sitemap.xml
+	}
+	handle @preview {
+		rewrite * /preview/{re.user.1}
+		root * /var/www/html/public
+		php_fastcgi app:9000 {
+			resolve_root_symlink
+			# FastCGI reports the ORIGINAL request URI to PHP, so Laravel would route /alice, not /preview/alice.
+			env REQUEST_URI /preview/{re.user.1}
+		}
+	}
+
 	# API, CSRF cookie and health check go to Laravel.
 	@laravel path /api/* /sanctum/* /up
 	handle @laravel {
@@ -61,6 +86,12 @@
 		header @immutable Cache-Control "public, max-age=31536000, immutable"
 		@fresh path /sw.js /manifest.json /index.html
 		header @fresh Cache-Control "no-cache"
+		# Profile pages (/{username}) must not be indexed; home, /terms and /privacy stay indexable.
+		@profile {
+			path_regexp ^/[a-z0-9_.]{3,24}$
+			not path /login /terms /privacy /welcome /link /inbox /sent /settings /og.png /sw.js /manifest.json /index.html /favicon.ico /robots.txt /sitemap.xml
+		}
+		header @profile X-Robots-Tag "noindex, nofollow"
 		try_files {path} /index.html
 		file_server
 	}
