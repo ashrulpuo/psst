@@ -72,11 +72,11 @@ export function storyTextColor(template: StoryTemplate): string {
   return PALETTES[template].text;
 }
 
-const SANS =
+export const SANS =
   '"Inter Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
-const DISPLAY = `"Bricolage Grotesque Variable", "Nunito Variable", "Avenir Next", ${SANS}`;
+export const DISPLAY = `"Bricolage Grotesque Variable", "Nunito Variable", "Avenir Next", ${SANS}`;
 
-type Measure = (text: string, px: number) => number;
+export type Measure = (text: string, px: number) => number;
 
 /** Largest font size in [min, start] at which `text` fits `maxWidth`. Pure. */
 export function fitFontSize(
@@ -161,15 +161,24 @@ export function releaseCanvas(): void {
 
 /** Make sure the app fonts are loaded before drawing, so text never falls back. */
 export async function ensureFonts(): Promise<void> {
-  try {
-    await Promise.all([
-      document.fonts.load(`800 64px ${DISPLAY}`),
-      document.fonts.load(`800 40px ${SANS}`)
-    ]);
-    await document.fonts.ready;
-  } catch {
-    /* draw with whatever is available */
-  }
+  const load = Promise.all([
+    document.fonts.load(`800 64px ${DISPLAY}`),
+    document.fonts.load(`800 40px ${SANS}`),
+    document.fonts.ready
+  ]).catch(() => undefined);
+  // A stalled font fetch must not block the card forever: draw with what we have.
+  await Promise.race([load, new Promise(resolve => setTimeout(resolve, 2500))]);
+}
+
+/** Text-width measurer bound to a canvas context and font family (weight 800). */
+export function measureIn(
+  ctx: CanvasRenderingContext2D,
+  family: string
+): Measure {
+  return (text, px) => {
+    ctx.font = `800 ${px}px ${family}`;
+    return ctx.measureText(text).width;
+  };
 }
 
 export function canvasToBlob(canvas: HTMLCanvasElement): Promise<Blob> {
@@ -181,7 +190,7 @@ export function canvasToBlob(canvas: HTMLCanvasElement): Promise<Blob> {
   });
 }
 
-function roundRect(
+export function roundRect(
   ctx: CanvasRenderingContext2D,
   x: number,
   y: number,
@@ -234,14 +243,8 @@ export async function renderStoryCard(
   const p = PALETTES[template];
   const margin = 96;
   const maxW = CARD_WIDTH - margin * 2;
-  const measureIn =
-    (family: string): Measure =>
-    (text, px) => {
-      ctx.font = `800 ${px}px ${family}`;
-      return ctx.measureText(text).width;
-    };
-  const display = measureIn(DISPLAY);
-  const sans = measureIn(SANS);
+  const display = measureIn(ctx, DISPLAY);
+  const sans = measureIn(ctx, SANS);
 
   paintBackground(ctx, template);
   ctx.direction = "ltr";
@@ -251,7 +254,8 @@ export async function renderStoryCard(
 
   ctx.fillStyle = p.accent;
   ctx.font = `800 56px ${DISPLAY}`;
-  ctx.fillText("psst", cx, 220);
+  // Instagram covers roughly the top 250px and bottom 340px with its own UI.
+  ctx.fillText("psst", cx, 330);
 
   ctx.fillStyle = p.text;
   const promptLines = wrapText(display, "ask me anything", maxW, 150);
@@ -273,7 +277,7 @@ export async function renderStoryCard(
   const urlText = ellipsize(sans, shown, inner, urlPx);
   const chipW = Math.min(maxW, sans(urlText, urlPx) + chipPad * 2);
   const chipH = 120;
-  const chipY = 1440;
+  const chipY = 1400;
   ctx.fillStyle = p.chip;
   roundRect(ctx, cx - chipW / 2, chipY, chipW, chipH, chipH / 2);
   ctx.fill();
@@ -298,14 +302,25 @@ export async function shareImage(
   blob: Blob,
   url: string
 ): Promise<"shared" | "downloaded"> {
-  const file = new File([blob], "psst-story.png", { type: "image/png" });
+  let file: File | null = null;
+  try {
+    file = new File([blob], "psst-story.png", { type: "image/png" });
+  } catch {
+    /* no File constructor: download instead */
+  }
   if (
+    file &&
     typeof navigator.share === "function" &&
     typeof navigator.canShare === "function" &&
     navigator.canShare({ files: [file] })
   ) {
-    await navigator.share({ files: [file], url });
-    return "shared";
+    try {
+      await navigator.share({ files: [file], url });
+      return "shared";
+    } catch (e) {
+      if (isShareCancel(e)) throw e;
+      // e.g. NotAllowedError after the user activation expired: save the PNG instead.
+    }
   }
   const href = URL.createObjectURL(blob);
   try {
