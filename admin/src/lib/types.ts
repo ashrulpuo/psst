@@ -67,6 +67,19 @@ export interface AdminReport {
   context?: AdminMessage[];
 }
 
+export type FlagStatus = "open" | "reviewed";
+
+export interface AdminFlag {
+  id: string;
+  message_id: string;
+  thread_id: string;
+  sender_kind: "guest" | "user";
+  terms: string[];
+  body: string;
+  created_at: string;
+  reviewed_at: string | null;
+}
+
 export interface AuditEntry {
   id: string;
   action: string;
@@ -95,6 +108,15 @@ export interface Overview {
     open_reports: number;
   };
   series: { signups: DayCount[]; messages: DayCount[] };
+  /** Absent on responses from a server that predates the growth stats. */
+  growth?: {
+    guest_sends_7d: number;
+    link_shares_7d: number;
+    note_shares_7d: number;
+    own_links_after_guest_7d: number;
+    /** 0-1 fraction; null when there were no guest sends in the window. */
+    conversion_rate: number | null;
+  };
   generated_at: string;
 }
 

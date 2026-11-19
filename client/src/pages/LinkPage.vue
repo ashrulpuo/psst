@@ -1,12 +1,22 @@
 <script setup lang="ts">
 // Home: one share card. The inbox is where messages are read.
-import { computed } from "vue";
+import { computed, ref } from "vue";
 import { useMeta, useQuasar } from "quasar";
 import { useRouter } from "vue-router";
 import { useI18n } from "vue-i18n";
 import qrcode from "qrcode-generator";
+import { trackEvent } from "@/api/endpoints";
 import { useAuthStore } from "@/stores/auth";
 import { copyText } from "@/utils/clipboard";
+import {
+  STORY_TEMPLATES,
+  isShareCancel,
+  renderStoryCard,
+  shareImage,
+  storyGradientCss,
+  storyTextColor,
+  type StoryTemplate
+} from "@/utils/storyCard";
 import AppButton from "@/components/AppButton.vue";
 
 useMeta({ title: "Your link · Psst" });
@@ -30,11 +40,62 @@ const qr = computed(() => {
 
 async function copy() {
   const ok = await copyText(url.value);
+  if (ok) void trackEvent("link_shared");
   $q.notify({
     type: ok ? "positive" : "warning",
     message: ok ? t("settings.copied") : url.value,
     position: "bottom"
   });
+}
+
+const TEMPLATE_KEY = "psst.story_template";
+
+function loadTemplate(): StoryTemplate {
+  try {
+    const saved = localStorage.getItem(TEMPLATE_KEY);
+    return STORY_TEMPLATES.find(x => x === saved) ?? STORY_TEMPLATES[0];
+  } catch {
+    return STORY_TEMPLATES[0];
+  }
+}
+
+const template = ref<StoryTemplate>(loadTemplate());
+const storyBusy = ref(false);
+
+function pickTemplate(next: StoryTemplate) {
+  template.value = next;
+  try {
+    localStorage.setItem(TEMPLATE_KEY, next);
+  } catch {
+    /* private mode: the choice just isn't remembered */
+  }
+}
+
+async function shareStory() {
+  if (storyBusy.value || !url.value || !handle.value) return;
+  storyBusy.value = true;
+  try {
+    const blob = await renderStoryCard(template.value, handle.value, url.value);
+    const result = await shareImage(blob, url.value);
+    void trackEvent("link_shared");
+    if (result === "downloaded") {
+      $q.notify({
+        type: "positive",
+        message: t("link.storySaved"),
+        position: "bottom"
+      });
+    }
+  } catch (e) {
+    if (!isShareCancel(e)) {
+      $q.notify({
+        type: "warning",
+        message: t("link.storyFailed"),
+        position: "bottom"
+      });
+    }
+  } finally {
+    storyBusy.value = false;
+  }
 }
 
 async function share() {
@@ -48,6 +109,7 @@ async function share() {
       text: t("link.prompt"),
       url: url.value
     });
+    void trackEvent("link_shared");
   } catch {
     /* dismissed */
   }
@@ -89,13 +151,43 @@ async function share() {
       <li>{{ $t("link.step2") }}</li>
     </ol>
 
-    <div class="story-row">
-      <div class="story-thumb">{{ $t("link.prompt") }}</div>
+    <section class="story-row" :aria-label="$t('link.storyTitle')">
+      <div
+        class="story-thumb"
+        :style="{
+          background: storyGradientCss(template),
+          color: storyTextColor(template)
+        }"
+        aria-hidden="true"
+      >
+        {{ $t("link.prompt") }}
+      </div>
       <div class="story-copy">
         <b>{{ $t("link.storyTitle") }}</b>
         <span>{{ $t("link.storyBody") }}</span>
+        <div
+          class="swatches"
+          role="radiogroup"
+          :aria-label="$t('link.storyStyle')"
+        >
+          <button
+            v-for="name in STORY_TEMPLATES"
+            :key="name"
+            type="button"
+            role="radio"
+            class="swatch"
+            :aria-checked="template === name"
+            :aria-label="$t('link.template.' + name)"
+            :title="$t('link.template.' + name)"
+            :style="{ background: storyGradientCss(name) }"
+            @click="pickTemplate(name)"
+          />
+        </div>
       </div>
-    </div>
+    </section>
+    <AppButton block :disabled="storyBusy || !url" @click="shareStory">
+      {{ $t("link.storyShare") }}
+    </AppButton>
   </main>
 </template>
 
@@ -261,6 +353,29 @@ async function share() {
   color: var(--text-3);
   font-size: 0.7rem;
   font-weight: 700;
+}
+.swatches {
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
+}
+.swatch {
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 2px solid var(--border);
+  border-radius: 50%;
+  cursor: pointer;
+}
+.swatch[aria-checked="true"] {
+  border-color: var(--edge);
+  box-shadow:
+    0 0 0 2px var(--surface),
+    0 0 0 4px var(--edge);
+}
+.swatch:focus-visible {
+  outline: 3px solid var(--edge);
+  outline-offset: 3px;
 }
 .steps li::before {
   content: counter(step);

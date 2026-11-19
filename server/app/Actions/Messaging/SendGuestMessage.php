@@ -2,6 +2,7 @@
 
 namespace App\Actions\Messaging;
 
+use App\Growth\GrowthEvents;
 use App\Messaging\CannotMessage;
 use App\Messaging\GuestKey;
 use App\Models\Thread;
@@ -40,6 +41,8 @@ class SendGuestMessage
         } catch (CannotMessage) {
             return false;
         }
+
+        GrowthEvents::record('guest_sent');
 
         return true;
     }

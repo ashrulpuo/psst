@@ -7,15 +7,18 @@ use App\Models\Message;
 use App\Models\Thread;
 use App\Models\ThreadHide;
 use App\Models\User;
+use App\Moderation\FlagInbound;
 use App\Push\PushNotifier;
 use App\Realtime\Broadcasts;
 use Illuminate\Support\Facades\DB;
+use Throwable;
 
 class PostMessage
 {
     public function __construct(
         private readonly Broadcasts $broadcasts,
         private readonly PushNotifier $push,
+        private readonly FlagInbound $flagInbound,
     ) {}
 
     /**
@@ -59,6 +62,16 @@ class PostMessage
                 'last_message_at' => $message->created_at,
                 'last_message_id' => $message->id,
             ]);
+
+            // Flagging is best-effort and never blocks delivery. The nested transaction is a savepoint, so a
+            // failed insert cannot leave the outer Postgres transaction aborted.
+            if (! $fromReceiver) {
+                try {
+                    DB::transaction(fn () => $this->flagInbound->handle($message, $body));
+                } catch (Throwable $e) {
+                    report($e);
+                }
+            }
 
             // A new note pulls the thread back into both lists, even if someone hid it.
             ThreadHide::query()->where('thread_id', $thread->id)->delete();

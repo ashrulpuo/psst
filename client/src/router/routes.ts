@@ -32,6 +32,19 @@ const routes: RouteRecordRaw[] = [
         component: () => import("@/pages/GetLinkPage.vue"),
         meta: { title: "Your link" }
       },
+      // Public legal pages. Must stay above /:username so they win over a profile.
+      {
+        path: "terms",
+        name: "terms",
+        component: () => import("@/pages/TermsPage.vue"),
+        meta: { title: "Terms" }
+      },
+      {
+        path: "privacy",
+        name: "privacy",
+        component: () => import("@/pages/PrivacyPage.vue"),
+        meta: { title: "Privacy" }
+      },
       {
         path: "welcome",
         component: () => import("@/pages/WelcomePage.vue"),

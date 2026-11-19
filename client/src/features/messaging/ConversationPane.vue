@@ -17,11 +17,21 @@ import {
   ShieldCheck
 } from "@lucide/vue";
 import type { Message } from "@/api/types";
+import { trackEvent } from "@/api/endpoints";
+import {
+  STORY_TEMPLATES,
+  isShareCancel,
+  prepareNote,
+  renderNoteCard,
+  shareImage,
+  type StoryTemplate
+} from "@/utils/storyCard";
 import { useMessagingStore } from "@/stores/messaging";
 import { useAuthStore } from "@/stores/auth";
 import { useRealtimeStore } from "@/stores/realtime";
 import { usePolling } from "@/composables/usePolling";
 import { dayLabel, shortTime } from "@/utils/format";
+import AppButton from "@/components/AppButton.vue";
 import AppAvatar from "@/components/AppAvatar.vue";
 import MessageBubble from "@/components/MessageBubble.vue";
 import MessageComposer from "@/components/MessageComposer.vue";
@@ -214,6 +224,85 @@ async function react(message: Message, emoji: string) {
     });
   }
 }
+// ---- share a received note as a story card ----
+// The note is drawn on this device only. Nothing about it is sent anywhere, and the tracking
+// event carries just its name.
+const TEMPLATE_KEY = "psst.story_template";
+const NOTICE_KEY = "psst.note_share_notice";
+const sharingId = ref<string | null>(null);
+
+function savedTemplate(): StoryTemplate {
+  try {
+    const saved = localStorage.getItem(TEMPLATE_KEY);
+    return STORY_TEMPLATES.find(x => x === saved) ?? STORY_TEMPLATES[0];
+  } catch {
+    return STORY_TEMPLATES[0];
+  }
+}
+
+function noticeSeen(): boolean {
+  try {
+    return localStorage.getItem(NOTICE_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
+
+const noticeFor = ref<Message | null>(null);
+const noticeOpen = computed({
+  get: () => noticeFor.value !== null,
+  set: v => !v && (noticeFor.value = null)
+});
+function confirmNotice() {
+  const message = noticeFor.value;
+  noticeFor.value = null;
+  try {
+    localStorage.setItem(NOTICE_KEY, "1");
+  } catch {
+    /* private mode: the notice shows again next time */
+  }
+  if (message) void shareNote(message, true);
+}
+
+async function shareNote(message: Message, skipNotice = false) {
+  const username = auth.user?.username;
+  const url = auth.profileLink;
+  if (sharingId.value || !username || !url || message.mine) return;
+  if (!prepareNote(message.body)) return;
+  if (!skipNotice && !noticeSeen()) {
+    noticeFor.value = message;
+    return;
+  }
+  sharingId.value = message.id;
+  try {
+    const blob = await renderNoteCard(
+      savedTemplate(),
+      message.body,
+      username,
+      url
+    );
+    const result = await shareImage(blob, url);
+    void trackEvent("note_shared");
+    if (result === "downloaded") {
+      $q.notify({
+        type: "positive",
+        message: t("thread.shareSaved"),
+        position: "bottom"
+      });
+    }
+  } catch (e) {
+    if (!isShareCancel(e)) {
+      $q.notify({
+        type: "warning",
+        message: t("thread.shareFailed"),
+        position: "bottom"
+      });
+    }
+  } finally {
+    sharingId.value = null;
+  }
+}
+
 async function submitReport(reason: string) {
   if (!reportTarget.value) return;
   reportBusy.value = true;
@@ -329,6 +418,14 @@ async function submitReport(reason: string) {
             :message="message"
             :can-report="true"
             :reactions-disabled="Boolean(blocked || awaitingSignIn)"
+            :can-share="
+              isInbox &&
+              !blocked &&
+              !!auth.profileLink &&
+              !!prepareNote(message.body)
+            "
+            :sharing="sharingId !== null"
+            @share="shareNote"
             @report="reportTarget = $event"
             @react="react"
             @retry="retry"
@@ -386,6 +483,24 @@ async function submitReport(reason: string) {
       :busy="blockBusy"
       @confirm="setBlocked(true)"
     />
+    <q-dialog v-model="noticeOpen">
+      <div
+        class="dialog-card"
+        role="alertdialog"
+        aria-labelledby="share-notice-title"
+      >
+        <h3 id="share-notice-title">{{ $t("thread.shareNoticeTitle") }}</h3>
+        <p class="text-secondary-copy">{{ $t("thread.shareNotice") }}</p>
+        <div class="dialog-actions">
+          <AppButton variant="ghost" size="sm" v-close-popup>{{
+            $t("thread.shareCancel")
+          }}</AppButton>
+          <AppButton size="sm" @click="confirmNotice">{{
+            $t("thread.shareContinue")
+          }}</AppButton>
+        </div>
+      </div>
+    </q-dialog>
     <ReportDialog
       v-model="reportOpen"
       :busy="reportBusy"

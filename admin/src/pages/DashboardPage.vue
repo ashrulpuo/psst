@@ -75,6 +75,46 @@ onMounted(() => void overview.load());
           />
         </section>
 
+        <section v-if="overview.data.growth" aria-labelledby="growth-heading" class="grid gap-3">
+          <div>
+            <h2 id="growth-heading" class="text-base font-semibold text-fg">Growth</h2>
+            <p class="text-xs text-fg-3">
+              Guest senders who made their own link (rolling 7 days). Target 10%.
+            </p>
+          </div>
+          <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+            <StatTile
+              label="Guest sends"
+              :value="overview.data.growth.guest_sends_7d"
+              hint="Last 7 days"
+            />
+            <StatTile
+              label="Link shares"
+              :value="overview.data.growth.link_shares_7d"
+              hint="Last 7 days"
+            />
+            <StatTile
+              label="Note shares"
+              :value="overview.data.growth.note_shares_7d"
+              hint="Last 7 days"
+            />
+            <StatTile
+              label="Own links after guest"
+              :value="overview.data.growth.own_links_after_guest_7d"
+              hint="Last 7 days"
+            />
+            <StatTile
+              label="Conversion"
+              :value="
+                overview.data.growth.conversion_rate === null
+                  ? '\u2014'
+                  : `${Math.round(overview.data.growth.conversion_rate * 1000) / 10}%`
+              "
+              hint="Own links per guest send"
+            />
+          </div>
+        </section>
+
         <div class="grid gap-6 xl:grid-cols-2">
           <BarChart
             title="New users per day"

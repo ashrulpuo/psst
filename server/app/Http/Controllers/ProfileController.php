@@ -55,6 +55,8 @@ class ProfileController extends Controller
                 ->setStatusCode(201);
         }
 
+        abort_unless(config('psst.guest_sends_enabled'), 503, 'Anonymous sending is paused for a moment.');
+
         // Bots fill every field: a hidden one that must stay empty. Pretend it worked.
         if ($request->filled('website')) {
             return $this->guestAccepted(GuestKey::presented($request) ?? GuestKey::newToken());
